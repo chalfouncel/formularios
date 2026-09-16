@@ -1,1463 +1,1672 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M&IC Corretores de Imóveis</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        
-        body {
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color:#f5f5f5;
-            color:#333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M&IC Corretores de Imóveis</title>
 
-        .header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 4px solid #d4af37;
-        }
-        .header img {
-            max-width: 150px;
-            max-height: 80px;
-            object-fit: contain;
-            margin-bottom: 12px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .header h1 {
-            color: #d4af37;
-            font-size: 22px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .header p {
-            color: #fff;
-            font-size: 13px;
-            letter-spacing: 2px;
-            margin-top: 5px;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px 15px;
-        }
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+}
 
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
+.header {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    padding: 25px 20px;
+    text-align: center;
+    border-bottom: 4px solid #d4af37;
+}
 
-        .section-header {
-            background: #1a1a1a;
-            color: #d4af37;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 15px;
-            font-weight: bold;
-        }
+.header img {
+    max-width: 150px;
+    max-height: 80px;
+    display: block;
+    margin: 0 auto 12px;
+    object-fit: contain;
+}
 
-        .screen { display: none; }
-        .screen.active { display: block; }
+.header h1 {
+    color: #d4af37;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-        .main-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .btn-profile {
-            background: #fff;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-profile .icon { font-size: 30px; display: block; margin-bottom: 6px; }
-        .btn-profile h3 { font-size: 14px; color: #1a1a1a; margin-bottom: 3px; }
-        .btn-profile small { font-size: 11px; color: #888; }
-        .btn-profile:hover {
-            border-color: #d4af37;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(212,175,55,0.2);
-        }
+.header p {
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-top: 5px;
+}
 
-        .instruction {
-            background: rgba(212,175,55,0.08);
-            border-left: 4px solid #d4af37;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 14px;
-            line-height: 1.7;
-            color: #444;
-        }
-        .instruction strong { color: #d4af37; }
-        .instruction ul { margin-top: 8px; padding-left: 18px; }
+.container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 15px;
+}
 
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
-            width: 100%;
-            margin: 6px 0;
-            transition: all 0.2s;
-        }
-        .btn-gold { background: #d4af37; color: #1a1a1a; }
-        .btn-gold:hover { background: #c4a030; transform: translateY(-2px); }
-        .btn-dark { background: #1a1a1a; color: #d4af37; border: 2px solid #d4af37; }
-        .btn-dark:hover { background: #2d2d2d; }
-        .btn-confirm { background: #28a745; color: #fff; }
-        .btn-confirm:hover { background: #218838; }
-        .btn-danger { background: #dc3545; color: #fff; }
-        .btn-danger:hover { background: #c82333; }
-        .btn-back {
-            background: none; border: none; color: #d4af37;
-            font-size: 15px; cursor: pointer; padding: 8px 0; margin-bottom: 10px;
-        }
-        .btn-back:hover { text-decoration: underline; }
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
 
-        .doc-progress {
-            text-align: center; color: #888; font-size: 13px; margin-bottom: 8px;
-        }
-        .doc-name {
-            background: #d4af37; color: #1a1a1a; padding: 13px;
-            border-radius: 8px; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;
-        }
+.screen {
+    display: none;
+}
 
-        .capture-area {
-            background: #f8f9fa;
-            border: 2px dashed #d4af37;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 12px;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .capture-area img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 6px;
-            object-fit: contain;
-            display: block;
-        }
-        #placeholder-text { 
-            color: #888; 
-            font-size: 14px;
-            margin: 0;
-        }
+.screen.active {
+    display: block;
+}
 
-        /* ===== FORMULÁRIO DO PROPRIETÁRIO ===== */
-        .form-section-title {
-            background: #d4af37;
-            color: #1a1a1a;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            margin: 15px 0 10px 0;
-            text-transform: uppercase;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 5px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 11px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            background: #fff;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #d4af37;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-        .radio-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .radio-option {
-            flex: 1;
-            position: relative;
-        }
-        .radio-option input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-        .radio-option label {
-            display: block;
-            padding: 12px;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
-            background: #fff;
-            color: #333;
-        }
-        .radio-option input:checked + label {
-            border-color: #d4af37;
-            background: #d4af37;
-            color: #1a1a1a;
-        }
-        .radio-option label:hover {
-            border-color: #d4af37;
-        }
-        .hidden-field {
-            display: none;
-        }
-        .form-progress {
-            text-align: center;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
+.main-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
 
-        /* ===== RELATÓRIO ===== */
-        .report-header {
-            text-align: center; margin-bottom: 20px; padding-bottom: 15px;
-            border-bottom: 3px solid #d4af37;
-        }
-        .report-header h2 { color: #1a1a1a; font-size: 20px; margin-bottom: 5px; }
+.btn-profile {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 10px;
+    cursor: pointer;
+    transition: .2s;
+}
 
-        .report-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .report-item img {
-            width: 200px;
-            height: auto;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 6px;
-            border: 2px solid #d4af37;
-        }
-        .report-item .file-icon {
-            width: 100px; height: 100px;
-            border-radius: 6px;
-            border: 2px solid #d4af37;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            background: #f8f9fa;
-        }
-        .report-item small { color: #888; }
+.btn-profile:hover {
+    border-color: #d4af37;
+    transform: translateY(-3px);
+}
 
-        .report-data-block {
-            background: #f8f9fa;
-            border: 2px solid #d4af37;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .report-data-block h3 {
-            color: #1a1a1a;
-            font-size: 16px;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #d4af37;
-        }
-        .report-data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px dashed #ddd;
-            font-size: 13px;
-        }
-        .report-data-row:last-child {
-            border-bottom: none;
-        }
-        .report-data-row .label {
-            color: #666;
-            font-weight: 600;
-            flex: 1;
-        }
-        .report-data-row .value {
-            color: #1a1a1a;
-            font-weight: 500;
-            flex: 1.5;
-            text-align: right;
-            word-break: break-word;
-        }
+.btn-profile .icon {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 6px;
+}
 
-        /* Modal */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.95);
-            z-index: 1000; align-items: center; justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal-close {
-            position: absolute; top: 15px; right: 15px;
-            background: #dc3545; color: #fff; border: none;
-            border-radius: 50%; width: 40px; height: 40px; font-size: 22px; cursor: pointer;
-            z-index: 1001;
-        }
-        .modal-content { padding: 15px; border-radius: 12px; max-width: 95%; }
-        .modal-content video { width: 100%; border-radius: 8px; }
+.btn-profile h3 {
+    color: #1a1a1a;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
 
-        #fileInputHidden { display: none; }
+.btn-profile small {
+    color: #888;
+    font-size: 11px;
+}
 
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .loading-overlay.active { display: flex; }
-        .loading-spinner {
-            width: 50px; height: 50px;
-            border: 4px solid #d4af37;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        .loading-text { color: #fff; font-size: 16px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+.section-header {
+    background: #1a1a1a;
+    color: #d4af37;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.instruction {
+    background: rgba(212,175,55,.08);
+    border-left: 4px solid #d4af37;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.instruction strong {
+    color: #a27d08;
+}
+
+.instruction ul {
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px 20px;
+    margin: 6px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-gold {
+    background: #d4af37;
+    color: #1a1a1a;
+}
+
+.btn-dark {
+    background: #1a1a1a;
+    color: #d4af37;
+    border: 2px solid #d4af37;
+}
+
+.btn-confirm {
+    background: #28a745;
+    color: #fff;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    color: #a27d08;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.form-section-title {
+    background: #d4af37;
+    color: #1a1a1a;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 15px 0 10px;
+    text-transform: uppercase;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    min-height: 75px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #d4af37;
+}
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+}
+
+.radio-option {
+    flex: 1;
+}
+
+.radio-option input {
+    display: none;
+}
+
+.radio-option label {
+    display: block;
+    padding: 12px;
+    text-align: center;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.radio-option input:checked + label {
+    background: #d4af37;
+    border-color: #d4af37;
+    color: #1a1a1a;
+}
+
+.hidden {
+    display: none;
+}
+
+.capture-area {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 12px;
+    border: 2px dashed #d4af37;
+    border-radius: 10px;
+    background: #f8f9fa;
+}
+
+.capture-area img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 6px;
+}
+
+#placeholder-text {
+    color: #888;
+    font-size: 14px;
+}
+
+.doc-progress {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.doc-name {
+    background: #d4af37;
+    color: #1a1a1a;
+    padding: 13px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.report-header {
+    text-align: center;
+    border-bottom: 3px solid #d4af37;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.report-header h2 {
+    color: #1a1a1a;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.report-data-block {
+    background: #f8f9fa;
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.report-data-block h3 {
+    color: #1a1a1a;
+    font-size: 16px;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #d4af37;
+}
+
+.report-data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px dashed #ddd;
+    font-size: 13px;
+}
+
+.report-data-row:last-child {
+    border-bottom: none;
+}
+
+.report-data-row .label {
+    flex: 1;
+    color: #666;
+    font-weight: 600;
+}
+
+.report-data-row .value {
+    flex: 1.5;
+    color: #1a1a1a;
+    text-align: right;
+    word-break: break-word;
+}
+
+.report-item {
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.report-item img {
+    width: 200px;
+    max-height: 300px;
+    object-fit: contain;
+    border: 2px solid #d4af37;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.file-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px solid #d4af37;
+    border-radius: 6px;
+    font-size: 40px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.95);
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 95%;
+    max-width: 500px;
+}
+
+.modal-content video {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #dc3545;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: rgba(0,0,0,.8);
+    color: #fff;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #d4af37;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 380px) {
+    .main-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <div class="header">
-        <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" 
-             alt="M&IC" 
-             id="header-logo"
-             onerror="console.log('Erro ao carregar logo'); this.style.display='none'">
-        <h1>M&IC Corretoores de Imóveis</h1>
-        <p>CAPTURA DE DOCUMENTOS</p>
+<header class="header">
+    <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png"
+         alt="M&IC"
+         onerror="this.style.display='none'">
+
+    <h1>M&IC Corretores de Imóveis</h1>
+    <p>CAPTURA DE DOCUMENTOS</p>
+</header>
+
+<main class="container">
+
+    <!-- TELA PRINCIPAL -->
+    <section id="screen-main" class="screen active">
+        <div class="card">
+            <div class="main-buttons">
+                <button class="btn-profile" onclick="selecionarPerfil('proprietario')">
+                    <span class="icon">🏠</span>
+                    <h3>Proprietário</h3>
+                    <small>Venda ou locação</small>
+                </button>
+
+                <button class="btn-profile" onclick="selecionarPerfil('comprador')">
+                    <span class="icon">🛒</span>
+                    <h3>Comprador</h3>
+                    <small>Aquisição</small>
+                </button>
+
+                <button class="btn-profile" onclick="selecionarPerfil('inquilino')">
+                    <span class="icon">🔑</span>
+                    <h3>Inquilino</h3>
+                    <small>Locação</small>
+                </button>
+
+                <button class="btn-profile" onclick="selecionarPerfil('corretor')">
+                    <span class="icon">🤝</span>
+                    <h3>Corretor</h3>
+                    <small>Profissional</small>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- LISTA DE DOCUMENTOS -->
+    <section id="screen-list" class="screen">
+        <button class="btn-back" onclick="mostrarTela('screen-main')">← Voltar</button>
+
+        <div class="card">
+            <div class="section-header" id="list-title">Documentos</div>
+
+            <div class="instruction">
+                <strong id="list-text"></strong>
+                <ul id="list-items"></ul>
+            </div>
+
+            <button class="btn btn-gold" onclick="iniciarCaptura()">
+                📷 Iniciar captura
+            </button>
+        </div>
+    </section>
+
+    <!-- CAPTURA DE DOCUMENTOS -->
+    <section id="screen-capture" class="screen">
+        <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
+
+        <div class="card">
+            <div class="doc-progress" id="capture-progress"></div>
+            <div class="doc-name" id="doc-name"></div>
+
+            <div class="capture-area">
+                <img id="preview-img" alt="Pré-visualização" style="display:none">
+                <p id="placeholder-text">
+                    Use os botões abaixo para tirar uma foto ou anexar um documento.
+                </p>
+            </div>
+
+            <div id="capture-buttons">
+                <button class="btn btn-gold" onclick="abrirCamera()">📷 Tirar foto</button>
+                <button class="btn btn-dark" onclick="abrirGaleria()">📎 Anexar da galeria</button>
+            </div>
+
+            <div id="confirm-buttons" style="display:none">
+                <button class="btn btn-confirm" onclick="confirmarDocumento()">✅ Confirmar</button>
+                <button class="btn btn-danger" onclick="refazerDocumento()">🔄 Refazer</button>
+            </div>
+
+            <input id="file-input"
+                   type="file"
+                   accept="image/*,.pdf"
+                   style="display:none"
+                   onchange="arquivoSelecionado(event)">
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DO PROPRIETÁRIO -->
+    <section id="screen-form-proprietario" class="screen">
+        <button class="btn-back" onclick="voltarParaLista()">← Voltar</button>
+
+        <div class="card">
+            <div class="section-header">Cadastro do Proprietário</div>
+
+            <div class="form-section-title">Finalidade do imóvel</div>
+
+            <div class="form-group">
+                <label>O imóvel é para locação ou venda? *</label>
+
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="finalidade" id="locacao" value="Locação">
+                        <label for="locacao">🔑 Locação</label>
+                    </div>
+
+                    <div class="radio-option">
+                        <input type="radio" name="finalidade" id="venda" value="Venda">
+                        <label for="venda">🏷️ Venda</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section-title">Dados pessoais</div>
+
+            <div class="form-group">
+                <label for="p-nome">Nome completo *</label>
+                <input id="p-nome" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-nacionalidade">Nacionalidade *</label>
+                <input id="p-nacionalidade" type="text" placeholder="Ex.: Brasileiro(a)">
+            </div>
+
+            <div class="form-group">
+                <label for="p-estado-civil">Estado civil *</label>
+                <select id="p-estado-civil">
+                    <option value="">Selecione...</option>
+                    <option>Solteiro(a)</option>
+                    <option>Casado(a)</option>
+                    <option>Divorciado(a)</option>
+                    <option>Viúvo(a)</option>
+                    <option>União estável</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="p-profissao">Profissão *</label>
+                <input id="p-profissao" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-rg">Número do RG</label>
+                <input id="p-rg" type="text" placeholder="Não obrigatório">
+            </div>
+
+            <div class="form-group">
+                <label for="p-cpf">Número do CPF *</label>
+                <input id="p-cpf" type="text" oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="p-endereco">Endereço completo com CEP *</label>
+                <input id="p-endereco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-email">E-mail *</label>
+                <input id="p-email" type="email">
+            </div>
+
+            <div class="form-group">
+                <label for="p-telefone">Telefone *</label>
+                <input id="p-telefone" type="tel" oninput="mascaraTelefone(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="p-endereco-imovel">Endereço completo do imóvel *</label>
+                <textarea id="p-endereco-imovel"></textarea>
+            </div>
+
+            <div class="form-section-title">Dados bancários</div>
+
+            <div class="form-group">
+                <label for="p-banco">Banco *</label>
+                <input id="p-banco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-agencia">Agência *</label>
+                <input id="p-agencia" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-conta">Conta *</label>
+                <input id="p-conta" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="p-pix">Chave PIX *</label>
+                <input id="p-pix" type="text">
+            </div>
+
+            <button class="btn btn-confirm" onclick="finalizarFormulario('proprietario')">
+                ✅ Finalizar cadastro
+            </button>
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DO COMPRADOR -->
+    <section id="screen-form-comprador" class="screen">
+        <button class="btn-back" onclick="voltarParaLista()">← Voltar</button>
+
+        <div class="card">
+            <div class="section-header">Cadastro do Comprador</div>
+
+            <div class="form-section-title">Dados pessoais</div>
+
+            <div class="form-group">
+                <label for="c-nome">Nome completo *</label>
+                <input id="c-nome" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-nacionalidade">Nacionalidade *</label>
+                <input id="c-nacionalidade" type="text" placeholder="Ex.: Brasileiro(a)">
+            </div>
+
+            <div class="form-group">
+                <label for="c-estado-civil">Estado civil *</label>
+                <select id="c-estado-civil">
+                    <option value="">Selecione...</option>
+                    <option>Solteiro(a)</option>
+                    <option>Casado(a)</option>
+                    <option>Divorciado(a)</option>
+                    <option>Viúvo(a)</option>
+                    <option>União estável</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="c-profissao">Profissão *</label>
+                <input id="c-profissao" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-rg">Número do RG</label>
+                <input id="c-rg" type="text" placeholder="Não obrigatório">
+            </div>
+
+            <div class="form-group">
+                <label for="c-cpf">Número do CPF *</label>
+                <input id="c-cpf" type="text" oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="c-endereco">Endereço completo com CEP *</label>
+                <input id="c-endereco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-email">E-mail *</label>
+                <input id="c-email" type="email">
+            </div>
+
+            <div class="form-group">
+                <label for="c-telefone">Telefone *</label>
+                <input id="c-telefone" type="tel" oninput="mascaraTelefone(this)">
+            </div>
+
+            <div class="form-section-title">Dados bancários</div>
+
+            <div class="form-group">
+                <label for="c-banco">Banco *</label>
+                <input id="c-banco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-agencia">Agência *</label>
+                <input id="c-agencia" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-conta">Conta *</label>
+                <input id="c-conta" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="c-pix">Chave PIX *</label>
+                <input id="c-pix" type="text">
+            </div>
+
+            <button class="btn btn-confirm" onclick="finalizarFormulario('comprador')">
+                ✅ Finalizar cadastro
+            </button>
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DO INQUILINO -->
+    <section id="screen-form-inquilino" class="screen">
+        <button class="btn-back" onclick="voltarParaLista()">← Voltar</button>
+
+        <div class="card">
+            <div class="section-header">Cadastro do Inquilino</div>
+
+            <div class="form-section-title">Dados pessoais</div>
+
+            <div class="form-group">
+                <label for="i-nome">Nome completo *</label>
+                <input id="i-nome" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-nacionalidade">Nacionalidade *</label>
+                <input id="i-nacionalidade" type="text" placeholder="Ex.: Brasileiro(a)">
+            </div>
+
+            <div class="form-group">
+                <label for="i-estado-civil">Estado civil *</label>
+                <select id="i-estado-civil">
+                    <option value="">Selecione...</option>
+                    <option>Solteiro(a)</option>
+                    <option>Casado(a)</option>
+                    <option>Divorciado(a)</option>
+                    <option>Viúvo(a)</option>
+                    <option>União estável</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="i-profissao">Profissão *</label>
+                <input id="i-profissao" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-rg">Número do RG</label>
+                <input id="i-rg" type="text" placeholder="Não obrigatório">
+            </div>
+
+            <div class="form-group">
+                <label for="i-cpf">Número do CPF *</label>
+                <input id="i-cpf" type="text" oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="i-endereco">Endereço completo com CEP *</label>
+                <input id="i-endereco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-email">E-mail *</label>
+                <input id="i-email" type="email">
+            </div>
+
+            <div class="form-group">
+                <label for="i-telefone">Telefone *</label>
+                <input id="i-telefone" type="tel" oninput="mascaraTelefone(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="i-pessoas">
+                    Além de você, quantas pessoas residirão no imóvel? *
+                </label>
+                <input id="i-pessoas" type="number" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Possui algum animal de estimação? *</label>
+
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="pet" id="pet-sim" value="Sim"
+                               onchange="alternarDetalhesPet()">
+                        <label for="pet-sim">Sim</label>
+                    </div>
+
+                    <div class="radio-option">
+                        <input type="radio" name="pet" id="pet-nao" value="Não"
+                               onchange="alternarDetalhesPet()">
+                        <label for="pet-nao">Não</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pet-detalhes" class="form-group hidden">
+                <label for="i-pet-detalhes">
+                    Se sim, informe a quantidade e o porte dos animais. *
+                </label>
+                <textarea id="i-pet-detalhes"
+                          placeholder="Ex.: 2 cachorros de porte médio"></textarea>
+            </div>
+
+            <div class="form-section-title">Dados bancários</div>
+
+            <div class="form-group">
+                <label for="i-banco">Banco *</label>
+                <input id="i-banco" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-agencia">Agência *</label>
+                <input id="i-agencia" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-conta">Conta *</label>
+                <input id="i-conta" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="i-pix">Chave PIX *</label>
+                <input id="i-pix" type="text">
+            </div>
+
+            <button class="btn btn-confirm" onclick="finalizarFormulario('inquilino')">
+                ✅ Finalizar cadastro
+            </button>
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DO CORRETOR -->
+    <section id="screen-form-corretor" class="screen">
+        <button class="btn-back" onclick="voltarParaLista()">← Voltar</button>
+
+        <div class="card">
+            <div class="section-header">Cadastro do Corretor</div>
+
+            <div class="form-section-title">Dados profissionais</div>
+
+            <div class="form-group">
+                <label for="r-nome">Nome completo *</label>
+                <input id="r-nome" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="r-cpf">Número do CPF *</label>
+                <input id="r-cpf" type="text" oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="form-group">
+                <label for="r-creci">CRECI *</label>
+                <input id="r-creci" type="text">
+            </div>
+
+            <div class="form-group">
+                <label for="r-email">E-mail *</label>
+                <input id="r-email" type="email">
+            </div>
+
+            <div class="form-group">
+                <label for="r-telefone">Telefone *</label>
+                <input id="r-telefone" type="tel" oninput="mascaraTelefone(this)">
+            </div>
+
+            <button class="btn btn-confirm" onclick="finalizarFormulario('corretor')">
+                ✅ Finalizar cadastro
+            </button>
+        </div>
+    </section>
+
+    <!-- RELATÓRIO -->
+    <section id="screen-report" class="screen">
+        <div class="card">
+            <div class="report-header">
+                <h2>Relatório de Documentos</h2>
+                <p>Perfil: <strong id="report-profile"></strong></p>
+                <small id="report-date"></small>
+            </div>
+
+            <div id="report-data"></div>
+            <div id="report-documents"></div>
+
+            <button class="btn btn-gold" onclick="gerarPDF()">
+                📄 Gerar PDF
+            </button>
+
+            <button class="btn btn-dark" onclick="novoProcesso()">
+                🔄 Novo processo
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<!-- MODAL DA CÂMERA -->
+<div id="camera-modal" class="modal">
+    <button class="modal-close" onclick="fecharCamera()">×</button>
+
+    <div class="modal-content">
+        <video id="camera-video" autoplay playsinline></video>
+        <canvas id="camera-canvas" style="display:none"></canvas>
+
+        <button class="btn btn-gold" onclick="tirarFoto()">
+            📸 Capturar foto
+        </button>
     </div>
+</div>
 
-    <div class="container">
+<!-- CARREGAMENTO -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text">Processando...</div>
+</div>
 
-        <!-- TELA PRINCIPAL -->
-        <div id="screen-main" class="screen active">
-            <div class="card">
-                <div class="main-buttons">
-                    <button class="btn-profile" onclick="selecionarPerfil('proprietario')">
-                        <span class="icon">🏠</span>
-                        <h3>Proprietário</h3>
-                        <small>Venda / Locação</small>
-                    </button>
-                    <button class="btn-profile" onclick="selecionarPerfil('comprador')">
-                        <span class="icon">🛒</span>
-                        <h3>Comprador</h3>
-                        <small>Aquisição</small>
-                    </button>
-                    <button class="btn-profile" onclick="selecionarPerfil('inquilino')">
-                        <span class="icon">🔑</span>
-                        <h3>Inquilino</h3>
-                        <small>Locação</small>
-                    </button>
-                    <button class="btn-profile" onclick="selecionarPerfil('corretor')">
-                        <span class="icon">🤝</span>
-                        <h3>Corretor</h3>
-                        <small>Profissional</small>
-                    </button>
-                </div>
-            </div>
-        </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        <!-- TELA DE LISTA DE DOCUMENTOS -->
-        <div id="screen-list" class="screen">
-            <button class="btn-back" onclick="voltarMain()">← Voltar</button>
-            <div class="card">
-                <div class="section-header" id="list-title">Documentos</div>
-                <div class="instruction">
-                    <strong id="list-text"></strong>
-                    <ul id="list-items" style="margin-top:10px;"></ul>
-                </div>
-                <button class="btn btn-gold" onclick="iniciarCaptura()">📷 Iniciar Captura</button>
-            </div>
-        </div>
+<script>
+const perfis = {
+    proprietario: {
+        nome: "Proprietário",
+        documentos: [
+            "RG com CPF ou CNH",
+            "Comprovante de residência",
+            "Certidão de estado civil"
+        ]
+    },
 
-        <!-- TELA DE CAPTURA -->
-        <div id="screen-capture" class="screen">
-            <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
-            <div class="card">
-                <div class="doc-progress" id="capture-progress"></div>
-                <div class="doc-name" id="doc-name">Documento</div>
+    comprador: {
+        nome: "Comprador",
+        documentos: [
+            "RG com CPF ou CNH",
+            "Comprovante de residência",
+            "Certidão de estado civil",
+            "CTPS Digital",
+            "FGTS Digital",
+            "Recibo de entrega do Imposto de Renda",
+            "Imposto de Renda completo"
+        ]
+    },
 
-                <div class="capture-area" id="capture-area">
-                    <img id="preview-img" style="display:none;" alt="Pré-visualização">
-                    <p id="placeholder-text">Use os botões abaixo para tirar uma foto ou anexar o documento</p>
-                </div>
+    inquilino: {
+        nome: "Inquilino",
+        documentos: [
+            "RG com CPF ou CNH",
+            "Comprovante de residência",
+            "Recibo de entrega do Imposto de Renda",
+            "Imposto de Renda completo"
+        ]
+    },
 
-                <div id="capture-btns">
-                    <button class="btn btn-gold" onclick="abrirCamera()">📷 Tirar Foto</button>
-                    <button class="btn btn-dark" onclick="abrirGaleria()">📎 Anexar da Galeria</button>
-                </div>
+    corretor: {
+        nome: "Corretor",
+        documentos: [
+            "RG com CPF ou CNH",
+            "CRECI"
+        ]
+    }
+};
 
-                <div id="confirm-btns" style="display:none;">
-                    <button class="btn btn-confirm" onclick="confirmarFoto()">✅ Confirmar</button>
-                    <button class="btn btn-danger" onclick="refazerFoto()">🔄 Refazer</button>
-                </div>
+let perfilAtual = null;
+let indiceDocumento = 0;
+let documentosCapturados = [];
+let documentoAtual = null;
+let dadosFormulario = null;
+let cameraStream = null;
 
-                <input type="file" id="fileInputHidden"
-                       accept="image/*,.pdf,.heic,.heif,.tif,.tiff,.bmp,application/pdf"
-                       onchange="arquivoSelecionado(event)">
-            </div>
-        </div>
+const $ = id => document.getElementById(id);
 
-        <!-- TELA DO FORMULÁRIO DO PROPRIETÁRIO -->
-        <div id="screen-form" class="screen">
-            <button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
-            <div class="card">
-                <div class="section-header">Cadastro do Proprietário</div>
-                <div class="form-progress" id="form-progress">Etapa 1 de 4</div>
+function mostrarTela(id) {
+    document.querySelectorAll(".screen").forEach(tela => {
+        tela.classList.remove("active");
+    });
 
-                <!-- ETAPA 1: FINALIDADE -->
-                <div id="form-etapa-1">
-                    <div class="form-section-title">Finalidade do imóvel</div>
-                    <div class="form-group">
-                        <label>Seu imóvel é para locação ou venda?</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="finalidade" id="finalidade-locacao" value="locacao" onchange="mudarFinalidade()">
-                                <label for="finalidade-locacao">🔑 Locação</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="finalidade" id="finalidade-venda" value="venda" onchange="mudarFinalidade()">
-                                <label for="finalidade-venda">🏷️ Venda</label>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-gold" onclick="proximaEtapa(2)">Próximo →</button>
-                </div>
+    $(id).classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-                <!-- ETAPA 2: DADOS PESSOAIS -->
-                <div id="form-etapa-2" style="display:none;">
-                    <div class="form-section-title">Dados pessoais</div>
-                    <div class="form-group">
-                        <label>Nome completo *</label>
-                        <input type="text" id="f-nome" placeholder="Digite seu nome completo">
-                    </div>
-                    <div class="form-group">
-                        <label>Nacionalidade *</label>
-                        <input type="text" id="f-nacionalidade" placeholder="Ex: Brasileiro(a)">
-                    </div>
-                    <div class="form-group">
-                        <label>Estado Civil *</label>
-                        <select id="f-estadoCivil">
-                            <option value="">Selecione...</option>
-                            <option value="Solteiro(a)">Solteiro(a)</option>
-                            <option value="Casado(a)">Casado(a)</option>
-                            <option value="Divorciado(a)">Divorciado(a)</option>
-                            <option value="Viúvo(a)">Viúvo(a)</option>
-                            <option value="União estável">União estável</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Profissão *</label>
-                        <input type="text" id="f-profissao" placeholder="Sua profissão">
-                    </div>
-                    <div class="form-group">
-                        <label>Número do RG</label>
-                        <input type="text" id="f-rg" placeholder="00.000.000-0 (opcional)">
-                    </div>
-                    <div class="form-group">
-                        <label>Número do CPF *</label>
-                        <input type="text" id="f-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)">
-                    </div>
-                    <div class="form-group">
-                        <label>Endereço completo com CEP *</label>
-                        <input type="text" id="f-endereco" placeholder="Rua, número, bairro, cidade - CEP">
-                    </div>
-                    <div class="form-group">
-                        <label>E-mail *</label>
-                        <input type="email" id="f-email" placeholder="seu@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Telefone *</label>
-                        <input type="tel" id="f-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-                    </div>
-                    <div class="form-group">
-                        <label id="label-endereco-imovel">Endereço completo do imóvel *</label>
-                        <textarea id="f-enderecoImovel" placeholder="Endereço completo do imóvel"></textarea>
-                    </div>
-                    <button class="btn btn-dark" onclick="voltarEtapa(1)">← Voltar</button>
-                    <button class="btn btn-gold" onclick="proximaEtapa(3)">Próximo →</button>
-                </div>
+function selecionarPerfil(chave) {
+    perfilAtual = perfis[chave];
+    indiceDocumento = 0;
+    documentosCapturados = [];
+    dadosFormulario = null;
 
-                <!-- ETAPA 3: DADOS DO IMÓVEL (APENAS VENDA) -->
-                <div id="form-etapa-3" style="display:none;">
-                    <div class="form-section-title">Dados do imóvel para venda</div>
-                    <div class="form-group">
-                        <label>Número do IPTU *</label>
-                        <input type="text" id="f-iptu" placeholder="Número do IPTU">
-                    </div>
-                    <div class="form-group">
-                        <label>Número da matrícula do imóvel no RGI *</label>
-                        <input type="text" id="f-matricula" placeholder="Número da matrícula">
-                    </div>
-                    <div class="form-group">
-                        <label>Número do Cartório de Registro de Imóveis (RGI) *</label>
-                        <input type="text" id="f-rgi" placeholder="Número do RGI">
-                    </div>
-                    <div class="form-group">
-                        <label>O imóvel está financiado? *</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="financiado" id="financiado-sim" value="sim" onchange="toggleFinanciamento()">
-                                <label for="financiado-sim">Sim</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="financiado" id="financiado-nao" value="nao" onchange="toggleFinanciamento()">
-                                <label for="financiado-nao">Não</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="hidden-field" id="campo-banco-financiamento">
-                        <div class="form-group">
-                            <label>Se estiver financiado, por qual banco?</label>
-                            <input type="text" id="f-bancoFinanciamento" placeholder="Nome do banco">
-                        </div>
-                        <div class="form-group">
-                            <label>Qual é o valor exato do saldo devedor?</label>
-                            <input type="text" id="f-saldoDevedor" placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Foi utilizado o FGTS para a compra do imóvel? *</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="fgts" id="fgts-sim" value="sim">
-                                <label for="fgts-sim">Sim</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="fgts" id="fgts-nao" value="nao">
-                                <label for="fgts-nao">Não</label>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-dark" onclick="voltarEtapa(2)">← Voltar</button>
-                    <button class="btn btn-gold" onclick="proximaEtapa(4)">Próximo →</button>
-                </div>
+    $("list-title").textContent = "Documentos — " + perfilAtual.nome;
 
-                <!-- ETAPA 4: DADOS BANCÁRIOS -->
-                <div id="form-etapa-4" style="display:none;">
-                    <div class="form-section-title">Dados bancários</div>
-                    <div class="form-group">
-                        <label>Banco *</label>
-                        <input type="text" id="f-banco" placeholder="Nome do banco">
-                    </div>
-                    <div class="form-group">
-                        <label>Agência *</label>
-                        <input type="text" id="f-agencia" placeholder="Número da agência">
-                    </div>
-                    <div class="form-group">
-                        <label>Conta *</label>
-                        <input type="text" id="f-conta" placeholder="Número da conta">
-                    </div>
-                    <div class="form-group">
-                        <label>Chave PIX *</label>
-                        <input type="text" id="f-chavePix" placeholder="Chave PIX">
-                    </div>
-                    <button class="btn btn-dark" onclick="voltarEtapa(3)">← Voltar</button>
-                    <button class="btn btn-confirm" onclick="finalizarFormulario()">✅ Finalizar Cadastro</button>
-                </div>
-            </div>
-        </div>
+    $("list-text").textContent =
+        "Separe os documentos abaixo ou anexe-os de forma digital:";
 
-        <!-- TELA DE RELATÓRIO -->
-        <div id="screen-report" class="screen">
-            <div class="card">
-                <div class="report-header">
-                    <h2>Relatório de Documentos</h2>
-                    <p style="color:#888;">Perfil: <strong id="report-perfil"></strong></p>
-                    <p style="color:#888;font-size:12px;" id="report-date"></p>
-                </div>
-                <div id="report-data"></div>
-                <div id="report-docs"></div>
-                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">📄 Gerar PDF</button>
-                <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">🔄 Novo Processo</button>
-            </div>
-        </div>
-    </div>
+    $("list-items").innerHTML = perfilAtual.documentos
+        .map(documento => `<li>${documento}</li>`)
+        .join("");
 
-    <div class="modal" id="camera-modal">
-        <button class="modal-close" onclick="fecharCamera()">×</button>
-        <div class="modal-content">
-            <video id="camera-video" autoplay playsinline></video>
-            <canvas id="camera-canvas" style="display:none;"></canvas>
-            <button class="btn btn-gold" onclick="tirarFoto()" style="margin-top:10px;">📸 Capturar</button>
-        </div>
-    </div>
+    mostrarTela("screen-list");
+}
 
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text" id="loading-text">Processando...</div>
-    </div>
+function iniciarCaptura() {
+    indiceDocumento = 0;
+    documentosCapturados = [];
+    mostrarTela("screen-capture");
+    carregarDocumento();
+}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script>
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
+function carregarDocumento() {
+    if (indiceDocumento >= perfilAtual.documentos.length) {
+        abrirFormularioDoPerfil();
+        return;
+    }
 
-        // ===== CONFIGURAÇÃO DOS PERFIS =====
-        const perfis = {
-            proprietario: {
-                nome: 'Proprietário',
-                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)']
-            },
-            comprador: {
-                nome: 'Comprador',
-                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)', 'CTPS Digital', 'FGTS Digital', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
-            },
-            inquilino: {
-                nome: 'Inquilino',
-                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
-            },
-            corretor: {
-                nome: 'Corretor',
-                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: ['RG com CPF ou CNH', 'CRECI']
-            }
+    $("doc-name").textContent =
+        perfilAtual.documentos[indiceDocumento];
+
+    $("capture-progress").textContent =
+        `Documento ${indiceDocumento + 1} de ${perfilAtual.documentos.length}`;
+
+    documentoAtual = null;
+    $("preview-img").style.display = "none";
+    $("preview-img").src = "";
+    $("placeholder-text").style.display = "block";
+    $("placeholder-text").textContent =
+        "Use os botões abaixo para tirar uma foto ou anexar um documento.";
+
+    $("capture-buttons").style.display = "block";
+    $("confirm-buttons").style.display = "none";
+    $("file-input").value = "";
+}
+
+function abrirFormularioDoPerfil() {
+    const telas = {
+        proprietario: "screen-form-proprietario",
+        comprador: "screen-form-comprador",
+        inquilino: "screen-form-inquilino",
+        corretor: "screen-form-corretor"
+    };
+
+    mostrarTela(telas[obterChaveDoPerfil()]);
+}
+
+function obterChaveDoPerfil() {
+    return Object.keys(perfis).find(
+        chave => perfis[chave] === perfilAtual
+    );
+}
+
+function voltarParaLista() {
+    mostrarTela("screen-list");
+}
+
+function abrirGaleria() {
+    $("file-input").click();
+}
+
+function arquivoSelecionado(evento) {
+    const arquivo = evento.target.files[0];
+
+    if (!arquivo) {
+        return;
+    }
+
+    if (arquivo.type.startsWith("image/")) {
+        const leitor = new FileReader();
+
+        leitor.onload = eventoLeitura => {
+            exibirPreview(eventoLeitura.target.result, arquivo.name);
         };
 
-        let perfilAtual = null, indiceDoc = 0, docsCapturados = [], fotoAtual = null, cameraStream = null;
-        let dadosProprietario = null;
-        let etapaAtual = 1;
+        leitor.readAsDataURL(arquivo);
+        return;
+    }
 
-        const $ = id => document.getElementById(id);
+    alert("O arquivo foi anexado ao relatório.");
+    exibirPreviewArquivo(arquivo.name);
+}
 
-        function mostrarTela(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            $(id).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+function exibirPreview(dataURL, nomeArquivo) {
+    documentoAtual = {
+        tipo: "imagem",
+        foto: dataURL,
+        nomeArquivo: nomeArquivo || `foto_${Date.now()}.jpg`
+    };
+
+    $("preview-img").src = dataURL;
+    $("preview-img").style.display = "block";
+    $("placeholder-text").style.display = "none";
+    $("capture-buttons").style.display = "none";
+    $("confirm-buttons").style.display = "block";
+}
+
+function exibirPreviewArquivo(nomeArquivo) {
+    documentoAtual = {
+        tipo: "arquivo",
+        nomeArquivo
+    };
+
+    $("preview-img").style.display = "none";
+    $("placeholder-text").innerHTML =
+        `📄 <strong>${nomeArquivo}</strong><br>
+         <small>Arquivo anexado</small>`;
+
+    $("placeholder-text").style.display = "block";
+    $("capture-buttons").style.display = "none";
+    $("confirm-buttons").style.display = "block";
+}
+
+function refazerDocumento() {
+    documentoAtual = null;
+    $("preview-img").src = "";
+    $("preview-img").style.display = "none";
+    $("placeholder-text").textContent =
+        "Use os botões abaixo para tirar uma foto ou anexar um documento.";
+    $("placeholder-text").style.display = "block";
+    $("capture-buttons").style.display = "block";
+    $("confirm-buttons").style.display = "none";
+    $("file-input").value = "";
+}
+
+function confirmarDocumento() {
+    if (!documentoAtual) {
+        alert("Tire uma foto ou anexe um documento antes de confirmar.");
+        return;
+    }
+
+    documentosCapturados.push({
+        nome: perfilAtual.documentos[indiceDocumento],
+        tipo: documentoAtual.tipo,
+        foto: documentoAtual.foto || null,
+        nomeArquivo: documentoAtual.nomeArquivo,
+        data: new Date().toLocaleString("pt-BR")
+    });
+
+    indiceDocumento++;
+    carregarDocumento();
+}
+
+function cancelarCaptura() {
+    if (
+        documentosCapturados.length &&
+        !confirm("Tem certeza? Os documentos capturados serão perdidos.")
+    ) {
+        return;
+    }
+
+    documentosCapturados = [];
+    indiceDocumento = 0;
+    pararCamera();
+    mostrarTela("screen-list");
+}
+
+async function abrirCamera() {
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        $("camera-video").srcObject = cameraStream;
+        $("camera-modal").classList.add("active");
+    } catch {
+        alert(
+            'Não foi possível acessar a câmera. Use a opção "Anexar da galeria".'
+        );
+    }
+}
+
+function fecharCamera() {
+    $("camera-modal").classList.remove("active");
+    pararCamera();
+}
+
+function pararCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+}
+
+function tirarFoto() {
+    const video = $("camera-video");
+    const canvas = $("camera-canvas");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext("2d").drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    exibirPreview(canvas.toDataURL("image/jpeg", .85));
+    fecharCamera();
+}
+
+function alternarDetalhesPet() {
+    const petSelecionado = document.querySelector(
+        'input[name="pet"]:checked'
+    );
+
+    $("pet-detalhes").classList.toggle(
+        "hidden",
+        !petSelecionado || petSelecionado.value !== "Sim"
+    );
+}
+
+function campoObrigatorio(id, campos) {
+    const elemento = $(id);
+
+    if (!elemento.value.trim()) {
+        campos.push(id);
+    }
+}
+
+function validarCampos(ids) {
+    const camposVazios = [];
+
+    ids.forEach(id => campoObrigatorio(id, camposVazios));
+
+    if (camposVazios.length) {
+        alert("Preencha todos os campos obrigatórios.");
+        $(camposVazios[0]).focus();
+        return false;
+    }
+
+    return true;
+}
+
+function obterValor(id) {
+    return $(id).value.trim();
+}
+
+function coletarDados(prefixo, incluirBancarios = true) {
+    const dados = {
+        nome: obterValor(`${prefixo}-nome`),
+        nacionalidade: obterValor(`${prefixo}-nacionalidade`),
+        estadoCivil: obterValor(`${prefixo}-estado-civil`),
+        profissao: obterValor(`${prefixo}-profissao`),
+        rg: obterValor(`${prefixo}-rg`),
+        cpf: obterValor(`${prefixo}-cpf`),
+        endereco: obterValor(`${prefixo}-endereco`),
+        email: obterValor(`${prefixo}-email`),
+        telefone: obterValor(`${prefixo}-telefone`)
+    };
+
+    if (incluirBancarios) {
+        dados.banco = obterValor(`${prefixo}-banco`);
+        dados.agencia = obterValor(`${prefixo}-agencia`);
+        dados.conta = obterValor(`${prefixo}-conta`);
+        dados.pix = obterValor(`${prefixo}-pix`);
+    }
+
+    return dados;
+}
+
+function finalizarFormulario(tipo) {
+    if (tipo === "proprietario") {
+        const ids = [
+            "p-nome",
+            "p-nacionalidade",
+            "p-estado-civil",
+            "p-profissao",
+            "p-cpf",
+            "p-endereco",
+            "p-email",
+            "p-telefone",
+            "p-endereco-imovel",
+            "p-banco",
+            "p-agencia",
+            "p-conta",
+            "p-pix"
+        ];
+
+        if (!validarCampos(ids)) return;
+
+        const finalidade = document.querySelector(
+            'input[name="finalidade"]:checked'
+        );
+
+        if (!finalidade) {
+            alert("Selecione se o imóvel é para locação ou venda.");
+            return;
         }
 
-        function voltarMain() { pararCamera(); mostrarTela('screen-main'); }
-        function voltarParaLista() { mostrarTela('screen-list'); }
+        dadosFormulario = {
+            tipo: "Proprietário",
+            finalidade: finalidade.value,
+            ...coletarDados("p"),
+            enderecoImovel: obterValor("p-endereco-imovel")
+        };
+    }
 
-        function voltarFormulario() {
-            if (etapaAtual > 1) {
-                voltarEtapa(etapaAtual - 1);
+    if (tipo === "comprador") {
+        const ids = [
+            "c-nome",
+            "c-nacionalidade",
+            "c-estado-civil",
+            "c-profissao",
+            "c-cpf",
+            "c-endereco",
+            "c-email",
+            "c-telefone",
+            "c-banco",
+            "c-agencia",
+            "c-conta",
+            "c-pix"
+        ];
+
+        if (!validarCampos(ids)) return;
+
+        dadosFormulario = {
+            tipo: "Comprador",
+            ...coletarDados("c")
+        };
+    }
+
+    if (tipo === "inquilino") {
+        const ids = [
+            "i-nome",
+            "i-nacionalidade",
+            "i-estado-civil",
+            "i-profissao",
+            "i-cpf",
+            "i-endereco",
+            "i-email",
+            "i-telefone",
+            "i-pessoas",
+            "i-banco",
+            "i-agencia",
+            "i-conta",
+            "i-pix"
+        ];
+
+        if (!validarCampos(ids)) return;
+
+        const pet = document.querySelector(
+            'input[name="pet"]:checked'
+        );
+
+        if (!pet) {
+            alert("Informe se possui algum animal de estimação.");
+            return;
+        }
+
+        if (
+            pet.value === "Sim" &&
+            !obterValor("i-pet-detalhes")
+        ) {
+            alert("Informe a quantidade e o porte dos animais.");
+            $("i-pet-detalhes").focus();
+            return;
+        }
+
+        dadosFormulario = {
+            tipo: "Inquilino",
+            ...coletarDados("i"),
+            pessoas: obterValor("i-pessoas"),
+            pet: pet.value,
+            petDetalhes: obterValor("i-pet-detalhes")
+        };
+    }
+
+    if (tipo === "corretor") {
+        const ids = [
+            "r-nome",
+            "r-cpf",
+            "r-creci",
+            "r-email",
+            "r-telefone"
+        ];
+
+        if (!validarCampos(ids)) return;
+
+        dadosFormulario = {
+            tipo: "Corretor",
+            nome: obterValor("r-nome"),
+            cpf: obterValor("r-cpf"),
+            creci: obterValor("r-creci"),
+            email: obterValor("r-email"),
+            telefone: obterValor("r-telefone")
+        };
+    }
+
+    mostrarRelatorio();
+}
+
+function criarLinha(rotulo, valor) {
+    return `
+        <div class="report-data-row">
+            <span class="label">${rotulo}:</span>
+            <span class="value">${valor || "-"}</span>
+        </div>
+    `;
+}
+
+function gerarBloco(titulo, linhas) {
+    return `
+        <div class="report-data-block">
+            <h3>${titulo}</h3>
+            ${linhas.join("")}
+        </div>
+    `;
+}
+
+function mostrarRelatorio() {
+    $("report-profile").textContent = perfilAtual.nome;
+    $("report-date").textContent =
+        "Gerado em: " + new Date().toLocaleString("pt-BR");
+
+    const d = dadosFormulario;
+    const linhas = [];
+
+    Object.entries(d).forEach(([chave, valor]) => {
+        const nomes = {
+            tipo: "Perfil",
+            finalidade: "Finalidade",
+            nome: "Nome completo",
+            nacionalidade: "Nacionalidade",
+            estadoCivil: "Estado civil",
+            profissao: "Profissão",
+            rg: "Número do RG",
+            cpf: "Número do CPF",
+            endereco: "Endereço completo",
+            email: "E-mail",
+            telefone: "Telefone",
+            enderecoImovel: "Endereço do imóvel",
+            banco: "Banco",
+            agencia: "Agência",
+            conta: "Conta",
+            pix: "Chave PIX",
+            pessoas: "Pessoas que residirão no imóvel",
+            pet: "Possui animal de estimação",
+            petDetalhes: "Detalhes dos animais",
+            creci: "CRECI"
+        };
+
+        if (chave !== "tipo") {
+            linhas.push(criarLinha(nomes[chave] || chave, valor));
+        }
+    });
+
+    $("report-data").innerHTML = gerarBloco(
+        "📋 Dados do " + d.tipo,
+        linhas
+    );
+
+    $("report-documents").innerHTML = documentosCapturados
+        .map((documento, indice) => {
+            const visual = documento.tipo === "imagem"
+                ? `<img src="${documento.foto}" alt="Documento">`
+                : `<div class="file-icon">📄</div>`;
+
+            return `
+                <div class="report-item">
+                    ${visual}
+                    <strong>${indice + 1}. ${documento.nome}</strong>
+                    <small>
+                        ${documento.nomeArquivo || "Arquivo anexado"}
+                        • ${documento.data}
+                    </small>
+                </div>
+            `;
+        })
+        .join("");
+
+    mostrarTela("screen-report");
+}
+
+function novoProcesso() {
+    perfilAtual = null;
+    indiceDocumento = 0;
+    documentosCapturados = [];
+    documentoAtual = null;
+    dadosFormulario = null;
+    mostrarTela("screen-main");
+}
+
+function mascaraCPF(input) {
+    let valor = input.value.replace(/\D/g, "");
+
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+    input.value = valor;
+}
+
+function mascaraTelefone(input) {
+    let valor = input.value.replace(/\D/g, "");
+
+    valor = valor.replace(/^(\d{2})(\d)/, "($1) $2");
+    valor = valor.replace(/(\d{5})(\d)/, "$1-$2");
+
+    input.value = valor;
+}
+
+function carregarImagem(url) {
+    return new Promise((resolve, reject) => {
+        const imagem = new Image();
+
+        imagem.onload = () => resolve(imagem);
+        imagem.onerror = reject;
+        imagem.src = url;
+    });
+}
+
+async function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const largura = 210;
+    const margem = 14;
+    let y = 20;
+
+    pdf.setFillColor(26, 26, 26);
+    pdf.rect(0, 0, largura, 45, "F");
+
+    pdf.setTextColor(212, 175, 55);
+    pdf.setFontSize(18);
+    pdf.setFont(undefined, "bold");
+    pdf.text("M&IC CORRETORES DE IMÓVEIS", 105, 27, {
+        align: "center"
+    });
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(11);
+    pdf.setFont(undefined, "normal");
+    pdf.text("Relatório de documentos", 105, 36, {
+        align: "center"
+    });
+
+    pdf.addPage();
+    y = 20;
+
+    pdf.setTextColor(26, 26, 26);
+    pdf.setFontSize(15);
+    pdf.setFont(undefined, "bold");
+    pdf.text("DADOS DO " + dadosFormulario.tipo.toUpperCase(), margem, y);
+
+    y += 12;
+    pdf.setFontSize(10);
+
+    Object.entries(dadosFormulario).forEach(([chave, valor]) => {
+        if (chave === "tipo") return;
+
+        const texto = `${chave}: ${valor || "-"}`;
+        const linhas = pdf.splitTextToSize(texto, 180);
+
+        if (y > 275) {
+            pdf.addPage();
+            y = 20;
+        }
+
+        pdf.setFont(undefined, "normal");
+        pdf.text(linhas, margem, y);
+        y += linhas.length * 6;
+    });
+
+    if (documentosCapturados.length) {
+        pdf.addPage();
+        y = 20;
+
+        pdf.setFontSize(15);
+        pdf.setFont(undefined, "bold");
+        pdf.text("DOCUMENTOS ANEXADOS", margem, y);
+        y += 12;
+
+        for (const documento of documentosCapturados) {
+            if (y > 245) {
+                pdf.addPage();
+                y = 20;
+            }
+
+            pdf.setFontSize(10);
+            pdf.setFont(undefined, "bold");
+            pdf.text(documento.nome, margem, y);
+            y += 7;
+
+            if (documento.tipo === "imagem" && documento.foto) {
+                try {
+                    const imagem = await carregarImagem(documento.foto);
+                    const proporcao = imagem.height / imagem.width;
+                    const larguraImagem = 180;
+                    const alturaImagem = larguraImagem * proporcao;
+
+                    if (y + alturaImagem > 280) {
+                        pdf.addPage();
+                        y = 20;
+                    }
+
+                    pdf.addImage(
+                        documento.foto,
+                        "JPEG",
+                        margem,
+                        y,
+                        larguraImagem,
+                        Math.min(alturaImagem, 150)
+                    );
+
+                    y += Math.min(alturaImagem, 150) + 12;
+                } catch {
+                    pdf.text("Imagem não disponível.", margem, y);
+                    y += 8;
+                }
             } else {
-                voltarParaLista();
+                pdf.setFont(undefined, "normal");
+                pdf.text(
+                    `[${documento.nomeArquivo || "Arquivo anexado"}]`,
+                    margem,
+                    y
+                );
+                y += 10;
             }
         }
+    }
 
-        function selecionarPerfil(chave) {
-            perfilAtual = perfis[chave];
-            indiceDoc = 0;
-            docsCapturados = [];
-            dadosProprietario = null;
-            $('list-title').textContent = 'Documentos — ' + perfilAtual.nome;
-            $('list-text').textContent = perfilAtual.texto;
-            const ul = $('list-items');
-            ul.innerHTML = '';
-            perfilAtual.docs.forEach(d => {
-                const li = document.createElement('li');
-                li.textContent = d;
-                ul.appendChild(li);
-            });
-            mostrarTela('screen-list');
-        }
+    pdf.save(
+        `MIC_${perfilAtual.nome.replace(/\s+/g, "_")}_documentos.pdf`
+    );
+}
+</script>
 
-        function iniciarCaptura() {
-            indiceDoc = 0;
-            docsCapturados = [];
-            mostrarTela('screen-capture');
-            carregarProximoDoc();
-        }
-
-        function carregarProximoDoc() {
-            if (indiceDoc >= perfilAtual.docs.length) {
-                if (perfilAtual.nome === 'Proprietário') {
-                    abrirFormulario();
-                } else {
-                    mostrarRelatorio();
-                }
-                return;
-            }
-
-            $('doc-name').textContent = perfilAtual.docs[indiceDoc];
-            $('capture-progress').textContent = 'Documento ' + (indiceDoc + 1) + ' de ' + perfilAtual.docs.length;
-
-            fotoAtual = null;
-            $('preview-img').style.display = 'none';
-            $('preview-img').src = '';
-            $('placeholder-text').style.display = 'block';
-            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
-            $('capture-btns').style.display = 'block';
-            $('confirm-btns').style.display = 'none';
-            $('fileInputHidden').value = '';
-        }
-
-        // ===== FORMULÁRIO DO PROPRIETÁRIO =====
-        function abrirFormulario() {
-            etapaAtual = 1;
-            for (let i = 1; i <= 4; i++) {
-                $('form-etapa-' + i).style.display = 'none';
-            }
-            $('form-etapa-1').style.display = 'block';
-            atualizarProgressoFormulario();
-            mostrarTela('screen-form');
-        }
-
-        function atualizarProgressoFormulario() {
-            $('form-progress').textContent = 'Etapa ' + etapaAtual + ' de 4';
-        }
-
-        function mudarFinalidade() {
-            const finalidade = document.querySelector('input[name="finalidade"]:checked');
-            if (finalidade) {
-                const labelEndereco = $('label-endereco-imovel');
-                if (finalidade.value === 'locacao') {
-                    labelEndereco.textContent = 'Endereço completo do imóvel a ser alugado *';
-                } else {
-                    labelEndereco.textContent = 'Endereço completo do imóvel a ser vendido *';
-                }
-            }
-        }
-
-        function toggleFinanciamento() {
-            const financiado = document.querySelector('input[name="financiado"]:checked');
-            if (financiado && financiado.value === 'sim') {
-                $('campo-banco-financiamento').style.display = 'block';
-            } else {
-                $('campo-banco-financiamento').style.display = 'none';
-            }
-        }
-
-        function proximaEtapa(novaEtapa) {
-            if (etapaAtual === 1) {
-                const finalidade = document.querySelector('input[name="finalidade"]:checked');
-                if (!finalidade) {
-                    alert('Selecione se o imóvel é para locação ou venda.');
-                    return;
-                }
-            }
-
-            if (etapaAtual === 2) {
-                const campos = ['f-nome', 'f-nacionalidade', 'f-estadoCivil', 'f-profissao', 'f-cpf', 'f-endereco', 'f-email', 'f-telefone', 'f-enderecoImovel'];
-                for (const id of campos) {
-                    if (!$(id).value.trim()) {
-                        alert('Preencha todos os campos obrigatórios.');
-                        $(id).focus();
-                        return;
-                    }
-                }
-            }
-
-            if (etapaAtual === 3) {
-                const campos = ['f-iptu', 'f-matricula', 'f-rgi'];
-                for (const id of campos) {
-                    if (!$(id).value.trim()) {
-                        alert('Preencha todos os campos obrigatórios.');
-                        $(id).focus();
-                        return;
-                    }
-                }
-                const financiado = document.querySelector('input[name="financiado"]:checked');
-                if (!financiado) {
-                    alert('Informe se o imóvel está financiado.');
-                    return;
-                }
-                const fgts = document.querySelector('input[name="fgts"]:checked');
-                if (!fgts) {
-                    alert('Informe se foi utilizado FGTS.');
-                    return;
-                }
-            }
-
-            if (etapaAtual === 2) {
-                const finalidade = document.querySelector('input[name="finalidade"]:checked');
-                if (finalidade && finalidade.value === 'locacao') {
-                    novaEtapa = 4;
-                }
-            }
-
-            $('form-etapa-' + etapaAtual).style.display = 'none';
-            $('form-etapa-' + novaEtapa).style.display = 'block';
-            etapaAtual = novaEtapa;
-            atualizarProgressoFormulario();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function voltarEtapa(novaEtapa) {
-            if (novaEtapa === 3) {
-                const finalidade = document.querySelector('input[name="finalidade"]:checked');
-                if (finalidade && finalidade.value === 'locacao') {
-                    novaEtapa = 2;
-                }
-            }
-            $('form-etapa-' + etapaAtual).style.display = 'none';
-            $('form-etapa-' + novaEtapa).style.display = 'block';
-            etapaAtual = novaEtapa;
-            atualizarProgressoFormulario();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function finalizarFormulario() {
-            const campos = ['f-banco', 'f-agencia', 'f-conta', 'f-chavePix'];
-            for (const id of campos) {
-                if (!$(id).value.trim()) {
-                    alert('Preencha todos os campos obrigatórios.');
-                    $(id).focus();
-                    return;
-                }
-            }
-
-            const finalidade = document.querySelector('input[name="finalidade"]:checked').value;
-            const financiado = document.querySelector('input[name="financiado"]:checked');
-            const fgts = document.querySelector('input[name="fgts"]:checked');
-
-            dadosProprietario = {
-                finalidade: finalidade,
-                nome: $('f-nome').value.trim(),
-                nacionalidade: $('f-nacionalidade').value.trim(),
-                estadoCivil: $('f-estadoCivil').value,
-                profissao: $('f-profissao').value.trim(),
-                rg: $('f-rg').value.trim(),
-                cpf: $('f-cpf').value.trim(),
-                endereco: $('f-endereco').value.trim(),
-                email: $('f-email').value.trim(),
-                telefone: $('f-telefone').value.trim(),
-                enderecoImovel: $('f-enderecoImovel').value.trim(),
-                banco: $('f-banco').value.trim(),
-                agencia: $('f-agencia').value.trim(),
-                conta: $('f-conta').value.trim(),
-                chavePix: $('f-chavePix').value.trim()
-            };
-
-            if (finalidade === 'venda') {
-                dadosProprietario.iptu = $('f-iptu').value.trim();
-                dadosProprietario.matricula = $('f-matricula').value.trim();
-                dadosProprietario.rgi = $('f-rgi').value.trim();
-                dadosProprietario.financiado = financiado ? financiado.value : 'nao';
-                dadosProprietario.bancoFinanciamento = $('f-bancoFinanciamento').value.trim();
-                dadosProprietario.saldoDevedor = $('f-saldoDevedor').value.trim();
-                dadosProprietario.fgts = fgts ? fgts.value : 'nao';
-            }
-
-            mostrarRelatorio();
-        }
-
-        // ===== MÁSCARAS =====
-        function mascaraCPF(input) {
-            let v = input.value.replace(/\D/g, '');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d)/, '$1.$2');
-            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            input.value = v;
-        }
-
-        function mascaraTelefone(input) {
-            let v = input.value.replace(/\D/g, '');
-            v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
-            v = v.replace(/(\d{5})(\d)/, '$1-$2');
-            input.value = v;
-        }
-
-        function mascaraMoeda(input) {
-            let v = input.value.replace(/\D/g, '');
-            v = (v / 100).toFixed(2) + '';
-            v = v.replace('.', ',');
-            v = v.replace(/(\d)(\d{3})(\d{3}),/g, '$1.$2.$3,');
-            v = v.replace(/(\d)(\d{3}),/g, '$1.$2,');
-            input.value = 'R$ ' + v;
-        }
-
-        // ===== CÂMERA =====
-        async function abrirCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                cameraStream = stream;
-                const video = $('camera-video');
-                video.srcObject = stream;
-                $('camera-modal').classList.add('active');
-            } catch (err) {
-                alert('Não foi possível acessar a câmera. Use "Anexar da Galeria".');
-            }
-        }
-
-        function fecharCamera() { $('camera-modal').classList.remove('active'); pararCamera(); }
-        function pararCamera() {
-            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-        }
-
-        function comprimirImagem(dataURL, maxWidth, quality) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > maxWidth) {
-                        h = (h * maxWidth) / w;
-                        w = maxWidth;
-                    }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(0, 0, w, h);
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const compressed = canvas.toDataURL('image/jpeg', quality);
-                    resolve(compressed);
-                };
-                img.onerror = () => reject(new Error('Falha ao carregar imagem para compressão'));
-                img.src = dataURL;
-            });
-        }
-
-        function tirarFoto() {
-            const video = $('camera-video'), canvas = $('camera-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const dataURL = canvas.toDataURL('image/jpeg', 0.9);
-            comprimirImagem(dataURL, 1200, 0.7)
-                .then(compressed => exibirPreview(compressed))
-                .catch(err => {
-                    console.error('Erro ao comprimir:', err);
-                    exibirPreview(dataURL);
-                });
-            fecharCamera();
-        }
-
-        function abrirGaleria() { $('fileInputHidden').click(); }
-
-        function arquivoSelecionado(event) {
-            const file = event.target.files[0];
-            if (!file) { return; }
-            if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    comprimirImagem(e.target.result, 1200, 0.7)
-                        .then(compressed => exibirPreview(compressed))
-                        .catch(err => exibirPreview(e.target.result));
-                };
-                reader.readAsDataURL(file);
-            }
-            else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                converterPdfEmImagem(file);
-            }
-            else {
-                alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
-                fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
-                exibirPreviewOutro(file.name);
-            }
-        }
-
-        async function converterPdfEmImagem(file) {
-            mostrarLoading('Convertendo PDF em imagem...');
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 2.0 });
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
-                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                const compressed = await comprimirImagem(dataURL, 1200, 0.7);
-                exibirPreview(compressed);
-                ocultarLoading();
-            } catch (err) {
-                console.error('Erro ao converter PDF:', err);
-                ocultarLoading();
-                alert('Erro ao converter PDF em imagem. Detalhe: ' + err.message);
-            }
-        }
-
-        function mostrarLoading(texto) {
-            $('loading-text').textContent = texto;
-            $('loading-overlay').classList.add('active');
-        }
-        function ocultarLoading() {
-            $('loading-overlay').classList.remove('active');
-        }
-
-        function exibirPreviewOutro(nomeArquivo) {
-            $('preview-img').style.display = 'none';
-            $('placeholder-text').innerHTML = '📄 <strong>' + nomeArquivo + '</strong><br><small style="color:#888;">Arquivo anexado</small>';
-            $('placeholder-text').style.display = 'block';
-            $('capture-btns').style.display = 'none';
-            $('confirm-btns').style.display = 'block';
-        }
-
-        function exibirPreview(dataURL) {
-            fotoAtual = { tipo: 'imagem', foto: dataURL };
-            const img = $('preview-img');
-            img.src = dataURL;
-            img.style.display = 'block';
-            $('placeholder-text').style.display = 'none';
-            $('capture-btns').style.display = 'none';
-            $('confirm-btns').style.display = 'block';
-        }
-
-        function refazerFoto() {
-            fotoAtual = null;
-            $('preview-img').style.display = 'none';
-            $('preview-img').src = '';
-            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
-            $('placeholder-text').style.display = 'block';
-            $('capture-btns').style.display = 'block';
-            $('confirm-btns').style.display = 'none';
-            $('fileInputHidden').value = '';
-        }
-
-        function confirmarFoto() {
-            if (!fotoAtual) {
-                alert('Tire uma foto ou anexe um arquivo antes de confirmar.');
-                return;
-            }
-            docsCapturados.push({
-                nome: perfilAtual.docs[indiceDoc],
-                foto: fotoAtual.foto || null,
-                tipo: fotoAtual.tipo || 'imagem',
-                nomeArquivo: fotoAtual.nome || 'foto_' + Date.now() + '.jpg',
-                data: new Date().toLocaleString('pt-BR')
-            });
-            indiceDoc++;
-            carregarProximoDoc();
-        }
-
-        function cancelarCaptura() {
-            if (docsCapturados.length > 0) {
-                if (!confirm('Tem certeza? Os documentos capturados serão perdidos.')) return;
-            }
-            docsCapturados = [];
-            indiceDoc = 0;
-            pararCamera();
-            mostrarTela('screen-list');
-        }
-
-        // ===== RELATÓRIO =====
-        function criarLinha(label, value) {
-            return '<div class="report-data-row"><span class="label">' + label + ':</span><span class="value">' + (value || '-') + '</span></div>';
-        }
-
-        function mostrarRelatorio() {
-            $('report-perfil').textContent = perfilAtual.nome;
-            $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
-
-            const dataContainer = $('report-data');
-            dataContainer.innerHTML = '';
-
-            if (dadosProprietario) {
-                let html = '<div class="report-data-block"><h3>📋 Dados do Proprietário</h3>';
-                html += criarLinha('Finalidade', dadosProprietario.finalidade === 'locacao' ? 'Locação' : 'Venda');
-                html += criarLinha('Nome completo', dadosProprietario.nome);
-                html += criarLinha('Nacionalidade', dadosProprietario.nacionalidade);
-                html += criarLinha('Estado Civil', dadosProprietario.estadoCivil);
-                html += criarLinha('Profissão', dadosProprietario.profissao);
-                html += criarLinha('RG', dadosProprietario.rg);
-                html += criarLinha('CPF', dadosProprietario.cpf);
-                html += criarLinha('Endereço', dadosProprietario.endereco);
-                html += criarLinha('E-mail', dadosProprietario.email);
-                html += criarLinha('Telefone', dadosProprietario.telefone);
-                html += criarLinha('Endereço do imóvel', dadosProprietario.enderecoImovel);
-
-                if (dadosProprietario.finalidade === 'venda') {
-                    html += criarLinha('IPTU', dadosProprietario.iptu);
-                    html += criarLinha('Matrícula no RGI', dadosProprietario.matricula);
-                    html += criarLinha('Cartório RGI', dadosProprietario.rgi);
-                    html += criarLinha('Financiado', dadosProprietario.financiado === 'sim' ? 'Sim' : 'Não');
-                    if (dadosProprietario.financiado === 'sim') {
-                        html += criarLinha('Banco do financiamento', dadosProprietario.bancoFinanciamento);
-                        html += criarLinha('Saldo devedor', dadosProprietario.saldoDevedor);
-                    }
-                    html += criarLinha('FGTS utilizado', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não');
-                }
-                html += '</div>';
-
-                html += '<div class="report-data-block"><h3>🏦 Dados Bancários</h3>';
-                html += criarLinha('Banco', dadosProprietario.banco);
-                html += criarLinha('Agência', dadosProprietario.agencia);
-                html += criarLinha('Conta', dadosProprietario.conta);
-                html += criarLinha('Chave PIX', dadosProprietario.chavePix);
-                html += '</div>';
-
-                dataContainer.innerHTML = html;
-            }
-
-            const container = $('report-docs');
-            container.innerHTML = '';
-
-            docsCapturados.forEach((doc, i) => {
-                const div = document.createElement('div');
-                div.className = 'report-item';
-                let visual = '';
-                if (doc.tipo === 'imagem' && doc.foto) {
-                    visual = '<img src="' + doc.foto + '" alt="" onerror="this.style.display=\'none\'">';
-                } else {
-                    visual = '<div class="file-icon">📄</div>';
-                }
-                div.innerHTML =
-                    visual +
-                    '<div><strong>' + (i + 1) + '. ' + doc.nome + '</strong>' +
-                    '<br><small style="color:#888;">' + doc.nomeArquivo + ' • ' + doc.data + '</small></div>';
-                container.appendChild(div);
-            });
-
-            mostrarTela('screen-report');
-        }
-
-        function novoProcesso() {
-            perfilAtual = null;
-            indiceDoc = 0;
-            docsCapturados = [];
-            fotoAtual = null;
-            dadosProprietario = null;
-            etapaAtual = 1;
-            mostrarTela('screen-main');
-        }
-
-        // ===== GERAR PDF =====
-        function carregarImagem(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        // Verifica se uma página do jsPDF tem conteúdo real (texto ou imagens)
-        function paginaTemConteudo(pdf, pageIndex) {
-            try {
-                // pdf.internal.pages é um array; cada página é um array de strings de operações
-                const pageObj = pdf.internal.pages[pageIndex];
-                if (!pageObj) return false;
-
-                // Concatena todo o conteúdo da página em uma string
-                let contentStr = '';
-                if (Array.isArray(pageObj)) {
-                    contentStr = pageObj.join(' ');
-                } else if (typeof pageObj === 'string') {
-                    contentStr = pageObj;
-                } else if (pageObj.contents) {
-                    contentStr = typeof pageObj.contents === 'string' ? pageObj.contents : JSON.stringify(pageObj.contents);
-                }
-
-                // Se a string for muito curta, provavelmente é vazia
-                if (contentStr.length < 10) return false;
-
-                // Verifica se há texto (operações Tj, TJ, ou blocos BT...ET)
-                const hasText = /\bTj\b/.test(contentStr) || /\bTJ\b/.test(contentStr) || /\bBT\b[\s\S]*?\bET\b/.test(contentStr);
-
-                // Verifica se há imagens (operador Do com referência a XObject)
-                const hasImage = /\/\w+\s+Do\b/.test(contentStr);
-
-                // Verifica se há linhas/formas além de retângulos de fundo simples
-                // (retângulos de fundo são comuns em cabeçalhos, mas sozinhos não contam)
-                const hasLines = /\bl\b/.test(contentStr) && /re\b/.test(contentStr) && contentStr.split('re').length > 3;
-
-                return hasText || hasImage || hasLines;
-            } catch (e) {
-                console.warn('Erro ao verificar página ' + pageIndex + ':', e);
-                return true; // Se der erro, assume que tem conteúdo para não deletar
-            }
-        }
-
-        async function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
-            const pageWidth = 210;
-            const pageHeight = 297;
-            const margin = 14;
-            const contentWidth = pageWidth - margin * 2;
-            let y = 0;
-
-            try {
-                // ===== PÁGINA 1: CAPA =====
-                const logoImg = await carregarImagem(logoUrl);
-
-                pdf.setFillColor(26, 26, 26);
-                pdf.rect(0, 0, pageWidth, 45, 'F');
-                pdf.addImage(logoImg, 'PNG', 85, 5, 40, 20);
-                pdf.setTextColor(212, 175, 55);
-                pdf.setFontSize(18);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('M&IC CORRETORES DE IMÓVEIS', 105, 32, { align: 'center' });
-                pdf.setTextColor(200, 200, 200);
-                pdf.setFontSize(10);
-                pdf.setFont(undefined, 'normal');
-                pdf.text('Relatório de Documentos — ' + perfilAtual.nome, 105, 39, { align: 'center' });
-                pdf.setTextColor(120, 120, 120);
-                pdf.setFontSize(8);
-                pdf.text(new Date().toLocaleString('pt-BR'), 105, 43, { align: 'center' });
-
-                y = 55;
-
-                // ===== DADOS DO PROPRIETÁRIO (se houver) =====
-                if (dadosProprietario) {
-                    pdf.addPage();
-                    y = 20;
-
-                    pdf.setFillColor(26, 26, 26);
-                    pdf.rect(0, y - 5, pageWidth, 12, 'F');
-                    pdf.setTextColor(212, 175, 55);
-                    pdf.setFontSize(14);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text('DADOS DO PROPRIETÁRIO', 105, y + 3, { align: 'center' });
-                    y += 15;
-
-                    pdf.setTextColor(26, 26, 26);
-                    pdf.setFontSize(11);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text('Informações pessoais', margin, y);
-                    y += 6;
-
-                    pdf.setFontSize(9);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.setTextColor(60, 60, 60);
-
-                    const dadosPessoais = [
-                        ['Finalidade:', dadosProprietario.finalidade === 'locacao' ? 'Locação' : 'Venda'],
-                        ['Nome:', dadosProprietario.nome],
-                        ['Nacionalidade:', dadosProprietario.nacionalidade],
-                        ['Estado Civil:', dadosProprietario.estadoCivil],
-                        ['Profissão:', dadosProprietario.profissao],
-                        ['RG:', dadosProprietario.rg || 'Não informado'],
-                        ['CPF:', dadosProprietario.cpf],
-                        ['Endereço:', dadosProprietario.endereco],
-                        ['E-mail:', dadosProprietario.email],
-                        ['Telefone:', dadosProprietario.telefone],
-                        ['Endereço do imóvel:', dadosProprietario.enderecoImovel]
-                    ];
-
-                    dadosPessoais.forEach(([label, value]) => {
-                        if (y > 275) { pdf.addPage(); y = 20; }
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(label, margin, y);
-                        pdf.setFont(undefined, 'normal');
-                        const lines = pdf.splitTextToSize(value || '-', contentWidth - 50);
-                        pdf.text(lines, margin + 50, y);
-                        y += Math.max(lines.length * 4.5, 5);
-                    });
-
-                    if (dadosProprietario.finalidade === 'venda') {
-                        y += 5;
-                        if (y > 265) { pdf.addPage(); y = 20; }
-                        pdf.setFontSize(11);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.setTextColor(26, 26, 26);
-                        pdf.text('Dados do imóvel', margin, y);
-                        y += 6;
-
-                        pdf.setFontSize(9);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.setTextColor(60, 60, 60);
-
-                        const dadosImovel = [
-                            ['IPTU:', dadosProprietario.iptu],
-                            ['Matrícula RGI:', dadosProprietario.matricula],
-                            ['Cartório RGI:', dadosProprietario.rgi],
-                            ['Financiado:', dadosProprietario.financiado === 'sim' ? 'Sim' : 'Não']
-                        ];
-
-                        if (dadosProprietario.financiado === 'sim') {
-                            dadosImovel.push(['Banco financiamento:', dadosProprietario.bancoFinanciamento]);
-                            dadosImovel.push(['Saldo devedor:', dadosProprietario.saldoDevedor]);
-                        }
-                        dadosImovel.push(['FGTS:', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não']);
-
-                        dadosImovel.forEach(([label, value]) => {
-                            if (y > 275) { pdf.addPage(); y = 20; }
-                            pdf.setFont(undefined, 'bold');
-                            pdf.text(label, margin, y);
-                            pdf.setFont(undefined, 'normal');
-                            pdf.text(value || '-', margin + 50, y);
-                            y += 5;
-                        });
-                    }
-
-                    y += 5;
-                    if (y > 265) { pdf.addPage(); y = 20; }
-                    pdf.setFontSize(11);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.setTextColor(26, 26, 26);
-                    pdf.text('Dados bancários', margin, y);
-                    y += 6;
-
-                    pdf.setFontSize(9);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.setTextColor(60, 60, 60);
-
-                    const dadosBancarios = [
-                        ['Banco:', dadosProprietario.banco],
-                        ['Agência:', dadosProprietario.agencia],
-                        ['Conta:', dadosProprietario.conta],
-                        ['Chave PIX:', dadosProprietario.chavePix]
-                    ];
-
-                    dadosBancarios.forEach(([label, value]) => {
-                        if (y > 275) { pdf.addPage(); y = 20; }
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(label, margin, y);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.text(value || '-', margin + 50, y);
-                        y += 5;
-                    });
-                }
-
-                // ===== DOCUMENTOS CAPTURADOS =====
-                if (docsCapturados.length > 0) {
-                    pdf.addPage();
-                    y = 20;
-
-                    pdf.setFillColor(26, 26, 26);
-                    pdf.rect(0, y - 5, pageWidth, 12, 'F');
-                    pdf.setTextColor(212, 175, 55);
-                    pdf.setFontSize(14);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text('DOCUMENTOS ANEXADOS', 105, y + 3, { align: 'center' });
-                    y += 18;
-
-                    for (let i = 0; i < docsCapturados.length; i++) {
-                        const doc = docsCapturados[i];
-
-                        if (y > 240) { pdf.addPage(); y = 20; }
-
-                        // Título do documento
-                        pdf.setFillColor(212, 175, 55);
-                        pdf.rect(margin, y - 4, contentWidth, 8, 'F');
-                        pdf.setTextColor(26, 26, 26);
-                        pdf.setFontSize(10);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text((i + 1) + '. ' + doc.nome, margin + 3, y + 2);
-                        y += 8;
-
-                        pdf.setFontSize(8);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.setTextColor(120, 120, 120);
-                        pdf.text(doc.nomeArquivo + ' — ' + doc.data, margin + 3, y + 3);
-                        y += 8;
-
-                        if (doc.tipo === 'imagem' && doc.foto) {
-                            try {
-                                const img = await carregarImagem(doc.foto);
-                                const imgW = img.naturalWidth;
-                                const imgH = img.naturalHeight;
-                                const maxW = contentWidth - 10;
-                                const maxH = 160;
-
-                                let drawW = maxW;
-                                let drawH = (imgH * maxW) / imgW;
-
-                                if (drawH > maxH) {
-                                    drawH = maxH;
-                                    drawW = (imgW * maxH) / imgH;
-                                }
-
-                                if (y + drawH > pageHeight - margin) {
-                                    pdf.addPage();
-                                    y = 20;
-                                }
-
-                                const imgX = margin + (contentWidth - drawW) / 2;
-                                pdf.addImage(doc.foto, 'JPEG', imgX, y, drawW, drawH);
-                                y += drawH + 10;
-                            } catch (imgErr) {
-                                console.warn('Erro ao adicionar imagem no PDF:', imgErr);
-                                if (y > 275) { pdf.addPage(); y = 20; }
-                                pdf.setTextColor(200, 50, 50);
-                                pdf.text('(Erro ao carregar imagem)', margin + 3, y);
-                                y += 8;
-                            }
-                        } else {
-                            if (y > 275) { pdf.addPage(); y = 20; }
-                            pdf.setTextColor(100, 100, 100);
-                            pdf.text('(Arquivo não visualizável)', margin + 3, y);
-                            y += 8;
-                        }
-
-                        y += 5;
-                    }
-                }
-
-                // ===== REMOVER PÁGINAS EM BRANCO =====
-                // Percorre do fim para o início e remove páginas sem conteúdo real
-                let totalPaginas = pdf.internal.getNumberOfPages();
-                let paginasRemovidas = 0;
-
-                for (let i = totalPaginas; i >= 1; i--) {
-                    if (!paginaTemConteudo(pdf, i - 1)) {
-                        pdf.deletePage(i);
-                        paginasRemovidas++;
-                    } else {
-                        // Se encontrou uma página com conteúdo, para de verificar
-                        // (páginas em branco só aparecem no final)
-                        break;
-                    }
-                }
-
-                console.log('Páginas em branco removidas:', paginasRemovidas);
-
-                // ===== SALVAR PDF =====
-                const nomeArquivo = 'Relatorio_' + perfilAtual.nome.replace(/\s/g, '_') + '_' +
-                    new Date().toISOString().slice(0, 10) + '.pdf';
-                pdf.save(nomeArquivo);
-
-            } catch (err) {
-                console.error('Erro ao gerar PDF:', err);
-                alert('Erro ao gerar PDF: ' + err.message);
-            }
-        }
-    </script>
 </body>
 </html>
