@@ -362,6 +362,27 @@
             margin-bottom: 4px;
         }
 
+        .status-box {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
         .report-item {
             display: flex;
             flex-direction: column;
@@ -1164,6 +1185,7 @@
                     <p style="color:#888;font-size:12px;" id="report-date"></p>
                 </div>
 
+                <div id="report-status" style="display:none;" class="status-box"></div>
                 <div id="report-data"></div>
                 <div id="report-docs"></div>
 
@@ -1408,12 +1430,26 @@
         function tirarFoto() {
             const video = $("camera-video");
             const canvas = $("camera-canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            let w = video.videoWidth || 1280;
+            let h = video.videoHeight || 720;
+            const maxDim = 1280;
+            if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                    h = Math.round((h * maxDim) / w);
+                    w = maxDim;
+                } else {
+                    w = Math.round((w * maxDim) / h);
+                    h = maxDim;
+                }
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, w, h);
+
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
             fecharCamera();
 
             exibirPrevia(dataUrl, perfilAtual.docs[indiceDoc]);
@@ -1423,33 +1459,57 @@
             $("fileInputHidden").click();
         }
 
+        // Otimizador de imagem para evitar Payload Too Large (limite da Vercel)
+        function redimensionarImagem(file, maxDim = 1280, qualidade = 0.80) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        const canvas = document.createElement("canvas");
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL("image/jpeg", qualidade));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         async function converterPdfParaImagem(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             const page = await pdf.getPage(1);
-            const viewport = page.getViewport({ scale: 1.5 });
+            const viewport = page.getViewport({ scale: 1.2 });
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-            return canvas.toDataURL("image/jpeg", 0.90);
-        }
-
-        function lerArquivoComoDataUrl(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+            return canvas.toDataURL("image/jpeg", 0.80);
         }
 
         async function arquivoSelecionado(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            mostrarLoading("Processando documento...");
+            mostrarLoading("Processando e otimizando documento...");
             try {
                 let dataUrl = "";
                 const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
@@ -1457,7 +1517,7 @@
                 if (isPdf && window.pdfjsLib) {
                     dataUrl = await converterPdfParaImagem(file);
                 } else {
-                    dataUrl = await lerArquivoComoDataUrl(file);
+                    dataUrl = await redimensionarImagem(file);
                 }
 
                 exibirPrevia(dataUrl, file.name);
@@ -1744,6 +1804,9 @@
             $("report-perfil").textContent = perfilAtual.nome;
             $("report-date").textContent = "Data: " + new Date().toLocaleString("pt-BR");
 
+            const statusEl = $("report-status");
+            statusEl.style.display = "none";
+
             const containerDados = $("report-data");
             containerDados.innerHTML = "";
 
@@ -1787,6 +1850,8 @@
         // Envio para a Vercel com Anexos Reais
         async function enviarEmailNotificacao(manual = false) {
             mostrarLoading("Enviando e-mail com anexos...");
+            const statusEl = $("report-status");
+
             try {
                 const nomeCliente = (typeof dadosFormulario !== 'undefined' && dadosFormulario) 
                     ? (dadosFormulario["Nome"] || "Cliente") 
@@ -1848,14 +1913,23 @@
                 });
 
                 if (response.ok) {
+                    statusEl.className = "status-box status-success";
+                    statusEl.textContent = "✅ Dados e documentos enviados com sucesso por e-mail!";
+                    statusEl.style.display = "block";
                     if (manual) alert("E-mail com documentos enviado com sucesso!");
                 } else {
                     const err = await response.json().catch(() => ({}));
                     console.warn("Erro no envio:", err);
+                    statusEl.className = "status-box status-warning";
+                    statusEl.textContent = "⚠️ Ocorreu uma instabilidade no envio automático. Use o botão 'Reenviar por E-mail'.";
+                    statusEl.style.display = "block";
                     if (manual) alert("Falha ao enviar e-mail: " + (err.error || response.status));
                 }
             } catch (e) {
                 console.error("Erro na requisição:", e);
+                statusEl.className = "status-box status-warning";
+                statusEl.textContent = "⚠️ Não foi possível conectar ao servidor de e-mail.";
+                statusEl.style.display = "block";
                 if (manual) alert("Erro ao conectar com a API de envio.");
             } finally {
                 esconderLoading();
