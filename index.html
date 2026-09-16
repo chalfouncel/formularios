@@ -2,301 +2,354 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&IC Corretores de Imóveis</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Documentos - M&IC Corretores</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
-            color: #f0f0f0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: #f5f5f5;
+            color: #333;
         }
 
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        /* ===== HEADER ===== */
+        /* Header */
         .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 30px 20px;
             text-align: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
+            border-bottom: 4px solid #d4af37;
+        }
+
+        .logo-container {
+            margin-bottom: 15px;
         }
 
         .logo {
-            width: 180px;
-            height: auto;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+            width: 120px;
+            height: 120px;
+            background: #1a1a1a;
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #d4af37;
         }
 
         .header h1 {
             color: #d4af37;
-            font-size: 1.4em;
-            letter-spacing: 2px;
-            font-weight: 300;
-        }
-
-        /* ===== BOTÕES PRINCIPAIS ===== */
-        .main-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn-profile {
-            background: linear-gradient(145deg, #d4af37 0%, #b8941f 100%);
-            color: #0d0d0d;
-            border: none;
-            padding: 25px 15px;
-            border-radius: 12px;
-            font-size: 1em;
-            font-weight: 700;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
             letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .header p {
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background: #1a1a1a;
+            color: #d4af37;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        .btn-profile:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.5);
+        .badge-required {
+            background: #28a745;
+            color: #fff;
         }
 
-        .btn-profile .icon {
-            font-size: 2em;
+        .badge-optional {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
             display: block;
             margin-bottom: 8px;
-        }
-
-        /* ===== TELAS ===== */
-        .screen {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== LISTA DE DOCUMENTOS ===== */
-        .doc-info {
-            background: rgba(212, 175, 55, 0.1);
-            border-left: 4px solid #d4af37;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .doc-info h2 {
-            color: #d4af37;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .doc-info p {
-            color: #e0e0e0;
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
-
-        .doc-info ul {
-            margin-top: 10px;
-            padding-left: 20px;
-            color: #e0e0e0;
-        }
-
-        .doc-info ul li {
-            margin: 6px 0;
-            line-height: 1.5;
-        }
-
-        /* ===== BOTÕES DE AÇÃO ===== */
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
             font-weight: 600;
-            cursor: pointer;
-            margin: 10px 0;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #333;
         }
 
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        /* File Upload */
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #d4af37;
+        }
+
+        .btn-choose {
+            background: #d4af37;
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-choose:hover {
+            background: #c4a030;
+            transform: translateY(-2px);
+        }
+
+        .file-info {
+            flex: 1;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Camera Button */
+        .btn-camera {
+            background: #1a1a1a;
+            color: #d4af37;
+            padding: 12px 24px;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-camera:hover {
+            background: #d4af37;
+            color: #1a1a1a;
+        }
+
+        /* Preview */
+        .preview-container {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #d4af37;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        /* Buttons */
         .btn-primary {
-            background: linear-gradient(145deg, #d4af37 0%, #b8941f 100%);
-            color: #0d0d0d;
+            background: #d4af37;
+            color: #1a1a1a;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background: #c4a030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(224, 224, 224, 0.1);
-            color: #e0e0e0;
+            background: #1a1a1a;
+            color: #d4af37;
+            padding: 14px 32px;
             border: 2px solid #d4af37;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        .btn-danger {
-            background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 2px solid #dc3545;
+        .btn-secondary:hover {
+            background: #d4af37;
+            color: #1a1a1a;
         }
 
-        .btn:active {
-            transform: scale(0.97);
+        /* Profile Selection */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        /* ===== CAPTURA DE FOTO ===== */
-        .capture-area {
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px dashed #d4af37;
-            border-radius: 12px;
+        .profile-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             padding: 20px;
             text-align: center;
-            margin: 20px 0;
-        }
-
-        .capture-area video,
-        .capture-area img {
-            width: 100%;
-            border-radius: 8px;
-            margin: 10px 0;
-            background: #000;
-        }
-
-        .capture-area video {
-            max-height: 400px;
-            object-fit: cover;
-        }
-
-        .current-doc {
-            background: #d4af37;
-            color: #0d0d0d;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            text-align: center;
-            margin: 15px 0;
-        }
-
-        .progress {
-            color: #d4af37;
-            text-align: center;
-            margin: 10px 0;
-            font-size: 0.9em;
-        }
-
-        /* ===== RELATÓRIO FINAL ===== */
-        .report-doc {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .report-doc img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 2px solid #d4af37;
-        }
-
-        .report-doc-info {
-            flex: 1;
-        }
-
-        .report-doc-info h4 {
-            color: #d4af37;
-            margin-bottom: 5px;
-            font-size: 0.95em;
-        }
-
-        .report-doc-info p {
-            color: #aaa;
-            font-size: 0.8em;
-        }
-
-        /* ===== BACK BUTTON ===== */
-        .back-btn {
-            background: transparent;
-            border: none;
-            color: #d4af37;
-            font-size: 1em;
             cursor: pointer;
-            padding: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .profile-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+        }
+
+        .profile-card.selected {
+            border-color: #d4af37;
+            background: #fff8e1;
+        }
+
+        .profile-card h3 {
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Report */
+        .report-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #d4af37;
+        }
+
+        .report-header h2 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .report-section {
+            margin-bottom: 25px;
+        }
+
+        .report-section h3 {
+            color: #d4af37;
+            background: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 6px;
             margin-bottom: 15px;
         }
 
-        .back-btn::before {
-            content: "←";
-            font-size: 1.3em;
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        /* ===== FOOTER ===== */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 0.8em;
-            margin-top: 30px;
+        .report-item:last-child {
+            border-bottom: none;
         }
 
-        /* ===== INPUT FILE OCULTO ===== */
-        #fileInput {
-            display: none;
-        }
-
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            color: #d4af37;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 3px solid rgba(212, 175, 55, 0.2);
-            border-top: 3px solid #d4af37;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== MODAL ===== */
+        /* Camera Modal */
         .modal {
             display: none;
             position: fixed;
@@ -304,11 +357,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
+            justify-content: center;
         }
 
         .modal.active {
@@ -316,540 +368,514 @@
         }
 
         .modal-content {
-            background: #1a1a1a;
-            border: 2px solid #d4af37;
+            background: #fff;
+            padding: 20px;
             border-radius: 12px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
         }
 
-        .modal-content h3 {
-            color: #d4af37;
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #cameraVideo {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
             margin-bottom: 15px;
         }
 
-        .modal-content p {
-            color: #e0e0e0;
-            margin-bottom: 20px;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success-message.active {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-
-        <!-- ===== TELA PRINCIPAL ===== -->
-        <div id="screen-main" class="screen active">
-            <div class="header">
-                <!-- ⚠️ SUBSTITUIR: URL da logomarca no GitHub -->
-                <img src="https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/Loga%20marca%20nova.png" 
-                     alt="M&IC Corretores de Imóveis" 
-                     class="logo"
-                     onerror="this.style.display='none'">
-                <h1>M&IC CORRETORES DE IMÓVEIS</h1>
-            </div>
-
-            <div class="main-buttons">
-                <button class="btn-profile" onclick="selectProfile('proprietario')">
-                    <span class="icon"></span>
-                    Proprietário
-                </button>
-                <button class="btn-profile" onclick="selectProfile('comprador')">
-                    <span class="icon">🛒</span>
-                    Comprador
-                </button>
-                <button class="btn-profile" onclick="selectProfile('inquilino')">
-                    <span class="icon"></span>
-                    Inquilino
-                </button>
-                <button class="btn-profile" onclick="selectProfile('corretor')">
-                    <span class="icon">🤝</span>
-                    Corretor
-                </button>
-            </div>
-
-            <div class="footer">
-                © 2026 M&IC Corretores de Imóveis
-            </div>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">M&IC</div>
         </div>
-
-        <!-- ===== TELA DE INFORMAÇÃO DE DOCUMENTOS ===== -->
-        <div id="screen-info" class="screen">
-            <button class="back-btn" onclick="goToMain()">Voltar</button>
-            <div class="doc-info">
-                <h2 id="info-title">Documentos Necessários</h2>
-                <p id="info-text"></p>
-                <ul id="info-list"></ul>
-            </div>
-            <button class="btn btn-primary" onclick="startCapture()">
-                📷 Iniciar Captura de Documentos
-            </button>
-        </div>
-
-        <!-- ===== TELA DE CAPTURA ===== -->
-        <div id="screen-capture" class="screen">
-            <button class="back-btn" onclick="cancelCapture()">Cancelar</button>
-            
-            <div class="current-doc" id="current-doc-name">Documento 1</div>
-            <div class="progress" id="capture-progress">Documento 1 de 3</div>
-
-            <div class="capture-area">
-                <video id="camera" autoplay playsinline></video>
-                <canvas id="canvas" style="display:none;"></canvas>
-                <img id="preview" style="display:none;" alt="Preview">
-            </div>
-
-            <div id="capture-buttons">
-                <button class="btn btn-primary" onclick="openCamera()"> Tirar Foto</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
-                    📎 Anexar da Galeria
-                </button>
-            </div>
-
-            <div id="preview-buttons" style="display:none;">
-                <button class="btn btn-primary" onclick="confirmPhoto()">✅ Confirmar Foto</button>
-                <button class="btn btn-secondary" onclick="retakePhoto()">🔄 Tirar Novamente</button>
-            </div>
-
-            <input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleFileSelect(event)">
-        </div>
-
-        <!-- ===== TELA DE RELATÓRIO FINAL ===== -->
-        <div id="screen-report" class="screen">
-            <button class="back-btn" onclick="goToMain()">Voltar ao Início</button>
-            
-            <div class="doc-info">
-                <h2> Relatório Final</h2>
-                <p id="report-profile-name"></p>
-            </div>
-
-            <div id="report-docs-list"></div>
-
-            <button class="btn btn-primary" onclick="generatePDF()">
-                📄 Gerar PDF com Marca D'água
-            </button>
-            <button class="btn btn-secondary" onclick="resetAll()">
-                🔄 Novo Processo
-            </button>
-        </div>
-
+        <h1>Captura de Documentos</h1>
+        <p>M&IC CORRETORES DE IMÓVEIS</p>
     </div>
 
-    <!-- ===== MODAL ===== -->
-    <div id="modal" class="modal">
+    <div class="container">
+        <!-- Profile Selection -->
+        <div class="card" id="profileSection">
+            <div class="section-header">
+                <h2>Selecione o Perfil</h2>
+            </div>
+            <div class="profile-grid">
+                <div class="profile-card" data-profile="proprietario">
+                    <h3>Proprietário</h3>
+                    <p>Documentos para venda ou locação</p>
+                </div>
+                <div class="profile-card" data-profile="comprador">
+                    <h3>Comprador</h3>
+                    <p>Documentos para aquisição</p>
+                </div>
+                <div class="profile-card" data-profile="inquilino">
+                    <h3>Inquilino</h3>
+                    <p>Documentos para locação</p>
+                </div>
+                <div class="profile-card" data-profile="corretor">
+                    <h3>Corretor</h3>
+                    <p>Documentos profissionais</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="card" id="infoSection" style="display: none;">
+            <div class="section-header">
+                <h2>Informações Pessoais</h2>
+            </div>
+            <div class="form-group">
+                <label for="fullName">Nome Completo *</label>
+                <input type="text" id="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail *</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telefone *</label>
+                <input type="tel" id="phone" placeholder="(00) 00000-0000" required>
+            </div>
+            <div class="form-group">
+                <label for="cpf">CPF *</label>
+                <input type="text" id="cpf" placeholder="000.000.000-00" required>
+            </div>
+            <button class="btn-primary" onclick="nextSection('documents')">Continuar</button>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="card" id="documentsSection" style="display: none;">
+            <!-- Document 1 -->
+            <div class="section-header">
+                <h2>1. Documento de Identidade (RG/CNH)</h2>
+                <span class="badge badge-required">Obrigatório</span>
+            </div>
+            <div class="file-upload">
+                <button class="btn-choose" onclick="document.getElementById('doc1').click()">Escolher arquivos</button>
+                <span class="file-info" id="doc1-info">Nenhum arquivo escolhido</span>
+                <input type="file" id="doc1" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this, 'doc1')">
+            </div>
+            <button class="btn-camera" onclick="openCamera('doc1')">📷 Capturar com Câmera</button>
+            <div class="preview-container" id="doc1-preview"></div>
+
+            <!-- Document 2 -->
+            <div class="section-header" style="margin-top: 30px;">
+                <h2>2. Comprovante de Renda</h2>
+                <span class="badge badge-required">Obrigatório</span>
+            </div>
+            <div class="file-upload">
+                <button class="btn-choose" onclick="document.getElementById('doc2').click()">Escolher arquivos</button>
+                <span class="file-info" id="doc2-info">Nenhum arquivo escolhido</span>
+                <input type="file" id="doc2" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this, 'doc2')">
+            </div>
+            <button class="btn-camera" onclick="openCamera('doc2')">📷 Capturar com Câmera</button>
+            <div class="preview-container" id="doc2-preview"></div>
+
+            <!-- Document 3 -->
+            <div class="section-header" style="margin-top: 30px;">
+                <h2>3. Comprovante de Residência</h2>
+                <span class="badge badge-required">Obrigatório</span>
+            </div>
+            <div class="file-upload">
+                <button class="btn-choose" onclick="document.getElementById('doc3').click()">Escolher arquivos</button>
+                <span class="file-info" id="doc3-info">Nenhum arquivo escolhido</span>
+                <input type="file" id="doc3" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this, 'doc3')">
+            </div>
+            <button class="btn-camera" onclick="openCamera('doc3')">📷 Capturar com Câmera</button>
+            <div class="preview-container" id="doc3-preview"></div>
+
+            <!-- Document 4 -->
+            <div class="section-header" style="margin-top: 30px;">
+                <h2>4. Contrato de Locação/Venda (se aplicável)</h2>
+                <span class="badge badge-optional">Opcional</span>
+            </div>
+            <div class="file-upload">
+                <button class="btn-choose" onclick="document.getElementById('doc4').click()">Escolher arquivos</button>
+                <span class="file-info" id="doc4-info">Nenhum arquivo escolhido</span>
+                <input type="file" id="doc4" accept="image/*,.pdf" multiple style="display: none;" onchange="handleFileSelect(this, 'doc4')">
+            </div>
+            <button class="btn-camera" onclick="openCamera('doc4')">📷 Capturar com Câmera</button>
+            <div class="preview-container" id="doc4-preview"></div>
+
+            <button class="btn-primary" onclick="generateReport()">Gerar Relatório</button>
+        </div>
+
+        <!-- Report Section -->
+        <div class="card" id="reportSection" style="display: none;">
+            <div class="report-container">
+                <div class="report-header">
+                    <h2>Relatório de Documentos</h2>
+                    <p id="reportDate"></p>
+                </div>
+                <div id="reportContent"></div>
+                <button class="btn-primary" onclick="downloadPDF()">📄 Baixar PDF</button>
+                <button class="btn-secondary" onclick="resetForm()">Novo Registro</button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processando documentos...</p>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            ✓ Documentos capturados com sucesso!
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div class="modal" id="cameraModal">
+        <button class="modal-close" onclick="closeCamera()">×</button>
         <div class="modal-content">
-            <h3 id="modal-title">Atenção</h3>
-            <p id="modal-text"></p>
-            <button class="btn btn-primary" onclick="closeModal()">OK</button>
+            <video id="cameraVideo" autoplay></video>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
+            <button class="btn-primary" onclick="capturePhoto()">📸 Capturar Foto</button>
         </div>
     </div>
 
     <script>
-        // ===== CONFIGURAÇÃO DOS PERFIS =====
-        const profiles = {
-            proprietario: {
-                name: 'Proprietário',
-                text: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Certidão de Estado Civil (Nascimento ou Casamento)'
-                ]
-            },
-            comprador: {
-                name: 'Comprador',
-                text: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Certidão de Estado Civil (Nascimento ou Casamento)',
-                    'CTPS Digital',
-                    'FGTS Digital',
-                    'Recibo de entrega do IR',
-                    'Imposto de Renda Completo'
-                ]
-            },
-            inquilino: {
-                name: 'Inquilino',
-                text: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Recibo de entrega do IR',
-                    'Imposto de Renda Completo'
-                ]
-            },
-            corretor: {
-                name: 'Corretor',
-                text: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'CRECI'
-                ]
-            }
+        let selectedProfile = '';
+        let currentCameraDoc = '';
+        let stream = null;
+        const uploadedFiles = {
+            doc1: [],
+            doc2: [],
+            doc3: [],
+            doc4: []
         };
 
-        // ===== ESTADO DO APP =====
-        let currentProfile = null;
-        let currentDocIndex = 0;
-        let capturedDocs = [];
-        let cameraStream = null;
-
-        // ===== NAVEGAÇÃO ENTRE TELAS =====
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function goToMain() {
-            stopCamera();
-            showScreen('screen-main');
-        }
-
-        // ===== SELEÇÃO DE PERFIL =====
-        function selectProfile(profileKey) {
-            currentProfile = profiles[profileKey];
-            currentDocIndex = 0;
-            capturedDocs = [];
-
-            document.getElementById('info-title').textContent = 
-                `Documentos - ${currentProfile.name}`;
-            document.getElementById('info-text').textContent = currentProfile.text;
-
-            const list = document.getElementById('info-list');
-            list.innerHTML = '';
-            currentProfile.docs.forEach(doc => {
-                const li = document.createElement('li');
-                li.textContent = doc;
-                list.appendChild(li);
+        // Profile Selection
+        document.querySelectorAll('.profile-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.profile-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedProfile = this.dataset.profile;
+                setTimeout(() => {
+                    document.getElementById('infoSection').style.display = 'block';
+                    document.getElementById('infoSection').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
             });
+        });
 
-            showScreen('screen-info');
-        }
-
-        // ===== INICIAR CAPTURA =====
-        function startCapture() {
-            showScreen('screen-capture');
-            loadNextDoc();
-        }
-
-        function loadNextDoc() {
-            if (currentDocIndex >= currentProfile.docs.length) {
-                showReport();
-                return;
+        // Phone Mask
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+                value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+                e.target.value = value;
             }
+        });
 
-            const docName = currentProfile.docs[currentDocIndex];
-            document.getElementById('current-doc-name').textContent = docName;
-            document.getElementById('capture-progress').textContent = 
-                `Documento ${currentDocIndex + 1} de ${currentProfile.docs.length}`;
+        // CPF Mask
+        document.getElementById('cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            }
+        });
 
-            document.getElementById('preview').style.display = 'none';
-            document.getElementById('camera').style.display = 'block';
-            document.getElementById('capture-buttons').style.display = 'block';
-            document.getElementById('preview-buttons').style.display = 'none';
+        function nextSection(section) {
+            if (section === 'documents') {
+                const name = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const cpf = document.getElementById('cpf').value;
+
+                if (!name || !email || !phone || !cpf) {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                document.getElementById('documentsSection').style.display = 'block';
+                document.getElementById('documentsSection').scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
-        // ===== CÂMERA =====
-        async function openCamera() {
-            try {
-                const video = document.getElementById('camera');
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
+        function handleFileSelect(input, docId) {
+            const files = Array.from(input.files);
+            const infoElement = document.getElementById(`${docId}-info`);
+            const previewContainer = document.getElementById(`${docId}-preview`);
+
+            if (files.length > 0) {
+                infoElement.textContent = `${files.length} arquivo(s) selecionado(s)`;
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            uploadedFiles[docId].push({
+                                name: file.name,
+                                data: e.target.result,
+                                type: file.type
+                            });
+                            updatePreview(docId);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        uploadedFiles[docId].push({
+                            name: file.name,
+                            data: null,
+                            type: file.type
+                        });
                     }
                 });
-                video.srcObject = cameraStream;
-                video.style.display = 'block';
-                document.getElementById('preview').style.display = 'none';
-            } catch (err) {
-                showModal('Erro de Câmera', 
-                    'Não foi possível acessar a câmera. Use a opção "Anexar da Galeria".');
             }
         }
 
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null;
+        function updatePreview(docId) {
+            const previewContainer = document.getElementById(`${docId}-preview`);
+            previewContainer.innerHTML = '';
+
+            uploadedFiles[docId].forEach((file, index) => {
+                if (file.data) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${file.data}" alt="${file.name}">
+                        <button class="remove-btn" onclick="removeFile('${docId}', ${index})">×</button>
+                    `;
+                    previewContainer.appendChild(div);
+                }
+            });
+        }
+
+        function removeFile(docId, index) {
+            uploadedFiles[docId].splice(index, 1);
+            updatePreview(docId);
+            
+            const infoElement = document.getElementById(`${docId}-info`);
+            if (uploadedFiles[docId].length === 0) {
+                infoElement.textContent = 'Nenhum arquivo escolhido';
+            } else {
+                infoElement.textContent = `${uploadedFiles[docId].length} arquivo(s) selecionado(s)`;
+            }
+        }
+
+        async function openCamera(docId) {
+            currentCameraDoc = docId;
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('cameraVideo');
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                modal.classList.add('active');
+            } catch (err) {
+                alert('Erro ao acessar a câmera: ' + err.message);
+            }
+        }
+
+        function closeCamera() {
+            const modal = document.getElementById('cameraModal');
+            modal.classList.remove('active');
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
             }
         }
 
         function capturePhoto() {
-            const video = document.getElementById('camera');
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const context = canvas.getContext('2d');
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
+            context.drawImage(video, 0, 0);
 
-            const dataURL = canvas.toDataURL('image/jpeg', 0.9);
-            showPreview(dataURL);
-            stopCamera();
+            const imageData = canvas.toDataURL('image/jpeg', 0.9);
+            const timestamp = new Date().getTime();
+
+            uploadedFiles[currentCameraDoc].push({
+                name: `foto_${timestamp}.jpg`,
+                data: imageData,
+                type: 'image/jpeg'
+            });
+
+            updatePreview(currentCameraDoc);
+            closeCamera();
+
+            const infoElement = document.getElementById(`${currentCameraDoc}-info`);
+            infoElement.textContent = `${uploadedFiles[currentCameraDoc].length} arquivo(s) selecionado(s)`;
         }
 
-        // ===== SELEÇÃO DE ARQUIVO =====
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function generateReport() {
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const cpf = document.getElementById('cpf').value;
 
-            const reader = new FileReader();
-            reader.onload = (e) => showPreview(e.target.result);
-            reader.readAsDataURL(file);
-        }
-
-        // ===== PREVIEW E ENQUADRAMENTO =====
-        function showPreview(dataURL) {
-            const img = document.getElementById('preview');
-            img.src = dataURL;
-            img.style.display = 'block';
-            document.getElementById('camera').style.display = 'none';
-            document.getElementById('capture-buttons').style.display = 'none';
-            document.getElementById('preview-buttons').style.display = 'block';
-        }
-
-        function retakePhoto() {
-            document.getElementById('preview').style.display = 'none';
-            document.getElementById('camera').style.display = 'block';
-            document.getElementById('capture-buttons').style.display = 'block';
-            document.getElementById('preview-buttons').style.display = 'none';
-            document.getElementById('fileInput').value = '';
-            openCamera();
-        }
-
-        function confirmPhoto() {
-            const img = document.getElementById('preview');
-            const originalSrc = img.src;
-
-            // Enquadramento proporcional via canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const image = new Image();
-
-            image.onload = () => {
-                // Redimensiona mantendo proporção (max 1200px)
-                const maxSize = 1200;
-                let width = image.width;
-                let height = image.height;
-
-                if (width > height && width > maxSize) {
-                    height = (height * maxSize) / width;
-                    width = maxSize;
-                } else if (height > maxSize) {
-                    width = (width * maxSize) / height;
-                    height = maxSize;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(image, 0, 0, width, height);
-
-                const finalDataURL = canvas.toDataURL('image/jpeg', 0.9);
-
-                capturedDocs.push({
-                    name: currentProfile.docs[currentDocIndex],
-                    data: finalDataURL,
-                    timestamp: new Date().toLocaleString('pt-BR')
-                });
-
-                currentDocIndex++;
-                document.getElementById('fileInput').value = '';
-                loadNextDoc();
-            };
-
-            image.src = originalSrc;
-        }
-
-        function cancelCapture() {
-            if (capturedDocs.length > 0) {
-                showModal('Cancelar Captura', 
-                    'Deseja realmente cancelar? Os documentos capturados serão perdidos.',
-                    () => {
-                        capturedDocs = [];
-                        currentDocIndex = 0;
-                        stopCamera();
-                        showScreen('screen-info');
-                    });
-            } else {
-                stopCamera();
-                showScreen('screen-info');
+            // Check required documents
+            if (uploadedFiles.doc1.length === 0 || 
+                uploadedFiles.doc2.length === 0 || 
+                uploadedFiles.doc3.length === 0) {
+                alert('Por favor, envie todos os documentos obrigatórios.');
+                return;
             }
-        }
 
-        // ===== RELATÓRIO FINAL =====
-        function showReport() {
-            document.getElementById('report-profile-name').textContent = 
-                `Perfil: ${currentProfile.name} — ${capturedDocs.length} documento(s) capturado(s)`;
+            document.getElementById('loading').classList.add('active');
 
-            const list = document.getElementById('report-docs-list');
-            list.innerHTML = '';
+            setTimeout(() => {
+                document.getElementById('loading').classList.remove('active');
+                
+                const reportContent = document.getElementById('reportContent');
+                const reportDate = document.getElementById('reportDate');
+                
+                reportDate.textContent = `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+                
+                reportContent.innerHTML = `
+                    <div class="report-section">
+                        <h3>Informações Pessoais</h3>
+                        <div class="report-item">
+                            <span><strong>Nome:</strong></span>
+                            <span>${name}</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>E-mail:</strong></span>
+                            <span>${email}</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>Telefone:</strong></span>
+                            <span>${phone}</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>CPF:</strong></span>
+                            <span>${cpf}</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>Perfil:</strong></span>
+                            <span>${selectedProfile.charAt(0).toUpperCase() + selectedProfile.slice(1)}</span>
+                        </div>
+                    </div>
 
-            capturedDocs.forEach((doc, idx) => {
-                const div = document.createElement('div');
-                div.className = 'report-doc';
-                div.innerHTML = `
-                    <img src="${doc.data}" alt="${doc.name}">
-                    <div class="report-doc-info">
-                        <h4>${idx + 1}. ${doc.name}</h4>
-                        <p>Capturado em: ${doc.timestamp}</p>
+                    <div class="report-section">
+                        <h3>Documentos Enviados</h3>
+                        <div class="report-item">
+                            <span><strong>Documento de Identidade:</strong></span>
+                            <span>${uploadedFiles.doc1.length} arquivo(s)</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>Comprovante de Renda:</strong></span>
+                            <span>${uploadedFiles.doc2.length} arquivo(s)</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>Comprovante de Residência:</strong></span>
+                            <span>${uploadedFiles.doc3.length} arquivo(s)</span>
+                        </div>
+                        <div class="report-item">
+                            <span><strong>Contrato (opcional):</strong></span>
+                            <span>${uploadedFiles.doc4.length > 0 ? uploadedFiles.doc4.length + ' arquivo(s)' : 'Não enviado'}</span>
+                        </div>
                     </div>
                 `;
-                list.appendChild(div);
-            });
 
-            showScreen('screen-report');
+                document.getElementById('reportSection').style.display = 'block';
+                document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+                
+                document.getElementById('successMessage').classList.add('active');
+                setTimeout(() => {
+                    document.getElementById('successMessage').classList.remove('active');
+                }, 3000);
+            }, 1500);
         }
 
-        // ===== GERAÇÃO DE PDF =====
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
+        function downloadPDF() {
+            alert('Funcionalidade de download PDF será implementada com biblioteca jsPDF');
+        }
 
-            // ⚠️ SUBSTITUIR: URL da marca d'água no GitHub
-            const watermarkURL = 'https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/Marca%20dagua%20nova.png';
-
-            try {
-                // Carregar marca d'água
-                const watermarkImg = await loadImage(watermarkURL);
-                const watermarkData = await imageToDataURL(watermarkImg);
-
-                // Cabeçalho
-                pdf.setFillColor(13, 13, 13);
-                pdf.rect(0, 0, 210, 40, 'F');
-                
-                pdf.setTextColor(212, 175, 55);
-                pdf.setFontSize(22);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('M&IC CORRETORES DE IMÓVEIS', 105, 20, { align: 'center' });
-                
-                pdf.setTextColor(224, 224, 224);
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'normal');
-                pdf.text(`Relatório de Documentos - ${currentProfile.name}`, 105, 30, { align: 'center' });
-
-                pdf.setTextColor(100, 100, 100);
-                pdf.setFontSize(9);
-                pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 105, 36, { align: 'center' });
-
-                let yPos = 50;
-
-                // Adicionar cada documento
-                for (let i = 0; i < capturedDocs.length; i++) {
-                    const doc = capturedDocs[i];
-
-                    // Verificar espaço na página
-                    if (yPos > 240) {
-                        pdf.addPage();
-                        yPos = 20;
-                    }
-
-                    // Título do documento
-                    pdf.setFillColor(212, 175, 55);
-                    pdf.rect(10, yPos - 5, 190, 8, 'F');
-                    pdf.setTextColor(13, 13, 13);
-                    pdf.setFontSize(11);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text(`${i + 1}. ${doc.name}`, 15, yPos + 1);
-                    yPos += 12;
-
-                    // Imagem do documento
-                    try {
-                        const imgProps = pdf.getImageProperties(doc.data);
-                        const imgWidth = 150;
-                        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-                        // Limitar altura
-                        const maxHeight = 120;
-                        let finalHeight = imgHeight;
-                        let finalWidth = imgWidth;
-                        if (finalHeight > maxHeight) {
-                            finalWidth = (imgWidth * maxHeight) / imgHeight;
-                            finalHeight = maxHeight;
-                        }
-
-                        const xPos = (210 - finalWidth) / 2;
-                        pdf.addImage(doc.data, 'JPEG', xPos, yPos, finalWidth, finalHeight);
-                        yPos += finalHeight + 10;
-                    } catch (err) {
-                        pdf.setTextColor(220, 53, 69);
-                        pdf.text('[Erro ao carregar imagem]', 105, yPos, { align: 'center' });
-                        yPos += 15;
-                    }
-                }
-
-                // Adicionar marca d'água em todas as páginas
-                const totalPages = pdf.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    pdf.addImage(watermarkData, 'PNG', 10, 270, 190, 20, undefined, 'FAST', 0.15);
-                }
-
-                // Salvar
-                const fileName = `M&IC_${currentProfile.name}_${Date.now()}.pdf`;
-                pdf.save(fileName);
-
-                showModal('PDF Gerado!', 
-                    `O arquivo "${fileName}" foi baixado com sucesso.`);
-
-            } catch (err) {
-                console.error(err);
-                showModal('Erro ao gerar PDF', 
-                    'Verifique se a URL da marca d\'água está correta e tente novamente.');
+        function resetForm() {
+            if (confirm('Deseja iniciar um novo registro? Todos os dados serão perdidos.')) {
+                location.reload();
             }
         }
 
-        // ===== HELPERS =====
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
-        function imageToDataURL(img) {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            return canvas.toDataURL('image/png');
-        }
-
-        function showModal(title, text, onConfirm) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-text').textContent = text;
-            document.getElementById('modal').classList.add('active');
-            
-            const btn = document.querySelector('#modal .btn');
-            btn.onclick = () => {
-                closeModal();
-                if (onConfirm) onConfirm();
-            };
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-
-        function resetAll() {
-            currentProfile = null;
-            currentDocIndex = 0;
-            capturedDocs = [];
-            goToMain();
-        }
-
-        // ===== INICIALIZAÇÃO =====
-        window.addEventListener('beforeunload', () => {
-            stopCamera();
+        // Close modal on outside click
+        document.getElementById('cameraModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCamera();
+            }
         });
     </script>
 </body>
 </html>
-
