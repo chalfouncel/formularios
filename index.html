@@ -373,26 +373,15 @@
         }
 
         .report-item img {
-            width: 220px;
+            width: 260px;
             max-width: 100%;
             height: auto;
-            max-height: 320px;
+            max-height: 360px;
             object-fit: contain;
             border-radius: 6px;
             border: 2px solid #d4af37;
             background: #fff;
-        }
-
-        .report-item .file-icon {
-            width: 90px;
-            height: 90px;
-            border-radius: 6px;
-            border: 2px solid #d4af37;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            background: #f8f9fa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .report-item strong {
@@ -504,7 +493,7 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -636,7 +625,7 @@
                     </button>
 
                     <button class="btn btn-dark" onclick="abrirGaleria()">
-                        📎 Anexar da galeria
+                        📎 Anexar da galeria / Arquivo
                     </button>
                 </div>
 
@@ -653,7 +642,7 @@
                 <input
                     type="file"
                     id="fileInputHidden"
-                    accept="image/*,.pdf,.heic,.heif,.tif,.tiff,.bmp"
+                    accept="image/*,application/pdf"
                     onchange="arquivoSelecionado(event)"
                 >
             </div>
@@ -1213,6 +1202,7 @@
         <div class="loading-text" id="loading-text">Processando...</div>
     </div>
 
+    <!-- Bibliotecas PDF.js e jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
@@ -1281,6 +1271,15 @@
         let etapaProprietario = 1;
 
         const $ = id => document.getElementById(id);
+
+        function mostrarLoading(texto) {
+            $("loading-text").innerText = texto || "Processando...";
+            $("loading-overlay").classList.add("active");
+        }
+
+        function esconderLoading() {
+            $("loading-overlay").classList.remove("active");
+        }
 
         function mostrarTela(id) {
             document.querySelectorAll(".screen").forEach(tela => {
@@ -1430,15 +1429,51 @@
             $("fileInputHidden").click();
         }
 
-        function arquivoSelecionado(event) {
+        // CONVERSÃO INTELIGENTE DE PDF / IMAGEM
+        async function converterPdfParaImagem(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            return canvas.toDataURL("image/jpeg", 0.90);
+        }
+
+        function lerArquivoComoDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function arquivoSelecionado(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                exibirPrevia(e.target.result, file.name);
-            };
-            reader.readAsDataURL(file);
+            mostrarLoading("Processando documento...");
+            try {
+                let dataUrl = "";
+                const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+                if (isPdf && window.pdfjsLib) {
+                    dataUrl = await converterPdfParaImagem(file);
+                } else {
+                    dataUrl = await lerArquivoComoDataUrl(file);
+                }
+
+                exibirPrevia(dataUrl, file.name);
+            } catch (err) {
+                console.error("Falha ao ler arquivo:", err);
+                alert("Erro ao ler o arquivo: " + err.message);
+            } finally {
+                esconderLoading();
+            }
         }
 
         function exibirPrevia(src, nome) {
@@ -1486,13 +1521,8 @@
         }
 
         function mudarFinalidade() {
-            const finalidade = document.querySelector(
-                'input[name="finalidade"]:checked'
-            );
-
-            if (!finalidade) {
-                return;
-            }
+            const finalidade = document.querySelector('input[name="finalidade"]:checked');
+            if (!finalidade) return;
 
             $("label-endereco-imovel").textContent =
                 finalidade.value === "locacao"
@@ -1501,25 +1531,15 @@
         }
 
         function toggleFinanciamento() {
-            const financiado = document.querySelector(
-                'input[name="financiado"]:checked'
-            );
-
+            const financiado = document.querySelector('input[name="financiado"]:checked');
             $("campo-banco-financiamento").style.display =
-                financiado && financiado.value === "sim"
-                    ? "block"
-                    : "none";
+                financiado && financiado.value === "sim" ? "block" : "none";
         }
 
         function togglePet() {
-            const pet = document.querySelector(
-                'input[name="inquilino-pet"]:checked'
-            );
-
+            const pet = document.querySelector('input[name="inquilino-pet"]:checked');
             $("campo-pet-detalhe").style.display =
-                pet && pet.value === "sim"
-                    ? "block"
-                    : "none";
+                pet && pet.value === "sim" ? "block" : "none";
         }
 
         function valor(id) {
@@ -1530,23 +1550,18 @@
         function validarCampos(ids) {
             for (const id of ids) {
                 const campo = $(id);
-
                 if (!campo || !campo.value.trim()) {
                     alert("Preencha todos os campos obrigatórios.");
                     if (campo) campo.focus();
                     return false;
                 }
             }
-
             return true;
         }
 
         function proximaEtapaProprietario(novaEtapa) {
             if (etapaProprietario === 1) {
-                const finalidade = document.querySelector(
-                    'input[name="finalidade"]:checked'
-                );
-
+                const finalidade = document.querySelector('input[name="finalidade"]:checked');
                 if (!finalidade) {
                     alert("Selecione se o imóvel é para locação ou venda.");
                     return;
@@ -1555,67 +1570,36 @@
 
             if (etapaProprietario === 2) {
                 const campos = [
-                    "f-nome",
-                    "f-nacionalidade",
-                    "f-estadoCivil",
-                    "f-profissao",
-                    "f-cpf",
-                    "f-endereco",
-                    "f-email",
-                    "f-telefone",
-                    "f-enderecoImovel"
+                    "f-nome", "f-nacionalidade", "f-estadoCivil", "f-profissao",
+                    "f-cpf", "f-endereco", "f-email", "f-telefone", "f-enderecoImovel"
                 ];
-
-                if (!validarCampos(campos)) {
-                    return;
-                }
+                if (!validarCampos(campos)) return;
             }
 
             if (etapaProprietario === 3) {
-                const campos = [
-                    "f-iptu",
-                    "f-matricula",
-                    "f-rgi"
-                ];
+                const campos = ["f-iptu", "f-matricula", "f-rgi"];
+                if (!validarCampos(campos)) return;
 
-                if (!validarCampos(campos)) {
-                    return;
-                }
-
-                const financiado = document.querySelector(
-                    'input[name="financiado"]:checked'
-                );
-
+                const financiado = document.querySelector('input[name="financiado"]:checked');
                 if (!financiado) {
                     alert("Informe se o imóvel está financiado.");
                     return;
                 }
 
-                const fgts = document.querySelector(
-                    'input[name="fgts"]:checked'
-                );
-
+                const fgts = document.querySelector('input[name="fgts"]:checked');
                 if (!fgts) {
                     alert("Informe se foi utilizado FGTS.");
                     return;
                 }
             }
 
-            const finalidade = document.querySelector(
-                'input[name="finalidade"]:checked'
-            );
-
-            if (
-                etapaProprietario === 2 &&
-                finalidade &&
-                finalidade.value === "locacao"
-            ) {
+            const finalidade = document.querySelector('input[name="finalidade"]:checked');
+            if (etapaProprietario === 2 && finalidade && finalidade.value === "locacao") {
                 novaEtapa = 4;
             }
 
             $("proprietario-etapa-" + etapaProprietario).style.display = "none";
             $("proprietario-etapa-" + novaEtapa).style.display = "block";
-
             etapaProprietario = novaEtapa;
             atualizarProgressoProprietario();
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1623,10 +1607,7 @@
 
         function voltarEtapaProprietario(novaEtapa) {
             if (novaEtapa === 3) {
-                const finalidade = document.querySelector(
-                    'input[name="finalidade"]:checked'
-                );
-
+                const finalidade = document.querySelector('input[name="finalidade"]:checked');
                 if (finalidade && finalidade.value === "locacao") {
                     novaEtapa = 2;
                 }
@@ -1634,7 +1615,6 @@
 
             $("proprietario-etapa-" + etapaProprietario).style.display = "none";
             $("proprietario-etapa-" + novaEtapa).style.display = "block";
-
             etapaProprietario = novaEtapa;
             atualizarProgressoProprietario();
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1664,9 +1644,7 @@
         }
 
         function finalizarFormularioProprietario() {
-            if (!validarCampos(["f-banco", "f-agencia", "f-conta", "f-chavePix"])) {
-                return;
-            }
+            if (!validarCampos(["f-banco", "f-agencia", "f-conta", "f-chavePix"])) return;
 
             const finalidade = document.querySelector('input[name="finalidade"]:checked').value;
             const financiado = document.querySelector('input[name="financiado"]:checked');
@@ -1714,7 +1692,6 @@
                 "fc-cpf", "fc-endereco", "fc-email", "fc-telefone",
                 "fc-banco", "fc-agencia", "fc-conta", "fc-chavePix"
             ];
-
             if (!validarCampos(campos)) return;
 
             dadosFormulario = {
@@ -1745,7 +1722,6 @@
                 "fi-cpf", "fi-endereco", "fi-email", "fi-telefone", "fi-pessoas",
                 "fi-banco", "fi-agencia", "fi-conta", "fi-chavePix"
             ];
-
             if (!validarCampos(campos)) return;
 
             const pet = document.querySelector('input[name="inquilino-pet"]:checked');
@@ -1837,7 +1813,7 @@
         }
 
         // ==========================================
-        // INTEGRAÇÃO COM SUPABASE / RESEND (EDGE FUNCTION)
+        // INTEGRAÇÃO COM SUPABASE / RESEND
         // ==========================================
         async function enviarEmailNotificacao(manual = false) {
             const btn = $("btn-enviar-email");
@@ -1846,27 +1822,27 @@
                 btn.innerText = "⏳ Enviando e-mail...";
             }
 
-            const overlay = $("loading-overlay");
-            const loadingText = $("loading-text");
-            if (overlay && loadingText) {
-                loadingText.innerText = "Enviando dados por e-mail...";
-                overlay.classList.add("active");
-            }
+            mostrarLoading("Enviando dados por e-mail...");
 
             try {
-                let htmlCorpo = `<h2>Novo Formulário Recebido — ${perfilAtual ? perfilAtual.nome : "Geral"}</h2>`;
-                htmlCorpo += `<p><strong>Data de envio:</strong> ${new Date().toLocaleString("pt-BR")}</p><hr>`;
-                htmlCorpo += `<h3>Dados Cadastrais:</h3><ul>`;
+                let htmlCorpo = `<div style="font-family: Arial, sans-serif; color: #333;">`;
+                htmlCorpo += `<h2 style="color: #b08d16; border-bottom: 2px solid #b08d16; padding-bottom: 6px;">Novo Cadastro — ${perfilAtual ? perfilAtual.nome : "Geral"}</h2>`;
+                htmlCorpo += `<p><strong>Data de envio:</strong> ${new Date().toLocaleString("pt-BR")}</p>`;
+                htmlCorpo += `<h3>Dados Cadastrais:</h3><table style="width: 100%; border-collapse: collapse;">`;
 
                 if (dadosFormulario) {
                     for (let chave in dadosFormulario) {
                         if (chave !== "tipo" && chave !== "titulo") {
-                            htmlCorpo += `<li><strong>${chave}:</strong> ${dadosFormulario[chave]}</li>`;
+                            htmlCorpo += `<tr>
+                                <td style="padding: 6px; border: 1px solid #ddd; background: #fafafa; font-weight: bold; width: 35%;">${chave}</td>
+                                <td style="padding: 6px; border: 1px solid #ddd;">${dadosFormulario[chave]}</td>
+                            </tr>`;
                         }
                     }
                 }
-                htmlCorpo += `</ul>`;
-                htmlCorpo += `<p><strong>Total de Documentos Capturados:</strong> ${docsCapturados.length}</p>`;
+                htmlCorpo += `</table>`;
+                htmlCorpo += `<p style="margin-top: 15px;"><strong>Documentos anexados/capturados:</strong> ${docsCapturados.length}</p>`;
+                htmlCorpo += `</div>`;
 
                 const resposta = await fetch("https://rzxutiozhkvbrcepbwam.supabase.co/functions/v1/send-email", {
                     method: "POST",
@@ -1874,7 +1850,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        to: "chalfouncorretor@gmail.com", // <-- SEU E-MAIL CONFIGURADO AQUI
+                        to: "chalfouncorretor@gmail.com",
                         subject: `Novo Cadastro: ${perfilAtual ? perfilAtual.nome : "Formulário"} - ${dadosFormulario ? (dadosFormulario["Nome completo"] || "") : ""}`,
                         html: htmlCorpo
                     })
@@ -1884,21 +1860,22 @@
                     if (manual) {
                         alert("E-mail enviado com sucesso para chalfouncorretor@gmail.com!");
                     } else {
-                        console.log("Notificação enviada com sucesso para chalfouncorretor@gmail.com");
+                        console.log("E-mail enviado com sucesso!");
                     }
                 } else {
-                    console.warn("Falha no envio do e-mail. Código de resposta: " + resposta.status);
+                    const textoErro = await resposta.text();
+                    console.error("Resposta do servidor:", resposta.status, textoErro);
                     if (manual) {
-                        alert("Houve uma falha ao enviar o e-mail. Verifique a Edge Function no Supabase.");
+                        alert(`Falha no envio (Status ${resposta.status}):\n${textoErro}`);
                     }
                 }
             } catch (err) {
-                console.error("Erro na requisição da Edge Function:", err);
+                console.error("Erro na chamada:", err);
                 if (manual) {
-                    alert("Erro ao conectar à Edge Function. Detalhes no console.");
+                    alert("Erro de conexão ao enviar o e-mail: " + err.message);
                 }
             } finally {
-                if (overlay) overlay.classList.remove("active");
+                esconderLoading();
                 if (btn) {
                     btn.disabled = false;
                     btn.innerText = "✉️ Reenviar por E-mail";
@@ -1906,35 +1883,133 @@
             }
         }
 
-        function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        // ==========================================
+        // GERAÇÃO COMPLETA DO RELATÓRIO EM PDF COM FOTOS
+        // ==========================================
+        async function gerarPDF() {
+            mostrarLoading("Gerando documento PDF...");
 
-            doc.setFontSize(16);
-            doc.text("Relatório de Documentos - M&IC Corretores", 15, 20);
-            doc.setFontSize(11);
-            doc.text(`Perfil: ${perfilAtual ? perfilAtual.nome : ""}`, 15, 28);
-            doc.text(`Data: ${new Date().toLocaleString("pt-BR")}`, 15, 34);
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4"
+                });
 
-            let y = 46;
-            if (dadosFormulario) {
-                doc.setFontSize(13);
-                doc.text(dadosFormulario.titulo, 15, y);
-                y += 8;
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const margin = 15;
+                const contentWidth = pageWidth - (margin * 2);
+
+                // --- PÁGINA 1: CABEÇALHO E DADOS CADASTRAIS ---
+                doc.setFillColor(26, 26, 26);
+                doc.rect(0, 0, pageWidth, 28, "F");
+                doc.setFillColor(212, 175, 55);
+                doc.rect(0, 28, pageWidth, 2, "F");
+
+                doc.setTextColor(212, 175, 55);
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("M&IC CORRETORES DE IMÓVEIS", pageWidth / 2, 13, { align: "center" });
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "normal");
+                doc.text("RELATÓRIO DE CADASTRO E DOCUMENTOS", pageWidth / 2, 20, { align: "center" });
+
+                // Informações Gerais
+                let y = 38;
+                doc.setTextColor(50, 50, 50);
                 doc.setFontSize(10);
-                for (let k in dadosFormulario) {
-                    if (k !== "tipo" && k !== "titulo") {
-                        if (y > 280) {
-                            doc.addPage();
-                            y = 20;
+                doc.text(`Perfil: ${perfilAtual ? perfilAtual.nome : ""}`, margin, y);
+                doc.text(`Data: ${new Date().toLocaleString("pt-BR")}`, pageWidth - margin, y, { align: "right" });
+
+                y += 8;
+                doc.setDrawColor(212, 175, 55);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 10;
+
+                if (dadosFormulario) {
+                    doc.setFontSize(13);
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(26, 26, 26);
+                    doc.text(dadosFormulario.titulo, margin, y);
+                    y += 6;
+
+                    doc.setFontSize(9);
+                    doc.setFont("helvetica", "normal");
+
+                    for (let chave in dadosFormulario) {
+                        if (chave !== "tipo" && chave !== "titulo") {
+                            if (y > pageHeight - 20) {
+                                doc.addPage();
+                                y = 20;
+                            }
+
+                            doc.setFillColor(248, 249, 250);
+                            doc.rect(margin, y - 4, contentWidth, 7, "F");
+
+                            doc.setFont("helvetica", "bold");
+                            doc.setTextColor(60, 60, 60);
+                            doc.text(chave + ":", margin + 3, y);
+
+                            doc.setFont("helvetica", "normal");
+                            doc.setTextColor(20, 20, 20);
+                            const valStr = String(dadosFormulario[chave]);
+                            doc.text(valStr, margin + 65, y, { maxWidth: contentWidth - 68 });
+
+                            y += 8;
                         }
-                        doc.text(`${k}: ${dadosFormulario[k]}`, 15, y);
-                        y += 6;
                     }
                 }
-            }
 
-            doc.save(`documentos_${perfilAtual ? perfilAtual.chave : "cadastro"}.pdf`);
+                // --- PÁGINAS SEGUINTES: CADA DOCUMENTO CAPTURADO ---
+                for (let i = 0; i < docsCapturados.length; i++) {
+                    const itemDoc = docsCapturados[i];
+                    doc.addPage();
+
+                    // Faixa Superior
+                    doc.setFillColor(26, 26, 26);
+                    doc.rect(0, 0, pageWidth, 18, "F");
+                    doc.setFillColor(212, 175, 55);
+                    doc.rect(0, 18, pageWidth, 1.5, "F");
+
+                    doc.setTextColor(212, 175, 55);
+                    doc.setFontSize(11);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`DOCUMENTO ${i + 1} DE ${docsCapturados.length}: ${itemDoc.tipo.toUpperCase()}`, pageWidth / 2, 11, { align: "center" });
+
+                    // Desenhar a imagem centralizada
+                    try {
+                        const maxImgWidth = contentWidth;
+                        const maxImgHeight = 240;
+                        const posX = margin;
+                        const posY = 30;
+
+                        doc.addImage(
+                            itemDoc.dataUrl,
+                            "JPEG",
+                            posX,
+                            posY,
+                            maxImgWidth,
+                            maxImgHeight,
+                            undefined,
+                            "FAST"
+                        );
+                    } catch (e) {
+                        console.error("Erro ao desenhar imagem no PDF:", e);
+                    }
+                }
+
+                doc.save(`documentos_${perfilAtual ? perfilAtual.chave : "cadastro"}.pdf`);
+            } catch (err) {
+                console.error("Erro ao gerar PDF:", err);
+                alert("Ocorreu um erro ao gerar o PDF: " + err.message);
+            } finally {
+                esconderLoading();
+            }
         }
 
         function novoProcesso() {
