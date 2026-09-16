@@ -1,87 +1,759 @@
-async function gerarPDF() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&IC Corretores de Imóveis</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color:#f5f5f5;
+            color:#333;
+        }
 
-    try {
-        const logoImg = await carregarImagem(logoUrl);
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 4px solid #d4af37;
+        }
+        .header img {
+            max-width: 150px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header h1 {
+            color: #d4af37;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header p {
+            color: #fff;
+            font-size: 13px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
 
-        // Cabeçalho
-        pdf.setFillColor(26, 26, 26);
-        pdf.rect(0, 0, 210, 45, 'F');
-        pdf.addImage(logoImg, 'PNG', 85, 5, 40, 20);
-        pdf.setTextColor(212, 175, 55);
-        pdf.setFontSize(18);
-        pdf.setFont(undefined, 'bold');
-        pdf.text('M&IC CORRETORES DE IMÓVEIS', 105, 32, { align: 'center' });
-        pdf.setTextColor(200, 200, 200);
-        pdf.setFontSize(10);
-        pdf.setFont(undefined, 'normal');
-        pdf.text('Relatório de Documentos — ' + perfilAtual.nome, 105, 39, { align: 'center' });
-        pdf.setTextColor(120, 120, 120);
-        pdf.setFontSize(8);
-        pdf.text(new Date().toLocaleString('pt-BR'), 105, 43, { align: 'center' });
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
 
-        let y = 55;
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
 
-        for (let i = 0; i < docsCapturados.length; i++) {
-            const doc = docsCapturados[i];
+        .section-header {
+            background: #1a1a1a;
+            color: #d4af37;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            font-weight: bold;
+        }
 
-            // ---- PRÉ-CALCULAR altura da imagem ----
-            let imgW = 170, imgH = 0, temImagem = false, formato = 'JPEG';
-            if (doc.foto && doc.foto.length > 100) {
-                try {
-                    const props = pdf.getImageProperties(doc.foto);
-                    if (doc.foto.indexOf('data:image/png') === 0) formato = 'PNG';
-                    imgW = 170;
-                    imgH = (props.height * imgW) / props.width;
-                    // Reduzir altura máxima para caber em uma folha
-                    if (imgH > 180) {
-                        imgH = 180;
-                        imgW = (props.width * imgH) / props.height;
-                    }
-                    temImagem = true;
-                } catch (e) {
-                    temImagem = false;
-                }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .main-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn-profile {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-profile .icon { font-size: 30px; display: block; margin-bottom: 6px; }
+        .btn-profile h3 { font-size: 14px; color: #1a1a1a; margin-bottom: 3px; }
+        .btn-profile small { font-size: 11px; color: #888; }
+        .btn-profile:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(212,175,55,0.2);
+        }
+
+        .instruction {
+            background: rgba(212,175,55,0.08);
+            border-left: 4px solid #d4af37;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #444;
+        }
+        .instruction strong { color: #d4af37; }
+        .instruction ul { margin-top: 8px; padding-left: 18px; }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            margin: 6px 0;
+            transition: all 0.2s;
+        }
+        .btn-gold { background: #d4af37; color: #1a1a1a; }
+        .btn-gold:hover { background: #c4a030; transform: translateY(-2px); }
+        .btn-dark { background: #1a1a1a; color: #d4af37; border: 2px solid #d4af37; }
+        .btn-dark:hover { background: #2d2d2d; }
+        .btn-confirm { background: #28a745; color: #fff; }
+        .btn-confirm:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: #fff; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-back {
+            background: none; border: none; color: #d4af37;
+            font-size: 15px; cursor: pointer; padding: 8px 0; margin-bottom: 10px;
+        }
+        .btn-back:hover { text-decoration: underline; }
+
+        .doc-progress {
+            text-align: center; color: #888; font-size: 13px; margin-bottom: 8px;
+        }
+        .doc-name {
+            background: #d4af37; color: #1a1a1a; padding: 13px;
+            border-radius: 8px; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;
+        }
+
+        .capture-area {
+            background: #f8f9fa;
+            border: 2px dashed #d4af37;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 12px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .capture-area img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 6px;
+            object-fit: contain;
+            display: block;
+        }
+        #placeholder-text { 
+            color: #888; 
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* ===== RELATÓRIO - IMAGENS EM TAMANHO DOBRADO ===== */
+        .report-header {
+            text-align: center; margin-bottom: 20px; padding-bottom: 15px;
+            border-bottom: 3px solid #d4af37;
+        }
+        .report-header h2 { color: #1a1a1a; font-size: 20px; margin-bottom: 5px; }
+
+        .report-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .report-item img {
+            width: 200px;          /* Dobrado: era 100px */
+            height: auto;          /* Mantém proporção */
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 2px solid #d4af37;
+        }
+        .report-item .file-icon {
+            width: 100px; height: 100px;   /* Dobrado: era 50px */
+            border-radius: 6px;
+            border: 2px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            background: #f8f9fa;
+        }
+        .report-item small { color: #888; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.95);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-close {
+            position: absolute; top: 15px; right: 15px;
+            background: #dc3545; color: #fff; border: none;
+            border-radius: 50%; width: 40px; height: 40px; font-size: 22px; cursor: pointer;
+            z-index: 1001;
+        }
+        .modal-content { padding: 15px; border-radius: 12px; max-width: 95%; }
+        .modal-content video { width: 100%; border-radius: 8px; }
+
+        #fileInputHidden { display: none; }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 4px solid #d4af37;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        .loading-text { color: #fff; font-size: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" 
+             alt="M&IC" 
+             id="header-logo"
+             onerror="console.log('Erro ao carregar logo'); this.style.display='none'">
+        <h1>M&IC Corretores de Imóveis</h1>
+        <p>CAPTURA DE DOCUMENTOS</p>
+    </div>
+
+    <div class="container">
+
+        <div id="screen-main" class="screen active">
+            <div class="card">
+                <div class="main-buttons">
+                    <button class="btn-profile" onclick="selecionarPerfil('proprietario')">
+                        <span class="icon">🏠</span>
+                        <h3>Proprietário</h3>
+                        <small>Venda / Locação</small>
+                    </button>
+                    <button class="btn-profile" onclick="selecionarPerfil('comprador')">
+                        <span class="icon">🛒</span>
+                        <h3>Comprador</h3>
+                        <small>Aquisição</small>
+                    </button>
+                    <button class="btn-profile" onclick="selecionarPerfil('inquilino')">
+                        <span class="icon">🔑</span>
+                        <h3>Inquilino</h3>
+                        <small>Locação</small>
+                    </button>
+                    <button class="btn-profile" onclick="selecionarPerfil('corretor')">
+                        <span class="icon">🤝</span>
+                        <h3>Corretor</h3>
+                        <small>Profissional</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-list" class="screen">
+            <button class="btn-back" onclick="voltarMain()">← Voltar</button>
+            <div class="card">
+                <div class="section-header" id="list-title">Documentos</div>
+                <div class="instruction">
+                    <strong id="list-text"></strong>
+                    <ul id="list-items" style="margin-top:10px;"></ul>
+                </div>
+                <button class="btn btn-gold" onclick="iniciarCaptura()">📷 Iniciar Captura</button>
+            </div>
+        </div>
+
+        <div id="screen-capture" class="screen">
+            <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
+            <div class="card">
+                <div class="doc-progress" id="capture-progress"></div>
+                <div class="doc-name" id="doc-name">Documento</div>
+
+                <div class="capture-area" id="capture-area">
+                    <img id="preview-img" style="display:none;" alt="Pré-visualização">
+                    <p id="placeholder-text">Use os botões abaixo para tirar uma foto ou anexar o documento</p>
+                </div>
+
+                <div id="capture-btns">
+                    <button class="btn btn-gold" onclick="abrirCamera()">📷 Tirar Foto</button>
+                    <button class="btn btn-dark" onclick="abrirGaleria()">📎 Anexar da Galeria</button>
+                </div>
+
+                <div id="confirm-btns" style="display:none;">
+                    <button class="btn btn-confirm" onclick="confirmarFoto()">✅ Confirmar</button>
+                    <button class="btn btn-danger" onclick="refazerFoto()">🔄 Refazer</button>
+                </div>
+
+                <input type="file" id="fileInputHidden"
+                       accept="image/*,.pdf,.heic,.heif,.tif,.tiff,.bmp,application/pdf"
+                       onchange="arquivoSelecionado(event)">
+            </div>
+        </div>
+
+        <div id="screen-report" class="screen">
+            <div class="card">
+                <div class="report-header">
+                    <h2>Relatório de Documentos</h2>
+                    <p style="color:#888;">Perfil: <strong id="report-perfil"></strong></p>
+                    <p style="color:#888;font-size:12px;" id="report-date"></p>
+                </div>
+                <div id="report-docs"></div>
+                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">📄 Gerar PDF</button>
+                <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">🔄 Novo Processo</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="camera-modal">
+        <button class="modal-close" onclick="fecharCamera()">×</button>
+        <div class="modal-content">
+            <video id="camera-video" autoplay playsinline></video>
+            <canvas id="camera-canvas" style="display:none;"></canvas>
+            <button class="btn btn-gold" onclick="tirarFoto()" style="margin-top:10px;">📸 Capturar</button>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Processando...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        // ===== CONFIGURAÇÃO DOS PERFIS (MESMA DINÂMICA PARA TODOS) =====
+        const perfis = {
+            proprietario: {
+                nome: 'Proprietário',
+                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)']
+            },
+            comprador: {
+                nome: 'Comprador',
+                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)', 'CTPS Digital', 'FGTS Digital', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
+            },
+            inquilino: {
+                nome: 'Inquilino',
+                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
+            },
+            corretor: {
+                nome: 'Corretor',
+                texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
+                docs: ['RG com CPF ou CNH', 'CRECI']
             }
+        };
 
-            // ---- Calcular altura TOTAL do bloco (título + imagem) ----
-            const alturaBloco = 14 + (temImagem ? imgH + 10 : 12);
+        let perfilAtual = null, indiceDoc = 0, docsCapturados = [], fotoAtual = null, cameraStream = null;
 
-            // ---- Se NÃO couber, criar nova página ANTES do título ----
-            if (y + alturaBloco > 285) {
-                pdf.addPage();
-                y = 20;
-            }
+        const $ = id => document.getElementById(id);
 
-            // ---- Desenhar título (nunca separado da imagem) ----
-            pdf.setFillColor(212, 175, 55);
-            pdf.rect(12, y - 4, 186, 8, 'F');
-            pdf.setTextColor(26, 26, 26);
-            pdf.setFontSize(10);
-            pdf.setFont(undefined, 'bold');
-            pdf.text((i + 1) + '. ' + doc.nome, 16, y + 2);
-            y += 14;
+        function mostrarTela(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            $(id).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            // ---- Desenhar imagem (sempre junto com o título) ----
-            if (temImagem) {
-                const x = (210 - imgW) / 2;
-                pdf.addImage(doc.foto, formato, x, y, imgW, imgH);
-                y += imgH + 10;
-            } else {
-                pdf.setTextColor(100, 100, 100);
-                pdf.setFontSize(9);
-                pdf.setFont(undefined, 'normal');
-                pdf.text('[' + doc.nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
-                y += 12;
+        function voltarMain() { pararCamera(); mostrarTela('screen-main'); }
+
+        // ===== PASSO 1: SELEÇÃO DO PERFIL (função única para todos os grupos) =====
+        function selecionarPerfil(chave) {
+            perfilAtual = perfis[chave];
+            indiceDoc = 0;
+            docsCapturados = [];
+            $('list-title').textContent = 'Documentos — ' + perfilAtual.nome;
+            $('list-text').textContent = perfilAtual.texto;
+            const ul = $('list-items');
+            ul.innerHTML = '';
+            perfilAtual.docs.forEach(d => {
+                const li = document.createElement('li');
+                li.textContent = d;
+                ul.appendChild(li);
+            });
+            mostrarTela('screen-list');
+        }
+
+        // ===== PASSO 2: CAPTURA (função única para todos os grupos) =====
+        function iniciarCaptura() {
+            indiceDoc = 0;
+            docsCapturados = [];
+            mostrarTela('screen-capture');
+            carregarProximoDoc();
+        }
+
+        function carregarProximoDoc() {
+            if (indiceDoc >= perfilAtual.docs.length) { mostrarRelatorio(); return; }
+
+            $('doc-name').textContent = perfilAtual.docs[indiceDoc];
+            $('capture-progress').textContent = 'Documento ' + (indiceDoc + 1) + ' de ' + perfilAtual.docs.length;
+
+            fotoAtual = null;
+            $('preview-img').style.display = 'none';
+            $('preview-img').src = '';
+            $('placeholder-text').style.display = 'block';
+            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
+            $('capture-btns').style.display = 'block';
+            $('confirm-btns').style.display = 'none';
+            $('fileInputHidden').value = '';
+        }
+
+        // ===== CÂMERA =====
+        async function abrirCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                cameraStream = stream;
+                const video = $('camera-video');
+                video.srcObject = stream;
+                $('camera-modal').classList.add('active');
+            } catch (err) {
+                alert('Não foi possível acessar a câmera. Use "Anexar da Galeria".');
             }
         }
 
-        pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
+        function fecharCamera() { $('camera-modal').classList.remove('active'); pararCamera(); }
+        function pararCamera() {
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+        }
 
-    } catch (err) {
-        console.error('Erro ao gerar PDF:', err);
-        alert('Erro ao gerar PDF. Detalhe: ' + err.message);
-    }
-}
+        // ===== COMPRIMIR IMAGEM =====
+        function comprimirImagem(dataURL, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    
+                    if (w > maxWidth) {
+                        h = (h * maxWidth) / w;
+                        w = maxWidth;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    const compressed = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressed);
+                };
+                img.onerror = () => reject(new Error('Falha ao carregar imagem para compressão'));
+                img.src = dataURL;
+            });
+        }
+
+        function tirarFoto() {
+            const video = $('camera-video'), canvas = $('camera-canvas');
+            canvas.width = video.videoWidth; 
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+            
+            comprimirImagem(dataURL, 1200, 0.7)
+                .then(compressed => exibirPreview(compressed))
+                .catch(err => {
+                    console.error('Erro ao comprimir:', err);
+                    exibirPreview(dataURL);
+                });
+            
+            fecharCamera();
+        }
+
+        // ===== GALERIA =====
+        function abrirGaleria() { $('fileInputHidden').click(); }
+
+        function arquivoSelecionado(event) {
+            const file = event.target.files[0];
+            if (!file) { return; }
+
+            console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
+
+            if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    comprimirImagem(e.target.result, 1200, 0.7)
+                        .then(compressed => exibirPreview(compressed))
+                        .catch(err => exibirPreview(e.target.result));
+                };
+                reader.readAsDataURL(file);
+            }
+            else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                converterPdfEmImagem(file);
+            }
+            else {
+                alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
+                fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
+                exibirPreviewOutro(file.name);
+            }
+        }
+
+        // ===== CONVERTER PDF EM IMAGEM =====
+        async function converterPdfEmImagem(file) {
+            mostrarLoading('Convertendo PDF em imagem...');
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const page = await pdf.getPage(1);
+                
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                
+                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                const compressed = await comprimirImagem(dataURL, 1200, 0.7);
+                exibirPreview(compressed);
+                ocultarLoading();
+                
+            } catch (err) {
+                console.error('Erro ao converter PDF:', err);
+                ocultarLoading();
+                alert('Erro ao converter PDF em imagem. Detalhe: ' + err.message);
+            }
+        }
+
+        function mostrarLoading(texto) {
+            $('loading-text').textContent = texto;
+            $('loading-overlay').classList.add('active');
+        }
+        function ocultarLoading() {
+            $('loading-overlay').classList.remove('active');
+        }
+
+        function exibirPreviewOutro(nomeArquivo) {
+            $('preview-img').style.display = 'none';
+            $('placeholder-text').innerHTML = '📄 <strong>' + nomeArquivo + '</strong><br><small style="color:#888;">Arquivo anexado</small>';
+            $('placeholder-text').style.display = 'block';
+            $('capture-btns').style.display = 'none';
+            $('confirm-btns').style.display = 'block';
+        }
+
+        // ===== PREVIEW =====
+        function exibirPreview(dataURL) {
+            fotoAtual = { tipo: 'imagem', foto: dataURL };
+
+            const img = $('preview-img');
+            img.onload = function() {
+                console.log('Preview carregado:', img.naturalWidth, 'x', img.naturalHeight);
+            };
+            img.src = dataURL;
+            img.style.display = 'block';
+            $('placeholder-text').style.display = 'none';
+            $('capture-btns').style.display = 'none';
+            $('confirm-btns').style.display = 'block';
+        }
+
+        function refazerFoto() {
+            fotoAtual = null;
+            $('preview-img').style.display = 'none';
+            $('preview-img').src = '';
+            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
+            $('placeholder-text').style.display = 'block';
+            $('capture-btns').style.display = 'block';
+            $('confirm-btns').style.display = 'none';
+            $('fileInputHidden').value = '';
+        }
+
+        function confirmarFoto() {
+            if (!fotoAtual) { 
+                alert('Tire uma foto ou anexe um arquivo antes de confirmar.'); 
+                return; 
+            }
+
+            docsCapturados.push({
+                nome: perfilAtual.docs[indiceDoc],
+                foto: fotoAtual.foto || null,
+                tipo: fotoAtual.tipo || 'imagem',
+                nomeArquivo: fotoAtual.nome || 'foto_' + Date.now() + '.jpg',
+                data: new Date().toLocaleString('pt-BR')
+            });
+
+            indiceDoc++;
+            carregarProximoDoc();
+        }
+
+        function cancelarCaptura() {
+            if (docsCapturados.length > 0) {
+                if (!confirm('Tem certeza? Os documentos capturados serão perdidos.')) return;
+            }
+            docsCapturados = [];
+            indiceDoc = 0;
+            pararCamera();
+            mostrarTela('screen-list');
+        }
+
+        // ===== RELATÓRIO (IMAGENS EM TAMANHO DOBRADO) =====
+        function mostrarRelatorio() {
+            $('report-perfil').textContent = perfilAtual.nome;
+            $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
+
+            const container = $('report-docs');
+            container.innerHTML = '';
+
+            docsCapturados.forEach((doc, i) => {
+                const div = document.createElement('div');
+                div.className = 'report-item';
+                let visual = '';
+                
+                if (doc.tipo === 'imagem' && doc.foto) {
+                    // Imagem em tamanho dobrado (200px)
+                    visual = '<img src="' + doc.foto + '" alt="" onerror="this.style.display=\'none\'">';
+                } else {
+                    // Ícone de arquivo em tamanho dobrado (100px)
+                    visual = '<div class="file-icon">📄</div>';
+                }
+                div.innerHTML =
+                    visual +
+                    '<div><strong>' + (i + 1) + '. ' + doc.nome + '</strong>' +
+                    '<br><small style="color:#888;">' + doc.nomeArquivo + ' • ' + doc.data + '</small></div>';
+                container.appendChild(div);
+            });
+
+            mostrarTela('screen-report');
+        }
+
+        // ===== GERAR PDF (IMAGENS EM TAMANHO DOBRADO) =====
+        async function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
+
+            try {
+                const logoImg = await carregarImagem(logoUrl);
+
+                pdf.setFillColor(26, 26, 26);
+                pdf.rect(0, 0, 210, 45, 'F');
+                
+                pdf.addImage(logoImg, 'PNG', 85, 5, 40, 20);
+                
+                pdf.setTextColor(212, 175, 55);
+                pdf.setFontSize(18);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('M&IC CORRETORES DE IMÓVEIS', 105, 32, { align: 'center' });
+                pdf.setTextColor(200, 200, 200);
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'normal');
+                pdf.text('Relatório de Documentos — ' + perfilAtual.nome, 105, 39, { align: 'center' });
+                pdf.setTextColor(120, 120, 120);
+                pdf.setFontSize(8);
+                pdf.text(new Date().toLocaleString('pt-BR'), 105, 43, { align: 'center' });
+
+                let y = 55;
+
+                for (let i = 0; i < docsCapturados.length; i++) {
+                    pdf.setFillColor(212, 175, 55);
+                    pdf.rect(12, y - 4, 186, 8, 'F');
+                    pdf.setTextColor(26, 26, 26);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text((i + 1) + '. ' + docsCapturados[i].nome, 16, y + 2);
+                    y += 14;
+
+                    try {
+                        if (docsCapturados[i].foto && docsCapturados[i].foto.length > 100) {
+                            const imgData = docsCapturados[i].foto;
+                            
+                            let format = 'JPEG';
+                            if (imgData.indexOf('data:image/png') === 0) format = 'PNG';
+                            
+                            const props = pdf.getImageProperties(imgData);
+                            
+                            // TAMANHO DOBRADO: largura máxima 180mm, altura máxima 220mm
+                            let w = 180;
+                            let h = (props.height * w) / props.width;
+                            
+                            if (h > 220) { 
+                                h = 220; 
+                                w = (props.width * h) / props.height; 
+                            }
+                            
+                            // Se a imagem não couber na página, cria nova página
+                            if (y + h > 285) { pdf.addPage(); y = 20; }
+                            
+                            const x = (210 - w) / 2;
+                            pdf.addImage(imgData, format, x, y, w, h);
+                            y += h + 10;
+                        } else {
+                            pdf.setTextColor(100, 100, 100);
+                            pdf.setFontSize(9);
+                            pdf.setFont(undefined, 'normal');
+                            pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
+                            y += 12;
+                        }
+                    } catch (e) {
+                        console.error('Erro ao adicionar imagem no PDF:', e);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.setFontSize(9);
+                        pdf.setFont(undefined, 'normal');
+                        pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
+                        y += 12;
+                    }
+                }
+
+                pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
+
+            } catch (err) {
+                console.error('Erro ao gerar PDF:', err);
+                alert('Erro ao gerar PDF. Detalhe: ' + err.message);
+            }
+        }
+
+        function carregarImagem(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Falha ao carregar imagem de ' + url));
+                img.src = url;
+            });
+        }
+
+        function novoProcesso() {
+            if (confirm('Iniciar um novo processo? Todos os dados serão perdidos.')) { location.reload(); }
+        }
+    </script>
+</body>
+</html>
