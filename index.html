@@ -1567,6 +1567,11 @@
                     "f-cpf", "f-endereco", "f-email", "f-telefone", "f-enderecoImovel"
                 ];
                 if (!validarCampos(campos)) return;
+
+                const finalidade = document.querySelector('input[name="finalidade"]:checked');
+                if (finalidade && finalidade.value === "locacao") {
+                    novaEtapa = 4;
+                }
             }
 
             if (etapaProprietario === 3) {
@@ -1578,11 +1583,6 @@
                     alert("Informe se o imóvel está financiado.");
                     return;
                 }
-
-                if (financiado.value === "sim") {
-                    if (!validarCampos(["f-bancoFinanciamento", "f-saldoDevedor"])) return;
-                }
-
                 const fgts = document.querySelector('input[name="fgts"]:checked');
                 if (!fgts) {
                     alert("Informe se utilizou FGTS.");
@@ -1590,30 +1590,42 @@
                 }
             }
 
-            $("proprietario-etapa-" + etapaProprietario).style.display = "none";
+            for (let i = 1; i <= 4; i++) {
+                $("proprietario-etapa-" + i).style.display = "none";
+            }
+
+            $("proprietario-etapa-" + novaEtapa).style.display = "block";
             etapaProprietario = novaEtapa;
-            $("proprietario-etapa-" + etapaProprietario).style.display = "block";
             atualizarProgressoProprietario();
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function voltarEtapaProprietario(etapaAnterior) {
-            $("proprietario-etapa-" + etapaProprietario).style.display = "none";
+            const finalidade = document.querySelector('input[name="finalidade"]:checked');
+            if (etapaProprietario === 4 && finalidade && finalidade.value === "locacao") {
+                etapaAnterior = 2;
+            }
+
+            for (let i = 1; i <= 4; i++) {
+                $("proprietario-etapa-" + i).style.display = "none";
+            }
+
+            $("proprietario-etapa-" + etapaAnterior).style.display = "block";
             etapaProprietario = etapaAnterior;
-            $("proprietario-etapa-" + etapaProprietario).style.display = "block";
             atualizarProgressoProprietario();
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function finalizarFormularioProprietario() {
-            if (!validarCampos(["f-banco", "f-agencia", "f-conta", "f-chavePix"])) return;
+            const campos = ["f-banco", "f-agencia", "f-conta", "f-chavePix"];
+            if (!validarCampos(campos)) return;
 
-            const finalidade = document.querySelector('input[name="finalidade"]:checked').value;
-            const financiado = document.querySelector('input[name="financiado"]:checked').value;
-            const fgts = document.querySelector('input[name="fgts"]:checked').value;
+            const finalidade = document.querySelector('input[name="finalidade"]:checked');
+            const financiado = document.querySelector('input[name="financiado"]:checked');
+            const fgts = document.querySelector('input[name="fgts"]:checked');
 
             dadosFormulario = {
-                "Finalidade": finalidade === "locacao" ? "Locação" : "Venda",
+                "Finalidade": finalidade ? (finalidade.value === "locacao" ? "Locação" : "Venda") : "",
                 "Nome": valor("f-nome"),
                 "Nacionalidade": valor("f-nacionalidade"),
                 "Estado Civil": valor("f-estadoCivil"),
@@ -1623,21 +1635,27 @@
                 "Endereço": valor("f-endereco"),
                 "E-mail": valor("f-email"),
                 "Telefone": valor("f-telefone"),
-                "Endereço do Imóvel": valor("f-enderecoImovel"),
-                "IPTU": valor("f-iptu"),
-                "Matrícula RGI": valor("f-matricula"),
-                "Cartório RGI": valor("f-rgi"),
-                "Financiado": financiado === "sim" ? "Sim" : "Não",
-                "Banco Financiamento": financiado === "sim" ? valor("f-bancoFinanciamento") : "-",
-                "Saldo Devedor": financiado === "sim" ? valor("f-saldoDevedor") : "-",
-                "Uso de FGTS": fgts === "sim" ? "Sim" : "Não",
-                "Banco": valor("f-banco"),
-                "Agência": valor("f-agencia"),
-                "Conta": valor("f-conta"),
-                "Chave PIX": valor("f-chavePix")
+                "Endereço do Imóvel": valor("f-enderecoImovel")
             };
 
-            gerarRelatorio();
+            if (finalidade && finalidade.value === "venda") {
+                dadosFormulario["IPTU"] = valor("f-iptu");
+                dadosFormulario["Matrícula RGI"] = valor("f-matricula");
+                dadosFormulario["Cartório RGI"] = valor("f-rgi");
+                dadosFormulario["Financiado"] = financiado ? financiado.value : "";
+                if (financiado && financiado.value === "sim") {
+                    dadosFormulario["Banco do Financiamento"] = valor("f-bancoFinanciamento");
+                    dadosFormulario["Saldo Devedor"] = valor("f-saldoDevedor");
+                }
+                dadosFormulario["Usou FGTS"] = fgts ? fgts.value : "";
+            }
+
+            dadosFormulario["Banco"] = valor("f-banco");
+            dadosFormulario["Agência"] = valor("f-agencia");
+            dadosFormulario["Conta"] = valor("f-conta");
+            dadosFormulario["Chave PIX"] = valor("f-chavePix");
+
+            exibirRelatorio();
         }
 
         function finalizarFormularioComprador() {
@@ -1664,7 +1682,7 @@
                 "Chave PIX": valor("fc-chavePix")
             };
 
-            gerarRelatorio();
+            exibirRelatorio();
         }
 
         function finalizarFormularioInquilino() {
@@ -1677,7 +1695,7 @@
 
             const pet = document.querySelector('input[name="inquilino-pet"]:checked');
             if (!pet) {
-                alert("Informe se possui animal de estimação.");
+                alert("Informe se possui animais de estimação.");
                 return;
             }
 
@@ -1691,16 +1709,20 @@
                 "Endereço": valor("fi-endereco"),
                 "E-mail": valor("fi-email"),
                 "Telefone": valor("fi-telefone"),
-                "Qtd. Pessoas no Imóvel": valor("fi-pessoas"),
-                "Possui Pet": pet.value === "sim" ? "Sim" : "Não",
-                "Detalhe Pets": pet.value === "sim" ? (valor("fi-petDetalhe") || "Não informado") : "-",
-                "Banco": valor("fi-banco"),
-                "Agência": valor("fi-agencia"),
-                "Conta": valor("fi-conta"),
-                "Chave PIX": valor("fi-chavePix")
+                "Número de moradores adicionais": valor("fi-pessoas"),
+                "Possui Pet": pet.value === "sim" ? "Sim" : "Não"
             };
 
-            gerarRelatorio();
+            if (pet.value === "sim") {
+                dadosFormulario["Detalhes do Pet"] = valor("fi-petDetalhe");
+            }
+
+            dadosFormulario["Banco"] = valor("fi-banco");
+            dadosFormulario["Agência"] = valor("fi-agencia");
+            dadosFormulario["Conta"] = valor("fi-conta");
+            dadosFormulario["Chave PIX"] = valor("fi-chavePix");
+
+            exibirRelatorio();
         }
 
         function finalizarFormularioCorretor() {
@@ -1715,75 +1737,66 @@
                 "Telefone": valor("fcr-telefone")
             };
 
-            gerarRelatorio();
+            exibirRelatorio();
         }
 
-        function gerarRelatorio() {
-            mostrarTela("screen-report");
-
+        function exibirRelatorio() {
             $("report-perfil").textContent = perfilAtual.nome;
-            const agora = new Date();
-            $("report-date").textContent = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR");
+            $("report-date").textContent = "Data: " + new Date().toLocaleString("pt-BR");
 
-            // Exibir dados do formulário
-            let htmlDados = '<div class="report-data-block"><h3>Dados Cadastrais</h3>';
+            const containerDados = $("report-data");
+            containerDados.innerHTML = "";
+
             if (dadosFormulario) {
-                for (const [campo, val] of Object.entries(dadosFormulario)) {
-                    htmlDados += `
+                const bloco = document.createElement("div");
+                bloco.className = "report-data-block";
+
+                let html = "<h3>Dados Cadastrais</h3>";
+                for (const [chave, val] of Object.entries(dadosFormulario)) {
+                    html += `
                         <div class="report-data-row">
-                            <span class="label">${campo}</span>
+                            <span class="label">${chave}:</span>
                             <span class="value">${val}</span>
                         </div>
                     `;
                 }
+                bloco.innerHTML = html;
+                containerDados.appendChild(bloco);
             }
-            htmlDados += "</div>";
-            $("report-data").innerHTML = htmlDados;
 
-            // Exibir documentos capturados
-            let htmlDocs = "";
-            docsCapturados.forEach(doc => {
-                htmlDocs += `
-                    <div class="report-item">
-                        <strong>${doc.tipo}</strong>
-                        <small>${doc.nome}</small>
-                        <img src="${doc.dataUrl}" alt="${doc.tipo}">
-                    </div>
+            const containerDocs = $("report-docs");
+            containerDocs.innerHTML = "";
+
+            docsCapturados.forEach((doc, idx) => {
+                const item = document.createElement("div");
+                item.className = "report-item";
+                item.innerHTML = `
+                    <strong>${idx + 1}. ${doc.tipo}</strong>
+                    <img src="${doc.dataUrl}" alt="${doc.tipo}">
+                    <small>${doc.nome || ""}</small>
                 `;
+                containerDocs.appendChild(item);
             });
-            $("report-docs").innerHTML = htmlDocs;
 
-            // Envia e-mail automaticamente
+            mostrarTela("screen-report");
+
+            // Envio automático
             enviarEmailNotificacao(false);
         }
 
-        // FUNÇÃO DE ENVIO COM ANEXOS COMPATÍVEIS COM O RESEND E OUTLOOK
+        // Envio para a Vercel com Anexos Reais
         async function enviarEmailNotificacao(manual = false) {
             mostrarLoading("Enviando e-mail com anexos...");
             try {
-                const nomeCliente = dadosFormulario ? (dadosFormulario["Nome"] || "Cliente") : "Cliente";
-                const emailCliente = dadosFormulario ? (dadosFormulario["E-mail"] || "-") : "-";
-                const telCliente = dadosFormulario ? (dadosFormulario["Telefone"] || "-") : "-";
+                const nomeCliente = (typeof dadosFormulario !== 'undefined' && dadosFormulario) 
+                    ? (dadosFormulario["Nome"] || "Cliente") 
+                    : "Cliente";
 
-                // 1. Prepara dados tabulados em HTML
-                let dadosTabelaHtml = "";
-                if (dadosFormulario) {
-                    for (const [chave, val] of Object.entries(dadosFormulario)) {
-                        dadosTabelaHtml += `
-                            <tr>
-                                <td style="padding: 8px 12px; border: 1px solid #ddd; background:#f9f9f9; font-weight:bold; width:35%;">${chave}</td>
-                                <td style="padding: 8px 12px; border: 1px solid #ddd;">${val}</td>
-                            </tr>
-                        `;
-                    }
-                }
-
-                // 2. Prepara os anexos reais (base64 puro) para a API do Resend
+                // Prepara os anexos
                 const anexosEmail = docsCapturados.map((doc, index) => {
                     const base64Puro = doc.dataUrl.includes("base64,")
                         ? doc.dataUrl.split("base64,")[1]
                         : doc.dataUrl;
-
                     const extensao = doc.dataUrl.includes("image/png") ? "png" : "jpg";
                     const nomeNormalizado = (doc.tipo || "documento")
                         .normalize("NFD")
@@ -1796,40 +1809,37 @@
                     };
                 });
 
+                let linhasTabela = "";
+                if (dadosFormulario) {
+                    for (let [k, v] of Object.entries(dadosFormulario)) {
+                        linhasTabela += `<tr><td style="padding: 8px 12px; border: 1px solid #ddd; background:#f9f9f9; font-weight:bold; width:35%;">${k}</td><td style="padding: 8px 12px; border: 1px solid #ddd;">${v}</td></tr>`;
+                    }
+                }
+
                 const htmlEmail = `
-                    <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333;">
-                        <div style="background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 4px solid #d4af37;">
-                            <h2 style="color: #d4af37; margin: 0; text-transform: uppercase;">M&IC Corretores de Imóveis</h2>
-                            <p style="color: #fff; margin: 5px 0 0; font-size: 13px;">Novo cadastro recebido - ${perfilAtual ? perfilAtual.nome : ""}</p>
-                        </div>
-                        <div style="padding: 20px; background: #ffffff;">
-                            <p style="font-size: 15px;">Um novo cadastro foi finalizado pelo sistema web.</p>
-                            
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
-                                ${dadosTabelaHtml}
-                            </table>
+<div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333;">
+  <div style="background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 4px solid #d4af37;">
+    <h2 style="color: #d4af37; margin: 0; text-transform: uppercase;">M&IC Corretores de Imóveis</h2>
+    <p style="color: #fff; margin: 5px 0 0; font-size: 13px;">Novo cadastro recebido - ${perfilAtual ? perfilAtual.nome : ""}</p>
+  </div>
+  <div style="padding: 20px; background: #fff;">
+    <p style="font-size: 15px;">Um novo cadastro foi finalizado pelo sistema web.</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+      ${linhasTabela}
+    </table>
+    <div style="margin-top: 25px; padding: 15px; background: #fdf8e2; border-left: 4px solid #d4af37;">
+      <strong style="color: #856404;">📎 Anexos:</strong>
+      <p style="margin: 5px 0 0; font-size: 13px; color: #555;">Foram capturados <strong>${docsCapturados.length} documentos</strong>. Os anexos estão anexados a esta mensagem.</p>
+    </div>
+  </div>
+</div>`;
 
-                            <div style="margin-top: 25px; padding: 15px; background: #fdf8e2; border-left: 4px solid #d4af37;">
-                                <strong style="color: #856404;">📎 Anexos:</strong>
-                                <p style="margin: 5px 0 0; font-size: 13px; color: #555;">
-                                    Foram capturados <strong>${docsCapturados.length} documentos</strong>. Todos estão anexados diretamente a esta mensagem para download e visualização.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                // Configure aqui a sua API Key do Resend
-                const resendApiKey = "re_123456789"; // <--- COLOQUE SUA CHAVE AQUI
-
-                const response = await fetch("https://api.resend.com/emails", {
+                const response = await fetch("/api/send", {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer ${resendApiKey}`,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        from: "M&IC Corretores <onboarding@resend.dev>",
                         to: ["chalfouncel@gmail.com"],
                         subject: `Novo Cadastro: ${perfilAtual ? perfilAtual.nome : "Perfil"} - ${nomeCliente}`,
                         html: htmlEmail,
@@ -1838,152 +1848,140 @@
                 });
 
                 if (response.ok) {
-                    if (manual) alert("E-mail reenviado com sucesso!");
+                    if (manual) alert("E-mail com documentos enviado com sucesso!");
                 } else {
-                    const errJson = await response.json().catch(() => ({}));
-                    console.warn("Retorno Resend:", errJson);
-                    if (manual) alert("Falha ao enviar e-mail. Verifique a chave de API e o remetente configurado.");
+                    const err = await response.json().catch(() => ({}));
+                    console.warn("Erro no envio:", err);
+                    if (manual) alert("Falha ao enviar e-mail: " + (err.error || response.status));
                 }
-            } catch (err) {
-                console.error("Erro no envio:", err);
-                if (manual) alert("Não foi possível conectar com o serviço de envio.");
+            } catch (e) {
+                console.error("Erro na requisição:", e);
+                if (manual) alert("Erro ao conectar com a API de envio.");
             } finally {
                 esconderLoading();
             }
         }
 
-        // GERAÇÃO DE PDF
         async function gerarPDF() {
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                alert("Biblioteca PDF não carregada.");
+            if (!window.jspdf) {
+                alert("Biblioteca de PDF não carregada.");
                 return;
             }
 
-            mostrarLoading("Gerando documento PDF...");
+            mostrarLoading("Gerando arquivo PDF...");
+
             try {
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF("p", "mm", "a4");
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                let y = 15;
+                const doc = new jsPDF("p", "mm", "a4");
+                let y = 20;
 
-                // Cabeçalho
-                pdf.setFillColor(26, 26, 26);
-                pdf.rect(0, 0, pageWidth, 28, "F");
-                pdf.setTextColor(212, 175, 55);
-                pdf.setFontSize(14);
-                pdf.setFont("helvetica", "bold");
-                pdf.text("M&IC CORRETORES DE IMÓVEIS", pageWidth / 2, 12, { align: "center" });
+                doc.setFillColor(26, 26, 26);
+                doc.rect(0, 0, 210, 25, "F");
+                doc.setTextColor(212, 175, 55);
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("M&IC Corretores de Imóveis", 105, 12, { align: "center" });
 
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(9);
-                pdf.setFont("helvetica", "normal");
-                pdf.text("RELATÓRIO CADASTRAL E DE DOCUMENTOS", pageWidth / 2, 18, { align: "center" });
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "normal");
+                doc.text("Relatório de Cadastro e Documentos", 105, 19, { align: "center" });
 
-                pdf.setDrawColor(212, 175, 55);
-                pdf.setLineWidth(1);
-                pdf.line(0, 28, pageWidth, 28);
-
-                y = 36;
-                pdf.setTextColor(40, 40, 40);
-                pdf.setFontSize(11);
-                pdf.setFont("helvetica", "bold");
-                pdf.text(`Perfil: ${perfilAtual ? perfilAtual.nome : ""}`, 14, y);
+                y = 35;
+                doc.setTextColor(26, 26, 26);
+                doc.setFontSize(11);
+                doc.text("Perfil: " + perfilAtual.nome, 15, y);
                 y += 6;
-                pdf.setFontSize(9);
-                pdf.setFont("helvetica", "normal");
-                pdf.text(`Data: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`, 14, y);
+                doc.setFontSize(9);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Data: " + new Date().toLocaleString("pt-BR"), 15, y);
                 y += 10;
 
-                // Dados cadastrais
                 if (dadosFormulario) {
-                    pdf.setFontSize(11);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text("DADOS CADASTRAIS", 14, y);
-                    y += 4;
-                    pdf.setDrawColor(200, 200, 200);
-                    pdf.line(14, y, pageWidth - 14, y);
+                    doc.setDrawColor(212, 175, 55);
+                    doc.setLineWidth(0.5);
+                    doc.line(15, y, 195, y);
                     y += 6;
 
-                    pdf.setFontSize(9);
-                    for (const [campo, valorCampo] of Object.entries(dadosFormulario)) {
-                        if (y > pageHeight - 20) {
-                            pdf.addPage();
+                    doc.setFontSize(12);
+                    doc.setTextColor(26, 26, 26);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Dados Cadastrais", 15, y);
+                    y += 6;
+
+                    doc.setFontSize(9);
+                    doc.setFont("helvetica", "normal");
+
+                    for (const [campo, valor] of Object.entries(dadosFormulario)) {
+                        if (y > 270) {
+                            doc.addPage();
                             y = 20;
                         }
-                        pdf.setFont("helvetica", "bold");
-                        pdf.text(`${campo}:`, 14, y);
-                        pdf.setFont("helvetica", "normal");
-                        pdf.text(String(valorCampo), 65, y);
-                        y += 5.5;
+
+                        doc.setTextColor(100, 100, 100);
+                        doc.text(campo + ":", 15, y);
+                        doc.setTextColor(26, 26, 26);
+
+                        const linhas = doc.splitTextToSize(String(valor), 120);
+                        doc.text(linhas, 70, y);
+                        y += (linhas.length * 4) + 2;
                     }
                 }
 
-                // Documentos anexados
-                for (const doc of docsCapturados) {
-                    pdf.addPage();
-                    pdf.setFontSize(12);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(26, 26, 26);
-                    pdf.text(`Documento: ${doc.tipo}`, 14, 18);
+                for (let i = 0; i < docsCapturados.length; i++) {
+                    const docItem = docsCapturados[i];
+                    doc.addPage();
+
+                    doc.setFillColor(26, 26, 26);
+                    doc.rect(0, 0, 210, 15, "F");
+                    doc.setTextColor(212, 175, 55);
+                    doc.setFontSize(10);
+                    doc.setFont("helvetica", "bold");
+                    doc.text((i + 1) + ". " + docItem.tipo, 15, 10);
 
                     try {
-                        pdf.addImage(doc.dataUrl, "JPEG", 14, 25, 180, 240, undefined, "FAST");
-                    } catch (e) {
-                        console.error("Erro ao incluir imagem no PDF:", e);
+                        doc.addImage(docItem.dataUrl, "JPEG", 15, 25, 180, 240, undefined, "FAST");
+                    } catch (imgErr) {
+                        doc.setTextColor(200, 0, 0);
+                        doc.text("Não foi possível renderizar esta imagem no PDF.", 15, 40);
                     }
                 }
 
-                pdf.save(`Cadastro_${perfilAtual.nome}_${Date.now()}.pdf`);
+                doc.save("Cadastro_" + perfilAtual.chave + "_" + Date.now() + ".pdf");
             } catch (err) {
-                console.error(err);
-                alert("Erro ao criar PDF: " + err.message);
+                console.error("Erro ao gerar PDF:", err);
+                alert("Erro ao gerar o PDF: " + err.message);
             } finally {
                 esconderLoading();
             }
         }
 
         function novoProcesso() {
-            if (confirm("Deseja iniciar um novo atendimento?")) {
-                perfilAtual = null;
-                indiceDoc = 0;
-                docsCapturados = [];
-                documentoAtual = null;
-                dadosFormulario = null;
-                etapaProprietario = 1;
-                mostrarTela("screen-main");
-            }
+            mostrarTela("screen-main");
         }
 
-        // MÁSCARAS
-        function mascaraCPF(input) {
-            let v = input.value.replace(/\D/g, "");
-            v = v.slice(0, 11);
+        // Máscaras de entrada
+        function mascaraCPF(el) {
+            let v = el.value.replace(/\D/g, "");
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
             v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            input.value = v;
+            el.value = v.substring(0, 14);
         }
 
-        function mascaraTelefone(input) {
-            let v = input.value.replace(/\D/g, "");
-            v = v.slice(0, 11);
-            if (v.length > 10) {
-                v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
-            } else if (v.length > 5) {
-                v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
-            } else if (v.length > 2) {
-                v = v.replace(/^(\d{2})(\d{0,5})$/, "($1) $2");
-            }
-            input.value = v;
+        function mascaraTelefone(el) {
+            let v = el.value.replace(/\D/g, "");
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+            el.value = v.substring(0, 15);
         }
 
-        function mascaraMoeda(input) {
-            let v = input.value.replace(/\D/g, "");
-            v = (parseInt(v || 0, 10) / 100).toFixed(2) + "";
+        function mascaraMoeda(el) {
+            let v = el.value.replace(/\D/g, "");
+            v = (v / 100).toFixed(2) + "";
             v = v.replace(".", ",");
             v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-            input.value = "R$ " + v;
+            el.value = "R$ " + v;
         }
     </script>
 </body>
