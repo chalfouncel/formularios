@@ -385,7 +385,7 @@
             border: 1px solid #ffeeba;
         }
 
-        /* Miniaturas na tela de relatório: cards elegantes de 75px */
+        /* Miniaturas na tela de relatório: cards de 75px */
         .report-item {
             display: flex;
             align-items: center;
@@ -1311,6 +1311,7 @@
                 docs: [
                     "RG com CPF ou CNH",
                     "Comprovante de residência",
+                    "Comprovante de Renda",
                     "Recibo de entrega do Imposto de Renda",
                     "Declaração completa do Imposto de Renda"
                 ]
@@ -1565,7 +1566,7 @@
                     ext: ext,
                     isPdf: isPdf,
                     previewUrl: previewUrl,
-                    fileBase64: fullDataUrl // Arquivo original integral preservado
+                    fileBase64: fullDataUrl // Arquivo original completo
                 };
 
                 exibirPrevia(documentoAtual);
@@ -1902,7 +1903,7 @@
 
             mostrarTela("screen-report");
 
-            // Envio automático para o seu e-mail (igual para os 4 perfis)
+            // Envio automático para o e-mail cadastrado
             enviarEmailNotificacao(false);
         }
 
@@ -1915,7 +1916,7 @@
                     ? (dadosFormulario["Nome"] || "Cliente") 
                     : "Cliente";
 
-                // Anexos integrais completos enviados ao email
+                // Anexos integrais completos enviados por email
                 const anexosEmail = docsCapturados.map((doc, index) => {
                     const base64Puro = doc.fileBase64.includes("base64,")
                         ? doc.fileBase64.split("base64,")[1]
@@ -1995,7 +1996,7 @@
             }
         }
 
-        // Função auxiliar que obtém a resolução real da imagem para calcular o aspecto proporcional
+        // Função que detecta a resolução original da imagem para o cálculo proporcional no PDF
         function carregarDimensoesImagem(dataUrl) {
             return new Promise(resolve => {
                 const img = new Image();
@@ -2005,7 +2006,7 @@
             });
         }
 
-        // Geração do PDF com miniatura proporcional, elegante e sem distorção
+        // Geração do PDF com visualização proporcional sem deformações
         async function gerarPDF() {
             if (!window.jspdf) {
                 alert("Biblioteca de PDF não carregada.");
@@ -2103,11 +2104,11 @@
                             if (dims.w > 0 && dims.h > 0) {
                                 const ratio = dims.w / dims.h;
                                 if (ratio > (maxW / maxH)) {
-                                    // A imagem é mais larga: fixa a largura e ajusta a altura
+                                    // Imagem horizontal (mais larga)
                                     finalW = maxW;
                                     finalH = maxW / ratio;
                                 } else {
-                                    // A imagem é mais alta: fixa a altura e ajusta a largura
+                                    // Imagem vertical (mais alta)
                                     finalH = maxH;
                                     finalW = maxH * ratio;
                                 }
@@ -2140,7 +2141,7 @@
                             doc.text("Não foi possível renderizar a imagem do documento.", 15, 40);
                         }
                     } else {
-                        // Caso seja um PDF sem renderização de imagem
+                        // Caso seja um PDF sem renderização prévia em imagem
                         doc.setTextColor(60, 60, 60);
                         doc.setFontSize(11);
                         doc.text("Arquivo anexado integralmente ao processo:", 15, 38);
@@ -2162,7 +2163,7 @@
             mostrarTela("screen-main");
         }
 
-        // Máscaras de entrada
+        // Funções de máscara
         function mascaraCPF(el) {
             let v = el.value.replace(/\D/g, "");
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
