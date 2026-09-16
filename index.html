@@ -395,6 +395,13 @@
             background: #f8f9fa;
         }
 
+        .report-item strong {
+            display: block;
+            color: #1a1a1a;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
         .report-item small {
             color: #888;
         }
@@ -1785,7 +1792,7 @@
                 $("camera-modal").classList.add("active");
             } catch (erro) {
                 alert(
-                    "Não foi possível acessar a câmera. Use a opção “Anexar da galeria”."
+                    "Não foi possível acessar a câmera. Use a opção \"Anexar da galeria\"."
                 );
             }
         }
@@ -1947,11 +1954,6 @@
         }
 
         function exibirPreviewImagem(dataURL, nomeArquivo = "") {
-            /*
-             * A imagem é armazenada integralmente em documentoAtual.
-             * Isso corrige a perda da imagem entre a prévia, a confirmação
-             * e a exibição no relatório.
-             */
             documentoAtual = {
                 tipo: "imagem",
                 imagem: dataURL,
@@ -2059,15 +2061,10 @@
             const documentosContainer = $("report-docs");
             documentosContainer.innerHTML = "";
 
-            docsCapturados.forEach((documento, indice) => {
+            docsCapturados.forEach((documento) => {
                 const item = document.createElement("div");
                 item.className = "report-item";
 
-                /*
-                 * A imagem é recriada diretamente a partir de documento.imagem.
-                 * Não é utilizado apenas o nome do arquivo, evitando que a
-                 * prévia desapareça no relatório.
-                 */
                 const imagem = document.createElement("img");
                 imagem.src = documento.imagem;
                 imagem.alt = documento.nome;
@@ -2078,10 +2075,7 @@
                 const informacoes = document.createElement("div");
 
                 const nomeDocumento = document.createElement("strong");
-                nomeDocumento.textContent =
-                    (indice + 1) + ". " + documento.nome;
-
-                const quebra = document.createElement("br");
+                nomeDocumento.textContent = documento.nome;
 
                 const detalhes = document.createElement("small");
                 detalhes.textContent =
@@ -2090,7 +2084,6 @@
                     documento.data;
 
                 informacoes.appendChild(nomeDocumento);
-                informacoes.appendChild(quebra);
                 informacoes.appendChild(detalhes);
 
                 item.appendChild(imagem);
@@ -2156,10 +2149,12 @@
             pdf.setFont(undefined, "bold");
             pdf.text(titulo, largura / 2, 17, { align: "center" });
 
-            pdf.setTextColor(220, 220, 220);
-            pdf.setFontSize(9);
-            pdf.setFont(undefined, "normal");
-            pdf.text(subtitulo, largura / 2, 27, { align: "center" });
+            if (subtitulo) {
+                pdf.setTextColor(220, 220, 220);
+                pdf.setFontSize(9);
+                pdf.setFont(undefined, "normal");
+                pdf.text(subtitulo, largura / 2, 27, { align: "center" });
+            }
         }
 
         async function gerarPDF() {
@@ -2262,8 +2257,8 @@
                     pdf.addPage();
                     adicionarCabecalhoPDF(
                         pdf,
-                        "DOCUMENTO " + (i + 1),
-                        documento.nome
+                        documento.nome,
+                        null
                     );
 
                     pdf.setTextColor(80, 80, 80);
