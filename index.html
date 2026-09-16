@@ -395,7 +395,7 @@
                         <small>Aquisição</small>
                     </button>
                     <button class="btn-profile" onclick="selecionarPerfil('inquilino')">
-                        <span class="icon"></span>
+                        <span class="icon">🔑</span>
                         <h3>Inquilino</h3>
                         <small>Locação</small>
                     </button>
@@ -464,7 +464,7 @@
                         <div class="radio-group">
                             <div class="radio-option">
                                 <input type="radio" name="finalidade" id="finalidade-locacao" value="locacao" onchange="mudarFinalidade()">
-                                <label for="finalidade-locacao"> Locação</label>
+                                <label for="finalidade-locacao">🔑 Locação</label>
                             </div>
                             <div class="radio-option">
                                 <input type="radio" name="finalidade" id="finalidade-venda" value="venda" onchange="mudarFinalidade()">
@@ -502,8 +502,8 @@
                         <input type="text" id="f-profissao" placeholder="Sua profissão">
                     </div>
                     <div class="form-group">
-                        <label>Número do RG *</label>
-                        <input type="text" id="f-rg" placeholder="00.000.000-0">
+                        <label>Número do RG</label>
+                        <input type="text" id="f-rg" placeholder="00.000.000-0 (opcional)">
                     </div>
                     <div class="form-group">
                         <label>Número do CPF *</label>
@@ -786,9 +786,9 @@
                 }
             }
 
-            // Validações Etapa 2
+            // Validações Etapa 2 (RG NÃO é obrigatório)
             if (etapaAtual === 2) {
-                const campos = ['f-nome', 'f-nacionalidade', 'f-estadoCivil', 'f-profissao', 'f-rg', 'f-cpf', 'f-endereco', 'f-email', 'f-telefone', 'f-enderecoImovel'];
+                const campos = ['f-nome', 'f-nacionalidade', 'f-estadoCivil', 'f-profissao', 'f-cpf', 'f-endereco', 'f-email', 'f-telefone', 'f-enderecoImovel'];
                 for (const id of campos) {
                     if (!$(id).value.trim()) {
                         alert('Preencha todos os campos obrigatórios.');
@@ -1131,7 +1131,7 @@
                 }
                 html += '</div>';
                 
-                html += '<div class="report-data-block"><h3> Dados Bancários</h3>';
+                html += '<div class="report-data-block"><h3>🏦 Dados Bancários</h3>';
                 html += criarLinha('Banco', dadosProprietario.banco);
                 html += criarLinha('Agência', dadosProprietario.agencia);
                 html += criarLinha('Conta', dadosProprietario.conta);
@@ -1151,7 +1151,7 @@
                 if (doc.tipo === 'imagem' && doc.foto) {
                     visual = '<img src="' + doc.foto + '" alt="" onerror="this.style.display=\'none\'">';
                 } else {
-                    visual = '<div class="file-icon"></div>';
+                    visual = '<div class="file-icon">📄</div>';
                 }
                 div.innerHTML =
                     visual +
@@ -1163,7 +1163,27 @@
             mostrarTela('screen-report');
         }
 
+        function novoProcesso() {
+            perfilAtual = null;
+            indiceDoc = 0;
+            docsCapturados = [];
+            fotoAtual = null;
+            dadosProprietario = null;
+            etapaAtual = 1;
+            mostrarTela('screen-main');
+        }
+
         // ===== GERAR PDF =====
+        function carregarImagem(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -1217,7 +1237,7 @@
                         ['Nacionalidade:', dadosProprietario.nacionalidade],
                         ['Estado Civil:', dadosProprietario.estadoCivil],
                         ['Profissão:', dadosProprietario.profissao],
-                        ['RG:', dadosProprietario.rg],
+                        ['RG:', dadosProprietario.rg || 'Não informado'],
                         ['CPF:', dadosProprietario.cpf],
                         ['Endereço:', dadosProprietario.endereco],
                         ['E-mail:', dadosProprietario.email],
@@ -1248,7 +1268,7 @@
                         pdf.setFont(undefined, 'normal');
                         pdf.setTextColor(60, 60, 60);
 
-                        const dadosVenda = [
+                        const dadosImovel = [
                             ['IPTU:', dadosProprietario.iptu],
                             ['Matrícula RGI:', dadosProprietario.matricula],
                             ['Cartório RGI:', dadosProprietario.rgi],
@@ -1256,12 +1276,13 @@
                         ];
 
                         if (dadosProprietario.financiado === 'sim') {
-                            dadosVenda.push(['Banco:', dadosProprietario.bancoFinanciamento]);
-                            dadosVenda.push(['Saldo devedor:', dadosProprietario.saldoDevedor]);
+                            dadosImovel.push(['Banco:', dadosProprietario.bancoFinanciamento]);
+                            dadosImovel.push(['Saldo devedor:', dadosProprietario.saldoDevedor]);
                         }
-                        dadosVenda.push(['FGTS:', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não']);
 
-                        dadosVenda.forEach(([label, value]) => {
+                        dadosImovel.push(['FGTS:', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não']);
+
+                        dadosImovel.forEach(([label, value]) => {
                             if (y > 275) { pdf.addPage(); y = 20; }
                             pdf.setFont(undefined, 'bold');
                             pdf.text(label, 14, y);
@@ -1301,83 +1322,81 @@
                     });
                 }
 
-                pdf.addPage();
-                y = 20;
+                if (docsCapturados.length > 0) {
+                    pdf.addPage();
+                    y = 20;
 
-                pdf.setFillColor(26, 26, 26);
-                pdf.rect(0, y - 5, 210, 12, 'F');
-                pdf.setTextColor(212, 175, 55);
-                pdf.setFontSize(14);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('DOCUMENTOS CAPTURADOS', 105, y + 3, { align: 'center' });
-                y += 15;
+                    pdf.setFillColor(26, 26, 26);
+                    pdf.rect(0, y - 5, 210, 12, 'F');
+                    pdf.setTextColor(212, 175, 55);
+                    pdf.setFontSize(14);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('DOCUMENTOS CAPTURADOS', 105, y + 3, { align: 'center' });
+                    y += 15;
 
-                for (let i = 0; i < docsCapturados.length; i++) {
-                    const doc = docsCapturados[i];
-                    let imgW = 170, imgH = 0, temImagem = false, formato = 'JPEG';
-                    if (doc.foto && doc.foto.length > 100) {
-                        try {
-                            const props = pdf.getImageProperties(doc.foto);
-                            if (doc.foto.indexOf('data:image/png') === 0) formato = 'PNG';
-                            imgW = 170;
-                            imgH = (props.height * imgW) / props.width;
-                            if (imgH > 180) {
-                                imgH = 180;
-                                imgW = (props.width * imgH) / props.height;
+                    for (let i = 0; i < docsCapturados.length; i++) {
+                        const doc = docsCapturados[i];
+                        let imgW = 170, imgH = 0, temImagem = false, formato = 'JPEG';
+
+                        if (doc.foto && doc.foto.length > 100) {
+                            try {
+                                const props = pdf.getImageProperties(doc.foto);
+                                if (doc.foto.indexOf('data:image/png') === 0) formato = 'PNG';
+                                imgW = 170;
+                                imgH = (props.height * imgW) / props.width;
+                                if (imgH > 180) {
+                                    imgH = 180;
+                                    imgW = (props.width * imgH) / props.height;
+                                }
+                                temImagem = true;
+                            } catch (e) {
+                                temImagem = false;
                             }
-                            temImagem = true;
-                        } catch (e) {
-                            temImagem = false;
+                        }
+
+                        const hBloco = 14 + (temImagem ? imgH + 10 : 12);
+                        if (y + hBloco > 285) {
+                            pdf.addPage();
+                            y = 20;
+                        }
+
+                        pdf.setFillColor(212, 175, 55);
+                        pdf.rect(12, y - 4, 186, 8, 'F');
+                        pdf.setTextColor(26, 26, 26);
+                        pdf.setFontSize(10);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text((i + 1) + '. ' + doc.nome, 16, y + 2);
+                        y += 14;
+
+                        if (temImagem) {
+                            const x = (210 - imgW) / 2;
+                            pdf.addImage(doc.foto, formato, x, y, imgW, imgH);
+                            y += imgH + 10;
+                        } else {
+                            pdf.setTextColor(100, 100, 100);
+                            pdf.setFontSize(9);
+                            pdf.setFont(undefined, 'normal');
+                            pdf.text('[' + doc.nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
+                            y += 12;
                         }
                     }
+                }
 
-                    const alturaBloco = 14 + (temImagem ? imgH + 10 : 12);
-                    if (y + alturaBloco > 285) {
-                        pdf.addPage();
-                        y = 20;
-                    }
-
-                    pdf.setFillColor(212, 175, 55);
-                    pdf.rect(12, y - 4, 186, 8, 'F');
-                    pdf.setTextColor(26, 26, 26);
-                    pdf.setFontSize(10);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text((i + 1) + '. ' + doc.nome, 16, y + 2);
-                    y += 14;
-
-                    if (temImagem) {
-                        const x = (210 - imgW) / 2;
-                        pdf.addImage(doc.foto, formato, x, y, imgW, imgH);
-                        y += imgH + 10;
-                    } else {
-                        pdf.setTextColor(100, 100, 100);
-                        pdf.setFontSize(9);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.text('[' + doc.nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
-                        y += 12;
+                // Remover última página se estiver vazia
+                const totalPages = pdf.internal.getNumberOfPages();
+                if (totalPages > 1) {
+                    const lastPage = pdf.internal.pages[totalPages];
+                    if (lastPage && (!lastPage.length || lastPage.length <= 2)) {
+                        pdf.deletePage(totalPages);
                     }
                 }
 
                 pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
 
-            } catch (err) {
-                console.error('Erro ao gerar PDF:', err);
-                alert('Erro ao gerar PDF. Detalhe: ' + err.message);
+            } catch (e) {
+                console.error(e);
+                alert('Erro ao gerar PDF: ' + e.message);
             }
-        }
-
-        function carregarImagem(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error('Falha ao carregar imagem de ' + url));
-                img.src = url;
-            });
-        }
-
-        function novoProcesso() {
-            if (confirm('Iniciar um novo processo? Todos os dados serão perdidos.')) { location.reload(); }
         }
     </script>
 </body>
