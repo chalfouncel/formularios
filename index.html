@@ -654,7 +654,7 @@
             mostrarTela('screen-report');
         }
 
-        // ===== GERAR PDF (IMAGENS EM TAMANHO DOBRADO) =====
+        // ===== GERAR PDF (SEM QUEBRA DE PÁGINA ENTRE TÍTULO E IMAGEM) =====
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -684,51 +684,55 @@
                 let y = 55;
 
                 for (let i = 0; i < docsCapturados.length; i++) {
+                    const doc = docsCapturados[i];
+                    
+                    // 1) PRÉ-CALCULAR altura da imagem
+                    let imgW = 170, imgH = 0, temImagem = false, formato = 'JPEG';
+                    if (doc.foto && doc.foto.length > 100) {
+                        try {
+                            const props = pdf.getImageProperties(doc.foto);
+                            if (doc.foto.indexOf('data:image/png') === 0) formato = 'PNG';
+                            imgW = 170;
+                            imgH = (props.height * imgW) / props.width;
+                            // Reduzir se for muito alta (para caber em uma folha)
+                            if (imgH > 180) {
+                                imgH = 180;
+                                imgW = (props.width * imgH) / props.height;
+                            }
+                            temImagem = true;
+                        } catch (e) {
+                            temImagem = false;
+                        }
+                    }
+
+                    // 2) Altura TOTAL do bloco (título + imagem)
+                    const alturaBloco = 14 + (temImagem ? imgH + 10 : 12);
+
+                    // 3) Se o bloco NÃO couber, criar nova página ANTES do título
+                    if (y + alturaBloco > 285) {
+                        pdf.addPage();
+                        y = 20;
+                    }
+
+                    // 4) Desenhar título (sempre junto com a imagem)
                     pdf.setFillColor(212, 175, 55);
                     pdf.rect(12, y - 4, 186, 8, 'F');
                     pdf.setTextColor(26, 26, 26);
                     pdf.setFontSize(10);
                     pdf.setFont(undefined, 'bold');
-                    pdf.text((i + 1) + '. ' + docsCapturados[i].nome, 16, y + 2);
+                    pdf.text((i + 1) + '. ' + doc.nome, 16, y + 2);
                     y += 14;
 
-                    try {
-                        if (docsCapturados[i].foto && docsCapturados[i].foto.length > 100) {
-                            const imgData = docsCapturados[i].foto;
-                            
-                            let format = 'JPEG';
-                            if (imgData.indexOf('data:image/png') === 0) format = 'PNG';
-                            
-                            const props = pdf.getImageProperties(imgData);
-                            
-                            // TAMANHO DOBRADO: largura máxima 180mm, altura máxima 220mm
-                            let w = 180;
-                            let h = (props.height * w) / props.width;
-                            
-                            if (h > 220) { 
-                                h = 220; 
-                                w = (props.width * h) / props.height; 
-                            }
-                            
-                            // Se a imagem não couber na página, cria nova página
-                            if (y + h > 285) { pdf.addPage(); y = 20; }
-                            
-                            const x = (210 - w) / 2;
-                            pdf.addImage(imgData, format, x, y, w, h);
-                            y += h + 10;
-                        } else {
-                            pdf.setTextColor(100, 100, 100);
-                            pdf.setFontSize(9);
-                            pdf.setFont(undefined, 'normal');
-                            pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
-                            y += 12;
-                        }
-                    } catch (e) {
-                        console.error('Erro ao adicionar imagem no PDF:', e);
+                    // 5) Desenhar imagem (sempre junto com o título)
+                    if (temImagem) {
+                        const x = (210 - imgW) / 2;
+                        pdf.addImage(doc.foto, formato, x, y, imgW, imgH);
+                        y += imgH + 10;
+                    } else {
                         pdf.setTextColor(100, 100, 100);
                         pdf.setFontSize(9);
                         pdf.setFont(undefined, 'normal');
-                        pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
+                        pdf.text('[' + doc.nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
                         y += 12;
                     }
                 }
