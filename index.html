@@ -13,7 +13,6 @@
             color:#333;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             padding: 25px 20px;
@@ -42,14 +41,12 @@
             margin-top: 5px;
         }
 
-        /* Container */
         .container {
             max-width: 500px;
             margin: 0 auto;
             padding: 20px 15px;
         }
 
-        /* Cards */
         .card {
             background: #fff;
             border-radius: 12px;
@@ -58,7 +55,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        /* Seção escura */
         .section-header {
             background: #1a1a1a;
             color: #d4af37;
@@ -69,11 +65,9 @@
             font-weight: bold;
         }
 
-        /* Telas */
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* Botões perfil */
         .main-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -97,7 +91,6 @@
             box-shadow: 0 4px 15px rgba(212,175,55,0.2);
         }
 
-        /* Instruções */
         .instruction {
             background: rgba(212,175,55,0.08);
             border-left: 4px solid #d4af37;
@@ -111,7 +104,6 @@
         .instruction strong { color: #d4af37; }
         .instruction ul { margin-top: 8px; padding-left: 18px; }
 
-        /* Botões gerais */
         .btn {
             padding: 14px 20px;
             border: none;
@@ -137,7 +129,6 @@
         }
         .btn-back:hover { text-decoration: underline; }
 
-        /* Captura */
         .doc-progress {
             text-align: center; color: #888; font-size: 13px; margin-bottom: 8px;
         }
@@ -173,7 +164,6 @@
             margin: 0;
         }
 
-        /* Relatório */
         .report-header {
             text-align: center; margin-bottom: 20px; padding-bottom: 15px;
             border-bottom: 3px solid #d4af37;
@@ -188,7 +178,6 @@
         }
         .report-item small { color: #888; }
 
-        /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.95);
@@ -206,7 +195,6 @@
 
         #fileInputHidden { display: none; }
 
-        /* Loading */
         .loading-overlay {
             display: none;
             position: fixed;
@@ -233,7 +221,6 @@
 </head>
 <body>
 
-    <!-- HEADER -->
     <div class="header">
         <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" 
              alt="M&IC" 
@@ -245,7 +232,6 @@
 
     <div class="container">
 
-        <!-- TELA 1: BOTÕES -->
         <div id="screen-main" class="screen active">
             <div class="card">
                 <div class="main-buttons">
@@ -273,7 +259,6 @@
             </div>
         </div>
 
-        <!-- TELA 2: LISTA -->
         <div id="screen-list" class="screen">
             <button class="btn-back" onclick="voltarMain()">← Voltar</button>
             <div class="card">
@@ -282,11 +267,10 @@
                     <strong id="list-text"></strong>
                     <ul id="list-items" style="margin-top:10px;"></ul>
                 </div>
-                <button class="btn btn-gold" onclick="iniciarCaptura()"> Iniciar Captura</button>
+                <button class="btn btn-gold" onclick="iniciarCaptura()">📷 Iniciar Captura</button>
             </div>
         </div>
 
-        <!-- TELA 3: CAPTURA -->
         <div id="screen-capture" class="screen">
             <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
             <div class="card">
@@ -299,7 +283,7 @@
                 </div>
 
                 <div id="capture-btns">
-                    <button class="btn btn-gold" onclick="abrirCamera()"> Tirar Foto</button>
+                    <button class="btn btn-gold" onclick="abrirCamera()">📷 Tirar Foto</button>
                     <button class="btn btn-dark" onclick="abrirGaleria()">📎 Anexar da Galeria</button>
                 </div>
 
@@ -314,7 +298,6 @@
             </div>
         </div>
 
-        <!-- TELA 4: RELATÓRIO -->
         <div id="screen-report" class="screen">
             <div class="card">
                 <div class="report-header">
@@ -323,13 +306,12 @@
                     <p style="color:#888;font-size:12px;" id="report-date"></p>
                 </div>
                 <div id="report-docs"></div>
-                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;"> Gerar PDF</button>
+                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">📄 Gerar PDF</button>
                 <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">🔄 Novo Processo</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CÂMERA -->
     <div class="modal" id="camera-modal">
         <button class="modal-close" onclick="fecharCamera()">×</button>
         <div class="modal-content">
@@ -339,22 +321,18 @@
         </div>
     </div>
 
-    <!-- LOADING OVERLAY -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="loading-text" id="loading-text">Processando...</div>
     </div>
 
-    <!-- PDF.js para converter PDF em imagem -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-        // Configurar worker do PDF.js
         if (window.pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
-        // ===== CONFIGURAÇÃO DOS PERFIS =====
         const perfis = {
             proprietario: {
                 nome: 'Proprietário',
@@ -382,7 +360,6 @@
 
         const $ = id => document.getElementById(id);
 
-        // ===== NAVEGAÇÃO =====
         function mostrarTela(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             $(id).classList.add('active');
@@ -391,7 +368,6 @@
 
         function voltarMain() { pararCamera(); mostrarTela('screen-main'); }
 
-        // ===== PASSO 1: SELEÇÃO =====
         function selecionarPerfil(chave) {
             perfilAtual = perfis[chave];
             indiceDoc = 0;
@@ -408,7 +384,6 @@
             mostrarTela('screen-list');
         }
 
-        // ===== PASSO 2: CAPTURA =====
         function iniciarCaptura() {
             indiceDoc = 0;
             docsCapturados = [];
@@ -450,13 +425,58 @@
             if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
         }
 
+        // ===== FUNÇÃO PRINCIPAL: COMPRIMIR IMAGEM =====
+        // Redimensiona para no máximo 1200px e qualidade 0.7
+        function comprimirImagem(dataURL, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    
+                    // Redimensiona se for maior que maxWidth
+                    if (w > maxWidth) {
+                        h = (h * maxWidth) / w;
+                        w = maxWidth;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    const compressed = canvas.toDataURL('image/jpeg', quality);
+                    console.log('Imagem comprimida:', dataURL.length, '->', compressed.length, 'bytes');
+                    resolve(compressed);
+                };
+                img.onerror = () => reject(new Error('Falha ao carregar imagem para compressão'));
+                img.src = dataURL;
+            });
+        }
+
         function tirarFoto() {
             const video = $('camera-video'), canvas = $('camera-canvas');
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth; 
+            canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const dataURL = canvas.toDataURL('image/jpeg', 0.9);
-            console.log('Foto tirada, tamanho:', dataURL.length);
-            exibirPreview(dataURL);
+            console.log('Foto tirada, tamanho original:', dataURL.length);
+            
+            // Comprime a imagem antes de exibir
+            comprimirImagem(dataURL, 1200, 0.7)
+                .then(compressed => {
+                    console.log('Foto comprimida:', compressed.length);
+                    exibirPreview(compressed);
+                })
+                .catch(err => {
+                    console.error('Erro ao comprimir:', err);
+                    // Fallback: usa a original
+                    exibirPreview(dataURL);
+                });
+            
             fecharCamera();
         }
 
@@ -472,14 +492,19 @@
 
             console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
 
-            // Se for imagem (qualquer extensão de imagem)
             if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
                 console.log('É imagem, lendo arquivo...');
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
-                    console.log('Arquivo lido com sucesso, tamanho:', e.target.result.length);
-                    exibirPreview(e.target.result);
+                    console.log('Arquivo lido, tamanho:', e.target.result.length);
+                    // Comprime imagens da galeria também
+                    comprimirImagem(e.target.result, 1200, 0.7)
+                        .then(compressed => exibirPreview(compressed))
+                        .catch(err => {
+                            console.error('Erro ao comprimir:', err);
+                            exibirPreview(e.target.result);
+                        });
                 };
                 
                 reader.onerror = function(e) {
@@ -489,17 +514,15 @@
                 
                 reader.readAsDataURL(file);
             }
-            // Se for PDF - converter em imagem
             else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 console.log('É PDF, convertendo em imagem...');
                 converterPdfEmImagem(file);
             }
-            // Outros tipos
             else {
                 console.log('Outro tipo de arquivo');
                 alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
                 fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
-                exibirPreviewPdf(file.name);
+                exibirPreviewOutro(file.name);
             }
         }
 
@@ -510,11 +533,8 @@
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                
-                // Pegar a primeira página
                 const page = await pdf.getPage(1);
                 
-                // Renderizar em canvas com alta qualidade
                 const viewport = page.getViewport({ scale: 2.0 });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
@@ -526,11 +546,12 @@
                     viewport: viewport
                 }).promise;
                 
-                // Converter canvas em imagem
-                const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
                 console.log('PDF convertido, tamanho:', dataURL.length);
                 
-                exibirPreview(dataURL);
+                // Comprime também
+                const compressed = await comprimirImagem(dataURL, 1200, 0.7);
+                exibirPreview(compressed);
                 ocultarLoading();
                 
             } catch (err) {
@@ -540,7 +561,6 @@
             }
         }
 
-        // ===== LOADING =====
         function mostrarLoading(texto) {
             $('loading-text').textContent = texto;
             $('loading-overlay').classList.add('active');
@@ -550,8 +570,7 @@
             $('loading-overlay').classList.remove('active');
         }
 
-        // Preview para outros arquivos (não PDF)
-        function exibirPreviewPdf(nomeArquivo) {
+        function exibirPreviewOutro(nomeArquivo) {
             $('preview-img').style.display = 'none';
             $('placeholder-text').innerHTML = '📄 <strong>' + nomeArquivo + '</strong><br><small style="color:#888;">Arquivo anexado</small>';
             $('placeholder-text').style.display = 'block';
@@ -559,27 +578,23 @@
             $('confirm-btns').style.display = 'block';
         }
 
-        // ===== PREVIEW IMAGEM (CORRIGIDO) =====
+        // ===== PREVIEW IMAGEM (SEM ALERT) =====
         function exibirPreview(dataURL) {
             console.log('Exibindo preview, tamanho:', dataURL.length);
             fotoAtual = { tipo: 'imagem', foto: dataURL };
 
             const img = $('preview-img');
             
-            // Limpa primeiro
-            img.onload = null;
-            img.onerror = null;
-            
             img.onload = function() {
-                console.log('Imagem carregada no preview, dimensões:', img.naturalWidth, 'x', img.naturalHeight);
+                console.log('Imagem carregada no preview:', img.naturalWidth, 'x', img.naturalHeight);
             };
             
             img.onerror = function(e) {
-                console.error('Erro ao exibir imagem:', e);
-                alert('Erro ao exibir a imagem. Tente novamente.');
+                console.error('Erro ao exibir imagem no preview:', e);
+                // NÃO mostra alert - apenas log no console
+                // Tenta exibir mesmo assim
             };
             
-            // Define o src
             img.src = dataURL;
             img.style.display = 'block';
             $('placeholder-text').style.display = 'none';
@@ -606,7 +621,7 @@
                 return; 
             }
 
-            console.log('Confirmando foto, tipo:', fotoAtual.tipo);
+            console.log('Confirmando foto, tipo:', fotoAtual.tipo, 'tamanho foto:', fotoAtual.foto ? fotoAtual.foto.length : 0);
 
             docsCapturados.push({
                 nome: perfilAtual.docs[indiceDoc],
@@ -615,6 +630,8 @@
                 nomeArquivo: fotoAtual.nome || 'foto_' + Date.now() + '.jpg',
                 data: new Date().toLocaleString('pt-BR')
             });
+
+            console.log('Documento salvo:', docsCapturados[docsCapturados.length - 1]);
 
             indiceDoc++;
             carregarProximoDoc();
@@ -632,7 +649,7 @@
 
         // ===== RELATÓRIO =====
         function mostrarRelatorio() {
-            console.log('Mostrando relatório, documentos capturados:', docsCapturados.length);
+            console.log('Mostrando relatório, documentos:', docsCapturados.length);
             $('report-perfil').textContent = perfilAtual.nome;
             $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
 
@@ -644,10 +661,10 @@
                 div.className = 'report-item';
                 let visual = '';
                 
-                console.log('Documento', i, 'tipo:', doc.tipo, 'tem foto:', !!doc.foto);
+                console.log('Doc', i, 'tipo:', doc.tipo, 'tem foto:', !!doc.foto, 'tamanho:', doc.foto ? doc.foto.length : 0);
                 
                 if (doc.tipo === 'imagem' && doc.foto) {
-                    visual = '<img src="' + doc.foto + '" alt="">';
+                    visual = '<img src="' + doc.foto + '" alt="" onerror="this.style.display=\'none\'">';
                 } else {
                     visual = '<div style="width:50px;height:50px;border-radius:4px;border:2px solid #d4af37;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f8f9fa;">📄</div>';
                 }
@@ -661,22 +678,20 @@
             mostrarTela('screen-report');
         }
 
-        // ===== GERAR PDF (SEM MARCA D'ÁGUA) =====
+        // ===== GERAR PDF =====
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             
-            // URL da logo
             const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
 
             try {
                 const logoImg = await carregarImagem(logoUrl);
 
-                // Cabeçalho com logo
+                // Cabeçalho
                 pdf.setFillColor(26, 26, 26);
                 pdf.rect(0, 0, 210, 45, 'F');
                 
-                // Adiciona logo no cabeçalho
                 pdf.addImage(logoImg, 'PNG', 85, 5, 40, 20);
                 
                 pdf.setTextColor(212, 175, 55);
@@ -705,12 +720,32 @@
                     y += 14;
 
                     try {
-                        if (docsCapturados[i].foto) {
-                            const props = pdf.getImageProperties(docsCapturados[i].foto);
-                            let w = 160, h = (props.height * w) / props.width;
-                            if (h > 100) { h = 100; w = (props.width * h) / props.height; }
+                        if (docsCapturados[i].foto && docsCapturados[i].foto.length > 100) {
+                            console.log('Adicionando imagem ao PDF, doc', i, 'tamanho:', docsCapturados[i].foto.length);
+                            
+                            const imgData = docsCapturados[i].foto;
+                            
+                            // Detecta formato
+                            let format = 'JPEG';
+                            if (imgData.indexOf('data:image/png') === 0) format = 'PNG';
+                            else if (imgData.indexOf('data:image/jpeg') === 0 || imgData.indexOf('data:image/jpg') === 0) format = 'JPEG';
+                            
+                            const props = pdf.getImageProperties(imgData);
+                            console.log('Propriedades da imagem:', props);
+                            
+                            let w = 160;
+                            let h = (props.height * w) / props.width;
+                            
+                            // Limita altura máxima
+                            if (h > 100) { 
+                                h = 100; 
+                                w = (props.width * h) / props.height; 
+                            }
+                            
                             const x = (210 - w) / 2;
-                            pdf.addImage(docsCapturados[i].foto, 'JPEG', x, y, w, h);
+                            console.log('Dimensões no PDF:', x, y, w, h, 'formato:', format);
+                            
+                            pdf.addImage(imgData, format, x, y, w, h);
                             y += h + 10;
                         } else {
                             pdf.setTextColor(100, 100, 100);
@@ -720,17 +755,19 @@
                             y += 12;
                         }
                     } catch (e) {
-                        pdf.setTextColor(200, 0, 0);
-                        pdf.text('[Erro ao carregar imagem]', 105, y, { align: 'center' });
+                        console.error('Erro ao adicionar imagem no PDF:', e);
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.setFontSize(9);
+                        pdf.setFont(undefined, 'normal');
+                        pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
                         y += 12;
                     }
                 }
 
-                // SEM MARCA D'ÁGUA - removido
-
                 pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
 
             } catch (err) {
+                console.error('Erro ao gerar PDF:', err);
                 alert('Erro ao gerar PDF. Detalhe: ' + err.message);
             }
         }
