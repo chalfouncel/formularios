@@ -25,6 +25,9 @@
             max-height: 80px;
             object-fit: contain;
             margin-bottom: 12px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .header h1 {
             color: #d4af37;
@@ -155,14 +158,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .capture-area img {
             max-width: 100%;
-            max-height: 250px;
+            max-height: 300px;
             border-radius: 6px;
             object-fit: contain;
+            display: block;
         }
-        #placeholder-text { color: #888; font-size: 14px; }
+        #placeholder-text { 
+            color: #888; 
+            font-size: 14px;
+            margin: 0;
+        }
 
         /* Relatório */
         .report-header {
@@ -202,7 +211,8 @@
 
     <!-- HEADER -->
     <div class="header">
-        <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" alt="M&IC" onerror="this.style.display='none'">
+        <!-- TROQUE A URL DA LOGO AQUI -->
+        <img src="logo.png" alt="M&IC" onerror="this.style.display='none'">
         <h1>M&IC Corretores de Imóveis</h1>
         <p>CAPTURA DE DOCUMENTOS</p>
     </div>
@@ -376,7 +386,9 @@
 
             fotoAtual = null;
             $('preview-img').style.display = 'none';
+            $('preview-img').src = '';
             $('placeholder-text').style.display = 'block';
+            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
             $('capture-btns').style.display = 'block';
             $('confirm-btns').style.display = 'none';
             $('fileInputHidden').value = '';
@@ -413,28 +425,44 @@
 
         function arquivoSelecionado(event) {
             const file = event.target.files[0];
-            if (!file) { return; }
+            if (!file) { 
+                console.log('Nenhum arquivo selecionado');
+                return; 
+            }
+
+            console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
 
             // Se for imagem → exibir preview
-            if (file.type.startsWith('image/')) {
+            if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
+                console.log('É imagem, lendo arquivo...');
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
+                    console.log('Arquivo lido com sucesso, tamanho:', e.target.result.length);
                     exibirPreview(e.target.result);
                 };
-                reader.onerror = function() {
-                    alert('Não foi possível ler o arquivo.');
+                
+                reader.onerror = function(e) {
+                    console.error('Erro ao ler arquivo:', e);
+                    alert('Não foi possível ler o arquivo. Tente outro formato.');
                 };
+                
+                reader.onabort = function() {
+                    console.log('Leitura abortada');
+                };
+                
                 reader.readAsDataURL(file);
             }
             // Se for PDF → avisar mas permitir anexar
             else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                console.log('É PDF');
                 alert('PDF anexado! Ele será incluído no relatório. (A pré-visualização só é exibida para imagens.)');
-                // Cria um placeholder com nome do arquivo
                 fotoAtual = { tipo: 'pdf', nome: file.name, arquivo: file };
                 exibirPreviewPdf(file.name);
             }
             // Outros tipos
             else {
+                console.log('Outro tipo de arquivo');
                 alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
                 fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
                 exibirPreviewPdf(file.name);
@@ -450,17 +478,26 @@
             $('confirm-btns').style.display = 'block';
         }
 
-        // ===== PREVIEW IMAGEM (CORRIGIDO - agora mostra a imagem) =====
+        // ===== PREVIEW IMAGEM (CORRIGIDO) =====
         function exibirPreview(dataURL) {
+            console.log('Exibindo preview...');
             fotoAtual = { tipo: 'imagem', foto: dataURL };
 
             const img = $('preview-img');
+            img.onload = function() {
+                console.log('Imagem carregada no preview');
+            };
+            img.onerror = function(e) {
+                console.error('Erro ao exibir imagem:', e);
+            };
+            
             img.src = dataURL;
-            img.style.display = 'block';              // mostra a imagem
-            $('placeholder-text').style.display = 'none'; // esconde o texto placeholder
-
-            $('capture-btns').style.display = 'none';  // esconde botões captura
-            $('confirm-btns').style.display = 'block'; // mostra botões confirmar/refazer
+            img.style.display = 'block';
+            $('placeholder-text').style.display = 'none';
+            $('capture-btns').style.display = 'none';
+            $('confirm-btns').style.display = 'block';
+            
+            console.log('Preview exibido');
         }
 
         function refazerFoto() {
@@ -475,7 +512,12 @@
         }
 
         function confirmarFoto() {
-            if (!fotoAtual) { alert('Tire uma foto ou anexe um arquivo antes de confirmar.'); return; }
+            if (!fotoAtual) { 
+                alert('Tire uma foto ou anexe um arquivo antes de confirmar.'); 
+                return; 
+            }
+
+            console.log('Confirmando foto, tipo:', fotoAtual.tipo);
 
             docsCapturados.push({
                 nome: perfilAtual.docs[indiceDoc],
@@ -501,6 +543,7 @@
 
         // ===== RELATÓRIO =====
         function mostrarRelatorio() {
+            console.log('Mostrando relatório, documentos capturados:', docsCapturados.length);
             $('report-perfil').textContent = perfilAtual.nome;
             $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
 
@@ -511,6 +554,9 @@
                 const div = document.createElement('div');
                 div.className = 'report-item';
                 let visual = '';
+                
+                console.log('Documento', i, 'tipo:', doc.tipo, 'tem foto:', !!doc.foto);
+                
                 if (doc.tipo === 'imagem' && doc.foto) {
                     visual = '<img src="' + doc.foto + '" alt="">';
                 } else {
@@ -535,6 +581,7 @@
             try {
                 const wmImg = await carregarImagem(watermarkUrl);
 
+                // Cabeçalho
                 pdf.setFillColor(26, 26, 26);
                 pdf.rect(0, 0, 210, 38, 'F');
                 pdf.setTextColor(212, 175, 55);
@@ -584,10 +631,12 @@
                     }
                 }
 
+                // Marca d'água CENTRALIZADA no meio da página
                 const total = pdf.internal.getNumberOfPages();
                 for (let p = 1; p <= total; p++) {
                     pdf.setPage(p);
-                    pdf.addImage(wmImg, 'PNG', 15, 275, 180, 15, undefined, 'FAST', 0.12);
+                    // Centralizado: x=15, y=141 (meio da página A4 de 297mm)
+                    pdf.addImage(wmImg, 'PNG', 15, 141, 180, 15, undefined, 'FAST', 0.12);
                 }
 
                 pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
