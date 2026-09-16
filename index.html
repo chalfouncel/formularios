@@ -374,7 +374,7 @@
              alt="M&IC" 
              id="header-logo"
              onerror="console.log('Erro ao carregar logo'); this.style.display='none'">
-        <h1>M&IC Corretores de Imóveis</h1>
+        <h1>M&IC Corretoores de Imóveis</h1>
         <p>CAPTURA DE DOCUMENTOS</p>
     </div>
 
@@ -777,7 +777,6 @@
         }
 
         function proximaEtapa(novaEtapa) {
-            // Validações Etapa 1
             if (etapaAtual === 1) {
                 const finalidade = document.querySelector('input[name="finalidade"]:checked');
                 if (!finalidade) {
@@ -786,7 +785,6 @@
                 }
             }
 
-            // Validações Etapa 2 (RG NÃO é obrigatório)
             if (etapaAtual === 2) {
                 const campos = ['f-nome', 'f-nacionalidade', 'f-estadoCivil', 'f-profissao', 'f-cpf', 'f-endereco', 'f-email', 'f-telefone', 'f-enderecoImovel'];
                 for (const id of campos) {
@@ -798,7 +796,6 @@
                 }
             }
 
-            // Validações Etapa 3 (apenas venda)
             if (etapaAtual === 3) {
                 const campos = ['f-iptu', 'f-matricula', 'f-rgi'];
                 for (const id of campos) {
@@ -820,7 +817,6 @@
                 }
             }
 
-            // Se estiver na Etapa 2 e a finalidade for LOCAÇÃO, pula direto para Etapa 4
             if (etapaAtual === 2) {
                 const finalidade = document.querySelector('input[name="finalidade"]:checked');
                 if (finalidade && finalidade.value === 'locacao') {
@@ -836,7 +832,6 @@
         }
 
         function voltarEtapa(novaEtapa) {
-            // Se voltar para etapa 3 mas for locação, vai para etapa 2
             if (novaEtapa === 3) {
                 const finalidade = document.querySelector('input[name="finalidade"]:checked');
                 if (finalidade && finalidade.value === 'locacao') {
@@ -965,7 +960,7 @@
 
         function tirarFoto() {
             const video = $('camera-video'), canvas = $('camera-canvas');
-            canvas.width = video.videoWidth; 
+            canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const dataURL = canvas.toDataURL('image/jpeg', 0.9);
@@ -983,7 +978,6 @@
         function arquivoSelecionado(event) {
             const file = event.target.files[0];
             if (!file) { return; }
-            console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
             if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -1045,9 +1039,6 @@
         function exibirPreview(dataURL) {
             fotoAtual = { tipo: 'imagem', foto: dataURL };
             const img = $('preview-img');
-            img.onload = function() {
-                console.log('Preview carregado:', img.naturalWidth, 'x', img.naturalHeight);
-            };
             img.src = dataURL;
             img.style.display = 'block';
             $('placeholder-text').style.display = 'none';
@@ -1067,9 +1058,9 @@
         }
 
         function confirmarFoto() {
-            if (!fotoAtual) { 
-                alert('Tire uma foto ou anexe um arquivo antes de confirmar.'); 
-                return; 
+            if (!fotoAtual) {
+                alert('Tire uma foto ou anexe um arquivo antes de confirmar.');
+                return;
             }
             docsCapturados.push({
                 nome: perfilAtual.docs[indiceDoc],
@@ -1103,7 +1094,7 @@
 
             const dataContainer = $('report-data');
             dataContainer.innerHTML = '';
-            
+
             if (dadosProprietario) {
                 let html = '<div class="report-data-block"><h3>📋 Dados do Proprietário</h3>';
                 html += criarLinha('Finalidade', dadosProprietario.finalidade === 'locacao' ? 'Locação' : 'Venda');
@@ -1117,7 +1108,7 @@
                 html += criarLinha('E-mail', dadosProprietario.email);
                 html += criarLinha('Telefone', dadosProprietario.telefone);
                 html += criarLinha('Endereço do imóvel', dadosProprietario.enderecoImovel);
-                
+
                 if (dadosProprietario.finalidade === 'venda') {
                     html += criarLinha('IPTU', dadosProprietario.iptu);
                     html += criarLinha('Matrícula no RGI', dadosProprietario.matricula);
@@ -1130,14 +1121,14 @@
                     html += criarLinha('FGTS utilizado', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não');
                 }
                 html += '</div>';
-                
+
                 html += '<div class="report-data-block"><h3>🏦 Dados Bancários</h3>';
                 html += criarLinha('Banco', dadosProprietario.banco);
                 html += criarLinha('Agência', dadosProprietario.agencia);
                 html += criarLinha('Conta', dadosProprietario.conta);
                 html += criarLinha('Chave PIX', dadosProprietario.chavePix);
                 html += '</div>';
-                
+
                 dataContainer.innerHTML = html;
             }
 
@@ -1184,16 +1175,59 @@
             });
         }
 
+        // Verifica se uma página do jsPDF tem conteúdo real (texto ou imagens)
+        function paginaTemConteudo(pdf, pageIndex) {
+            try {
+                // pdf.internal.pages é um array; cada página é um array de strings de operações
+                const pageObj = pdf.internal.pages[pageIndex];
+                if (!pageObj) return false;
+
+                // Concatena todo o conteúdo da página em uma string
+                let contentStr = '';
+                if (Array.isArray(pageObj)) {
+                    contentStr = pageObj.join(' ');
+                } else if (typeof pageObj === 'string') {
+                    contentStr = pageObj;
+                } else if (pageObj.contents) {
+                    contentStr = typeof pageObj.contents === 'string' ? pageObj.contents : JSON.stringify(pageObj.contents);
+                }
+
+                // Se a string for muito curta, provavelmente é vazia
+                if (contentStr.length < 10) return false;
+
+                // Verifica se há texto (operações Tj, TJ, ou blocos BT...ET)
+                const hasText = /\bTj\b/.test(contentStr) || /\bTJ\b/.test(contentStr) || /\bBT\b[\s\S]*?\bET\b/.test(contentStr);
+
+                // Verifica se há imagens (operador Do com referência a XObject)
+                const hasImage = /\/\w+\s+Do\b/.test(contentStr);
+
+                // Verifica se há linhas/formas além de retângulos de fundo simples
+                // (retângulos de fundo são comuns em cabeçalhos, mas sozinhos não contam)
+                const hasLines = /\bl\b/.test(contentStr) && /re\b/.test(contentStr) && contentStr.split('re').length > 3;
+
+                return hasText || hasImage || hasLines;
+            } catch (e) {
+                console.warn('Erro ao verificar página ' + pageIndex + ':', e);
+                return true; // Se der erro, assume que tem conteúdo para não deletar
+            }
+        }
+
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 14;
+            const contentWidth = pageWidth - margin * 2;
+            let y = 0;
 
             try {
+                // ===== PÁGINA 1: CAPA =====
                 const logoImg = await carregarImagem(logoUrl);
 
                 pdf.setFillColor(26, 26, 26);
-                pdf.rect(0, 0, 210, 45, 'F');
+                pdf.rect(0, 0, pageWidth, 45, 'F');
                 pdf.addImage(logoImg, 'PNG', 85, 5, 40, 20);
                 pdf.setTextColor(212, 175, 55);
                 pdf.setFontSize(18);
@@ -1207,14 +1241,15 @@
                 pdf.setFontSize(8);
                 pdf.text(new Date().toLocaleString('pt-BR'), 105, 43, { align: 'center' });
 
-                let y = 55;
+                y = 55;
 
+                // ===== DADOS DO PROPRIETÁRIO (se houver) =====
                 if (dadosProprietario) {
                     pdf.addPage();
                     y = 20;
 
                     pdf.setFillColor(26, 26, 26);
-                    pdf.rect(0, y - 5, 210, 12, 'F');
+                    pdf.rect(0, y - 5, pageWidth, 12, 'F');
                     pdf.setTextColor(212, 175, 55);
                     pdf.setFontSize(14);
                     pdf.setFont(undefined, 'bold');
@@ -1224,7 +1259,7 @@
                     pdf.setTextColor(26, 26, 26);
                     pdf.setFontSize(11);
                     pdf.setFont(undefined, 'bold');
-                    pdf.text('Informações pessoais', 14, y);
+                    pdf.text('Informações pessoais', margin, y);
                     y += 6;
 
                     pdf.setFontSize(9);
@@ -1248,20 +1283,20 @@
                     dadosPessoais.forEach(([label, value]) => {
                         if (y > 275) { pdf.addPage(); y = 20; }
                         pdf.setFont(undefined, 'bold');
-                        pdf.text(label, 14, y);
+                        pdf.text(label, margin, y);
                         pdf.setFont(undefined, 'normal');
-                        const lines = pdf.splitTextToSize(value, 120);
-                        pdf.text(lines, 60, y);
-                        y += 5 * lines.length + 1;
+                        const lines = pdf.splitTextToSize(value || '-', contentWidth - 50);
+                        pdf.text(lines, margin + 50, y);
+                        y += Math.max(lines.length * 4.5, 5);
                     });
 
                     if (dadosProprietario.finalidade === 'venda') {
-                        y += 3;
-                        if (y > 275) { pdf.addPage(); y = 20; }
-                        pdf.setTextColor(26, 26, 26);
+                        y += 5;
+                        if (y > 265) { pdf.addPage(); y = 20; }
                         pdf.setFontSize(11);
                         pdf.setFont(undefined, 'bold');
-                        pdf.text('Dados do imóvel (venda)', 14, y);
+                        pdf.setTextColor(26, 26, 26);
+                        pdf.text('Dados do imóvel', margin, y);
                         y += 6;
 
                         pdf.setFontSize(9);
@@ -1276,29 +1311,27 @@
                         ];
 
                         if (dadosProprietario.financiado === 'sim') {
-                            dadosImovel.push(['Banco:', dadosProprietario.bancoFinanciamento]);
+                            dadosImovel.push(['Banco financiamento:', dadosProprietario.bancoFinanciamento]);
                             dadosImovel.push(['Saldo devedor:', dadosProprietario.saldoDevedor]);
                         }
-
                         dadosImovel.push(['FGTS:', dadosProprietario.fgts === 'sim' ? 'Sim' : 'Não']);
 
                         dadosImovel.forEach(([label, value]) => {
                             if (y > 275) { pdf.addPage(); y = 20; }
                             pdf.setFont(undefined, 'bold');
-                            pdf.text(label, 14, y);
+                            pdf.text(label, margin, y);
                             pdf.setFont(undefined, 'normal');
-                            const lines = pdf.splitTextToSize(value, 120);
-                            pdf.text(lines, 60, y);
-                            y += 5 * lines.length + 1;
+                            pdf.text(value || '-', margin + 50, y);
+                            y += 5;
                         });
                     }
 
-                    y += 3;
-                    if (y > 275) { pdf.addPage(); y = 20; }
-                    pdf.setTextColor(26, 26, 26);
+                    y += 5;
+                    if (y > 265) { pdf.addPage(); y = 20; }
                     pdf.setFontSize(11);
                     pdf.setFont(undefined, 'bold');
-                    pdf.text('Dados bancários', 14, y);
+                    pdf.setTextColor(26, 26, 26);
+                    pdf.text('Dados bancários', margin, y);
                     y += 6;
 
                     pdf.setFontSize(9);
@@ -1315,87 +1348,114 @@
                     dadosBancarios.forEach(([label, value]) => {
                         if (y > 275) { pdf.addPage(); y = 20; }
                         pdf.setFont(undefined, 'bold');
-                        pdf.text(label, 14, y);
+                        pdf.text(label, margin, y);
                         pdf.setFont(undefined, 'normal');
-                        pdf.text(value, 60, y);
-                        y += 6;
+                        pdf.text(value || '-', margin + 50, y);
+                        y += 5;
                     });
                 }
 
+                // ===== DOCUMENTOS CAPTURADOS =====
                 if (docsCapturados.length > 0) {
                     pdf.addPage();
                     y = 20;
 
                     pdf.setFillColor(26, 26, 26);
-                    pdf.rect(0, y - 5, 210, 12, 'F');
+                    pdf.rect(0, y - 5, pageWidth, 12, 'F');
                     pdf.setTextColor(212, 175, 55);
                     pdf.setFontSize(14);
                     pdf.setFont(undefined, 'bold');
-                    pdf.text('DOCUMENTOS CAPTURADOS', 105, y + 3, { align: 'center' });
-                    y += 15;
+                    pdf.text('DOCUMENTOS ANEXADOS', 105, y + 3, { align: 'center' });
+                    y += 18;
 
                     for (let i = 0; i < docsCapturados.length; i++) {
                         const doc = docsCapturados[i];
-                        let imgW = 170, imgH = 0, temImagem = false, formato = 'JPEG';
 
-                        if (doc.foto && doc.foto.length > 100) {
-                            try {
-                                const props = pdf.getImageProperties(doc.foto);
-                                if (doc.foto.indexOf('data:image/png') === 0) formato = 'PNG';
-                                imgW = 170;
-                                imgH = (props.height * imgW) / props.width;
-                                if (imgH > 180) {
-                                    imgH = 180;
-                                    imgW = (props.width * imgH) / props.height;
-                                }
-                                temImagem = true;
-                            } catch (e) {
-                                temImagem = false;
-                            }
-                        }
+                        if (y > 240) { pdf.addPage(); y = 20; }
 
-                        const hBloco = 14 + (temImagem ? imgH + 10 : 12);
-                        if (y + hBloco > 285) {
-                            pdf.addPage();
-                            y = 20;
-                        }
-
+                        // Título do documento
                         pdf.setFillColor(212, 175, 55);
-                        pdf.rect(12, y - 4, 186, 8, 'F');
+                        pdf.rect(margin, y - 4, contentWidth, 8, 'F');
                         pdf.setTextColor(26, 26, 26);
                         pdf.setFontSize(10);
                         pdf.setFont(undefined, 'bold');
-                        pdf.text((i + 1) + '. ' + doc.nome, 16, y + 2);
-                        y += 14;
+                        pdf.text((i + 1) + '. ' + doc.nome, margin + 3, y + 2);
+                        y += 8;
 
-                        if (temImagem) {
-                            const x = (210 - imgW) / 2;
-                            pdf.addImage(doc.foto, formato, x, y, imgW, imgH);
-                            y += imgH + 10;
+                        pdf.setFontSize(8);
+                        pdf.setFont(undefined, 'normal');
+                        pdf.setTextColor(120, 120, 120);
+                        pdf.text(doc.nomeArquivo + ' — ' + doc.data, margin + 3, y + 3);
+                        y += 8;
+
+                        if (doc.tipo === 'imagem' && doc.foto) {
+                            try {
+                                const img = await carregarImagem(doc.foto);
+                                const imgW = img.naturalWidth;
+                                const imgH = img.naturalHeight;
+                                const maxW = contentWidth - 10;
+                                const maxH = 160;
+
+                                let drawW = maxW;
+                                let drawH = (imgH * maxW) / imgW;
+
+                                if (drawH > maxH) {
+                                    drawH = maxH;
+                                    drawW = (imgW * maxH) / imgH;
+                                }
+
+                                if (y + drawH > pageHeight - margin) {
+                                    pdf.addPage();
+                                    y = 20;
+                                }
+
+                                const imgX = margin + (contentWidth - drawW) / 2;
+                                pdf.addImage(doc.foto, 'JPEG', imgX, y, drawW, drawH);
+                                y += drawH + 10;
+                            } catch (imgErr) {
+                                console.warn('Erro ao adicionar imagem no PDF:', imgErr);
+                                if (y > 275) { pdf.addPage(); y = 20; }
+                                pdf.setTextColor(200, 50, 50);
+                                pdf.text('(Erro ao carregar imagem)', margin + 3, y);
+                                y += 8;
+                            }
                         } else {
+                            if (y > 275) { pdf.addPage(); y = 20; }
                             pdf.setTextColor(100, 100, 100);
-                            pdf.setFontSize(9);
-                            pdf.setFont(undefined, 'normal');
-                            pdf.text('[' + doc.nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
-                            y += 12;
+                            pdf.text('(Arquivo não visualizável)', margin + 3, y);
+                            y += 8;
                         }
+
+                        y += 5;
                     }
                 }
 
-                // Remover última página se estiver vazia
-                const totalPages = pdf.internal.getNumberOfPages();
-                if (totalPages > 1) {
-                    const lastPage = pdf.internal.pages[totalPages];
-                    if (lastPage && (!lastPage.length || lastPage.length <= 2)) {
-                        pdf.deletePage(totalPages);
+                // ===== REMOVER PÁGINAS EM BRANCO =====
+                // Percorre do fim para o início e remove páginas sem conteúdo real
+                let totalPaginas = pdf.internal.getNumberOfPages();
+                let paginasRemovidas = 0;
+
+                for (let i = totalPaginas; i >= 1; i--) {
+                    if (!paginaTemConteudo(pdf, i - 1)) {
+                        pdf.deletePage(i);
+                        paginasRemovidas++;
+                    } else {
+                        // Se encontrou uma página com conteúdo, para de verificar
+                        // (páginas em branco só aparecem no final)
+                        break;
                     }
                 }
 
-                pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
+                console.log('Páginas em branco removidas:', paginasRemovidas);
 
-            } catch (e) {
-                console.error(e);
-                alert('Erro ao gerar PDF: ' + e.message);
+                // ===== SALVAR PDF =====
+                const nomeArquivo = 'Relatorio_' + perfilAtual.nome.replace(/\s/g, '_') + '_' +
+                    new Date().toISOString().slice(0, 10) + '.pdf';
+                pdf.save(nomeArquivo);
+
+            } catch (err) {
+                console.error('Erro ao gerar PDF:', err);
+                alert('Erro ao gerar PDF: ' + err.message);
             }
         }
     </script>
