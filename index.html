@@ -1178,6 +1178,10 @@
                 <div id="report-data"></div>
                 <div id="report-docs"></div>
 
+                <button class="btn btn-confirm" id="btn-enviar-email" onclick="enviarEmailNotificacao(true)">
+                    ✉️ Reenviar por E-mail
+                </button>
+
                 <button class="btn btn-gold" onclick="gerarPDF()">
                     📄 Gerar PDF
                 </button>
@@ -1370,6 +1374,100 @@
             }
         }
 
+        function cancelarCaptura() {
+            pararCamera();
+            mostrarTela("screen-list");
+        }
+
+        function abrirCamera() {
+            const modal = $("camera-modal");
+            const video = $("camera-video");
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" }
+                })
+                .then(stream => {
+                    cameraStream = stream;
+                    video.srcObject = stream;
+                    modal.classList.add("active");
+                })
+                .catch(err => {
+                    alert("Não foi possível acessar a câmera: " + err.message);
+                });
+            } else {
+                alert("Seu navegador não suporta acesso direto à câmera.");
+            }
+        }
+
+        function pararCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+        }
+
+        function fecharCamera() {
+            pararCamera();
+            $("camera-modal").classList.remove("active");
+        }
+
+        function tirarFoto() {
+            const video = $("camera-video");
+            const canvas = $("camera-canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            fecharCamera();
+
+            exibirPrevia(dataUrl, perfilAtual.docs[indiceDoc]);
+        }
+
+        function abrirGaleria() {
+            $("fileInputHidden").click();
+        }
+
+        function arquivoSelecionado(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                exibirPrevia(e.target.result, file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function exibirPrevia(src, nome) {
+            documentoAtual = {
+                tipo: perfilAtual.docs[indiceDoc],
+                nome: nome,
+                dataUrl: src
+            };
+
+            $("preview-img").src = src;
+            $("preview-img").style.display = "block";
+            $("placeholder-text").style.display = "none";
+            $("capture-btns").style.display = "none";
+            $("confirm-btns").style.display = "block";
+        }
+
+        function refazerDocumento() {
+            documentoAtual = null;
+            carregarProximoDocumento();
+        }
+
+        function confirmarDocumento() {
+            if (documentoAtual) {
+                docsCapturados.push(documentoAtual);
+            }
+            indiceDoc++;
+            carregarProximoDocumento();
+        }
+
         function abrirFormularioProprietario() {
             etapaProprietario = 1;
 
@@ -1425,7 +1523,8 @@
         }
 
         function valor(id) {
-            return $(id).value.trim();
+            const el = $(id);
+            return el ? el.value.trim() : "";
         }
 
         function validarCampos(ids) {
@@ -1434,7 +1533,7 @@
 
                 if (!campo || !campo.value.trim()) {
                     alert("Preencha todos os campos obrigatórios.");
-                    campo.focus();
+                    if (campo) campo.focus();
                     return false;
                 }
             }
@@ -1576,38 +1675,37 @@
             dadosFormulario = {
                 tipo: "proprietario",
                 titulo: "Dados do Proprietário",
-                finalidade: finalidade === "locacao" ? "Locação" : "Venda",
+                "Finalidade": finalidade === "locacao" ? "Locação" : "Venda",
                 "Nome completo": valor("f-nome"),
-                Nacionalidade: valor("f-nacionalidade"),
+                "Nacionalidade": valor("f-nacionalidade"),
                 "Estado civil": valor("f-estadoCivil"),
-                Profissão: valor("f-profissao"),
-                RG: valor("f-rg") || "Não informado",
-                CPF: valor("f-cpf"),
+                "Profissão": valor("f-profissao"),
+                "RG": valor("f-rg") || "Não informado",
+                "CPF": valor("f-cpf"),
                 "Endereço completo": valor("f-endereco"),
                 "E-mail": valor("f-email"),
-                Telefone: valor("f-telefone"),
+                "Telefone": valor("f-telefone"),
                 "Endereço do imóvel": valor("f-enderecoImovel"),
-                Banco: valor("f-banco"),
-                Agência: valor("f-agencia"),
-                Conta: valor("f-conta"),
+                "Banco": valor("f-banco"),
+                "Agência": valor("f-agencia"),
+                "Conta": valor("f-conta"),
                 "Chave PIX": valor("f-chavePix")
             };
 
             if (finalidade === "venda") {
-                dadosFormulario["Número do IPTU"] = valor("f-iptu");
-                dadosFormulario["Matrícula no RGI"] = valor("f-matricula");
+                dadosFormulario["IPTU"] = valor("f-iptu");
+                dadosFormulario["Matrícula RGI"] = valor("f-matricula");
                 dadosFormulario["Cartório RGI"] = valor("f-rgi");
-                dadosFormulario["Imóvel financiado"] = financiado && financiado.value === "sim" ? "Sim" : "Não";
-
+                dadosFormulario["Financiado"] = financiado ? (financiado.value === "sim" ? "Sim" : "Não") : "Não";
                 if (financiado && financiado.value === "sim") {
                     dadosFormulario["Banco do financiamento"] = valor("f-bancoFinanciamento");
                     dadosFormulario["Saldo devedor"] = valor("f-saldoDevedor");
                 }
-
-                dadosFormulario["Uso de FGTS"] = fgts && fgts.value === "sim" ? "Sim" : "Não";
+                dadosFormulario["FGTS utilizado"] = fgts ? (fgts.value === "sim" ? "Sim" : "Não") : "Não";
             }
 
-            mostrarRelatorio();
+            montarRelatorio();
+            enviarEmailNotificacao(false);
         }
 
         function finalizarFormularioComprador() {
@@ -1623,21 +1721,22 @@
                 tipo: "comprador",
                 titulo: "Dados do Comprador",
                 "Nome completo": valor("fc-nome"),
-                Nacionalidade: valor("fc-nacionalidade"),
+                "Nacionalidade": valor("fc-nacionalidade"),
                 "Estado civil": valor("fc-estadoCivil"),
-                Profissão: valor("fc-profissao"),
-                RG: valor("fc-rg") || "Não informado",
-                CPF: valor("fc-cpf"),
+                "Profissão": valor("fc-profissao"),
+                "RG": valor("fc-rg") || "Não informado",
+                "CPF": valor("fc-cpf"),
                 "Endereço completo": valor("fc-endereco"),
                 "E-mail": valor("fc-email"),
-                Telefone: valor("fc-telefone"),
-                Banco: valor("fc-banco"),
-                Agência: valor("fc-agencia"),
-                Conta: valor("fc-conta"),
+                "Telefone": valor("fc-telefone"),
+                "Banco": valor("fc-banco"),
+                "Agência": valor("fc-agencia"),
+                "Conta": valor("fc-conta"),
                 "Chave PIX": valor("fc-chavePix")
             };
 
-            mostrarRelatorio();
+            montarRelatorio();
+            enviarEmailNotificacao(false);
         }
 
         function finalizarFormularioInquilino() {
@@ -1659,27 +1758,25 @@
                 tipo: "inquilino",
                 titulo: "Dados do Inquilino",
                 "Nome completo": valor("fi-nome"),
-                Nacionalidade: valor("fi-nacionalidade"),
+                "Nacionalidade": valor("fi-nacionalidade"),
                 "Estado civil": valor("fi-estadoCivil"),
-                Profissão: valor("fi-profissao"),
-                RG: valor("fi-rg") || "Não informado",
-                CPF: valor("fi-cpf"),
+                "Profissão": valor("fi-profissao"),
+                "RG": valor("fi-rg") || "Não informado",
+                "CPF": valor("fi-cpf"),
                 "Endereço completo": valor("fi-endereco"),
                 "E-mail": valor("fi-email"),
-                Telefone: valor("fi-telefone"),
+                "Telefone": valor("fi-telefone"),
                 "Pessoas no imóvel": valor("fi-pessoas"),
-                "Possui pets": pet.value === "sim" ? "Sim" : "Não",
-                Banco: valor("fi-banco"),
-                Agência: valor("fi-agencia"),
-                Conta: valor("fi-conta"),
+                "Possui Pet": pet.value === "sim" ? "Sim" : "Não",
+                "Detalhe Pet": pet.value === "sim" ? valor("fi-petDetalhe") : "Nenhum",
+                "Banco": valor("fi-banco"),
+                "Agência": valor("fi-agencia"),
+                "Conta": valor("fi-conta"),
                 "Chave PIX": valor("fi-chavePix")
             };
 
-            if (pet.value === "sim") {
-                dadosFormulario["Detalhes dos pets"] = valor("fi-petDetalhe");
-            }
-
-            mostrarRelatorio();
+            montarRelatorio();
+            enviarEmailNotificacao(false);
         }
 
         function finalizarFormularioCorretor() {
@@ -1690,404 +1787,164 @@
                 tipo: "corretor",
                 titulo: "Dados do Corretor",
                 "Nome completo": valor("fcr-nome"),
-                CPF: valor("fcr-cpf"),
-                CRECI: valor("fcr-creci"),
+                "CPF": valor("fcr-cpf"),
+                "CRECI": valor("fcr-creci"),
                 "E-mail": valor("fcr-email"),
-                Telefone: valor("fcr-telefone")
+                "Telefone": valor("fcr-telefone")
             };
 
-            mostrarRelatorio();
+            montarRelatorio();
+            enviarEmailNotificacao(false);
         }
 
-        function abrirCamera() {
-            const modal = $("camera-modal");
-            const video = $("camera-video");
+        function montarRelatorio() {
+            $("report-perfil").textContent = perfilAtual ? perfilAtual.nome : "";
+            $("report-date").textContent = new Date().toLocaleString("pt-BR");
 
-            navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" }
-            }).then(stream => {
-                cameraStream = stream;
-                video.srcObject = stream;
-                modal.classList.add("active");
-            }).catch(err => {
-                console.error(err);
-                alert("Não foi possível acessar a câmera do dispositivo.");
-            });
-        }
-
-        function fecharCamera() {
-            pararCamera();
-            $("camera-modal").classList.remove("active");
-        }
-
-        function pararCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-        }
-
-        function tirarFoto() {
-            const video = $("camera-video");
-            const canvas = $("camera-canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0);
-
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-            fecharCamera();
-
-            documentoAtual = {
-                tipo: "imagem",
-                nome: perfilAtual.docs[indiceDoc],
-                nomeArquivo: "foto_camera.jpg",
-                data: new Date().toLocaleString("pt-BR"),
-                imagem: dataUrl
-            };
-
-            $("preview-img").src = dataUrl;
-            $("preview-img").style.display = "block";
-            $("placeholder-text").style.display = "none";
-            $("capture-btns").style.display = "none";
-            $("confirm-btns").style.display = "block";
-        }
-
-        function abrirGaleria() {
-            $("fileInputHidden").click();
-        }
-
-        async function arquivoSelecionado(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            mostrarLoading("Processando arquivo...");
-
-            try {
-                if (file.type.startsWith("image/")) {
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        documentoAtual = {
-                            tipo: "imagem",
-                            nome: perfilAtual.docs[indiceDoc],
-                            nomeArquivo: file.name,
-                            data: new Date().toLocaleString("pt-BR"),
-                            imagem: e.target.result
-                        };
-                        $("preview-img").src = e.target.result;
-                        $("preview-img").style.display = "block";
-                        $("placeholder-text").style.display = "none";
-                        $("capture-btns").style.display = "none";
-                        $("confirm-btns").style.display = "block";
-                        ocultarLoading();
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
-                    const reader = new FileReader();
-                    reader.onload = async e => {
-                        try {
-                            const typedarray = new Uint8Array(e.target.result);
-                            const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                            const page = await pdf.getPage(1);
-                            const viewport = page.getViewport({ scale: 1.5 });
-
-                            const canvas = document.createElement("canvas");
-                            const ctx = canvas.getContext("2d");
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-
-                            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-                            const imgUrl = canvas.toDataURL("image/jpeg", 0.85);
-
-                            documentoAtual = {
-                                tipo: "pdf",
-                                nome: perfilAtual.docs[indiceDoc],
-                                nomeArquivo: file.name,
-                                data: new Date().toLocaleString("pt-BR"),
-                                imagem: imgUrl
-                            };
-
-                            $("preview-img").src = imgUrl;
-                            $("preview-img").style.display = "block";
-                            $("placeholder-text").style.display = "none";
-                            $("capture-btns").style.display = "none";
-                            $("confirm-btns").style.display = "block";
-                        } catch (err) {
-                            console.error(err);
-                            alert("Não foi possível carregar o PDF.");
-                        } finally {
-                            ocultarLoading();
-                        }
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    ocultarLoading();
-                    alert("Formato não suportado diretamente.");
-                }
-            } catch (err) {
-                ocultarLoading();
-                alert("Erro ao ler o documento.");
-            }
-        }
-
-        function confirmarDocumento() {
-            if (!documentoAtual) return;
-            docsCapturados.push(documentoAtual);
-            indiceDoc++;
-            carregarProximoDocumento();
-        }
-
-        function refazerDocumento() {
-            documentoAtual = null;
-            $("preview-img").src = "";
-            $("preview-img").style.display = "none";
-            $("placeholder-text").style.display = "block";
-            $("capture-btns").style.display = "block";
-            $("confirm-btns").style.display = "none";
-            $("fileInputHidden").value = "";
-        }
-
-        function cancelarCaptura() {
-            pararCamera();
-            mostrarTela("screen-list");
-        }
-
-        function mostrarRelatorio() {
-            $("report-perfil").textContent = perfilAtual.nome;
-            $("report-date").textContent = "Gerado em: " + new Date().toLocaleString("pt-BR");
-
-            const container = $("report-data");
-            container.innerHTML = "";
+            const dataDiv = $("report-data");
+            dataDiv.innerHTML = "";
 
             if (dadosFormulario) {
-                const bloco = document.createElement("div");
-                bloco.className = "report-data-block";
-
-                const titulo = document.createElement("h3");
-                titulo.textContent = dadosFormulario.titulo;
-                bloco.appendChild(titulo);
-
-                Object.entries(dadosFormulario).forEach(([k, v]) => {
-                    if (k === "tipo" || k === "titulo") return;
-                    const row = document.createElement("div");
-                    row.className = "report-data-row";
-                    row.innerHTML = `<span class="label">${k}:</span><span class="value">${v}</span>`;
-                    bloco.appendChild(row);
-                });
-
-                container.appendChild(bloco);
+                let html = `<div class="report-data-block"><h3>${dadosFormulario.titulo}</h3>`;
+                for (let k in dadosFormulario) {
+                    if (k !== "tipo" && k !== "titulo") {
+                        html += `
+                            <div class="report-data-row">
+                                <span class="label">${k}</span>
+                                <span class="value">${dadosFormulario[k]}</span>
+                            </div>
+                        `;
+                    }
+                }
+                html += `</div>`;
+                dataDiv.innerHTML = html;
             }
 
-            const docs = $("report-docs");
-            docs.innerHTML = "";
-
+            const docsDiv = $("report-docs");
+            docsDiv.innerHTML = "";
             docsCapturados.forEach(doc => {
                 const item = document.createElement("div");
                 item.className = "report-item";
-
-                if (doc.imagem) {
-                    const img = document.createElement("img");
-                    img.src = doc.imagem;
-                    img.alt = doc.nome;
-                    item.appendChild(img);
-                } else {
-                    const icon = document.createElement("div");
-                    icon.className = "file-icon";
-                    icon.textContent = "📄";
-                    item.appendChild(icon);
-                }
-
-                const info = document.createElement("div");
-                const nome = document.createElement("strong");
-                nome.textContent = doc.nome;
-                info.appendChild(nome);
-
-                const sub = document.createElement("small");
-                sub.textContent = `${doc.nomeArquivo || ""} • ${doc.data || ""}`;
-                info.appendChild(sub);
-
-                item.appendChild(info);
-                docs.appendChild(item);
+                item.innerHTML = `
+                    <img src="${doc.dataUrl}" alt="${doc.tipo}">
+                    <strong>${doc.tipo}</strong>
+                    <small>${doc.nome || ""}</small>
+                `;
+                docsDiv.appendChild(item);
             });
 
             mostrarTela("screen-report");
         }
 
-        function carregarImagemAsync(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
-        }
-
-        async function gerarPDF() {
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                alert("Biblioteca PDF não encontrada.");
-                return;
+        // ==========================================
+        // INTEGRAÇÃO COM SUPABASE / RESEND (EDGE FUNCTION)
+        // ==========================================
+        async function enviarEmailNotificacao(manual = false) {
+            const btn = $("btn-enviar-email");
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "⏳ Enviando e-mail...";
             }
 
-            mostrarLoading("Gerando PDF...");
+            const overlay = $("loading-overlay");
+            const loadingText = $("loading-text");
+            if (overlay && loadingText) {
+                loadingText.innerText = "Enviando dados por e-mail...";
+                overlay.classList.add("active");
+            }
 
             try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: "portrait",
-                    unit: "mm",
-                    format: "a4" // 210 x 297 mm
+                let htmlCorpo = `<h2>Novo Formulário Recebido — ${perfilAtual ? perfilAtual.nome : "Geral"}</h2>`;
+                htmlCorpo += `<p><strong>Data de envio:</strong> ${new Date().toLocaleString("pt-BR")}</p><hr>`;
+                htmlCorpo += `<h3>Dados Cadastrais:</h3><ul>`;
+
+                if (dadosFormulario) {
+                    for (let chave in dadosFormulario) {
+                        if (chave !== "tipo" && chave !== "titulo") {
+                            htmlCorpo += `<li><strong>${chave}:</strong> ${dadosFormulario[chave]}</li>`;
+                        }
+                    }
+                }
+                htmlCorpo += `</ul>`;
+                htmlCorpo += `<p><strong>Total de Documentos Capturados:</strong> ${docsCapturados.length}</p>`;
+
+                const resposta = await fetch("https://rzxutiozhkvbrcepbwam.supabase.co/functions/v1/send-email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        to: "chalfouncorretor@gmail.com", // <-- SEU E-MAIL CONFIGURADO AQUI
+                        subject: `Novo Cadastro: ${perfilAtual ? perfilAtual.nome : "Formulário"} - ${dadosFormulario ? (dadosFormulario["Nome completo"] || "") : ""}`,
+                        html: htmlCorpo
+                    })
                 });
 
-                const largura = 210;
-                const altura = 297;
-                const margemInf = 15;
-                let y = 14;
-
-                // CABEÇALHO DO TOPO (PÁGINA 1)
-                function desenharCabecalhoPagina() {
-                    pdf.setFillColor(26, 26, 26);
-                    pdf.rect(0, 0, largura, 16, "F");
-                    pdf.setTextColor(212, 175, 55);
-                    pdf.setFontSize(12);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text("M&IC CORRETORES DE IMÓVEIS", largura / 2, 7.5, { align: "center" });
-
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(255, 255, 255);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.text("RELATÓRIO DE DOCUMENTOS — " + perfilAtual.nome.toUpperCase(), largura / 2, 13, { align: "center" });
-                }
-
-                desenharCabecalhoPagina();
-                y = 22;
-
-                // DADOS DO FORMULÁRIO
-                if (dadosFormulario) {
-                    pdf.setFillColor(248, 249, 250);
-                    pdf.setDrawColor(212, 175, 55);
-                    pdf.roundedRect(12, y, largura - 24, 7, 2, 2, "FD");
-
-                    pdf.setTextColor(26, 26, 26);
-                    pdf.setFontSize(9);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text(dadosFormulario.titulo.toUpperCase(), largura / 2, y + 4.8, { align: "center" });
-
-                    y += 10;
-                    pdf.setFontSize(8);
-
-                    for (const [k, v] of Object.entries(dadosFormulario)) {
-                        if (k === "tipo" || k === "titulo") continue;
-
-                        const textoVal = String(v);
-                        const quebras = pdf.splitTextToSize(textoVal, largura - 75);
-                        const alturaLinha = Math.max(4.5, quebras.length * 3.8);
-
-                        if (y + alturaLinha > altura - margemInf) {
-                            pdf.addPage();
-                            desenharCabecalhoPagina();
-                            y = 22;
-                        }
-
-                        pdf.setFont("helvetica", "bold");
-                        pdf.setTextColor(70, 70, 70);
-                        pdf.text(`${k}:`, 14, y);
-
-                        pdf.setFont("helvetica", "normal");
-                        pdf.setTextColor(20, 20, 20);
-                        pdf.text(quebras, 68, y);
-
-                        y += alturaLinha;
-                    }
-                    y += 5;
-                }
-
-                // DOCUMENTOS (CÁLCULO EXATO DE PÁGINA PARA NÃO SEPARAR CABEÇALHO/TARJA DA IMAGEM)
-                for (let i = 0; i < docsCapturados.length; i++) {
-                    const doc = docsCapturados[i];
-                    let imgCarregada = null;
-                    let wImg = 0;
-                    let hImg = 0;
-
-                    if (doc.imagem) {
-                        try {
-                            imgCarregada = await carregarImagemAsync(doc.imagem);
-                            const maxW = 160;
-                            const maxH = 120; // Altura máxima equilibrada para caber junto na folha A4
-                            let iw = imgCarregada.width;
-                            let ih = imgCarregada.height;
-                            const ratio = Math.min(maxW / iw, maxH / ih);
-                            wImg = iw * ratio;
-                            hImg = ih * ratio;
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    }
-
-                    const alturaTarja = 8; // Tarja preta compacta
-                    const alturaMetadados = 5;
-                    const espacoAposImagem = 8;
-                    const alturaTotalBloco = alturaTarja + 2 + alturaMetadados + 3 + hImg + espacoAposImagem;
-
-                    // Se o bloco inteiro (tarja + texto + imagem) não couber no espaço que sobra da folha A4, quebra ANTES
-                    if (y + alturaTotalBloco > altura - margemInf) {
-                        pdf.addPage();
-                        desenharCabecalhoPagina();
-                        y = 22;
-                    }
-
-                    // 1. TARJA PRETA COMPACTA
-                    pdf.setFillColor(26, 26, 26);
-                    pdf.rect(12, y, largura - 24, alturaTarja, "F");
-
-                    // TÍTULO NA TARJA
-                    pdf.setTextColor(212, 175, 55);
-                    pdf.setFontSize(9);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text(doc.nome.toUpperCase(), largura / 2, y + 5.5, { align: "center" });
-                    y += alturaTarja + 2.5;
-
-                    // 2. LEGENDA COM DATA / ARQUIVO
-                    pdf.setFontSize(7.5);
-                    pdf.setTextColor(100, 100, 100);
-                    pdf.setFont("helvetica", "normal");
-                    pdf.text(`${doc.nomeArquivo || ""} • ${doc.data || ""}`, largura / 2, y, { align: "center" });
-                    y += 3.5;
-
-                    // 3. IMAGEM DO DOCUMENTO (GARANTIDO NA MESMA PÁGINA)
-                    if (imgCarregada && wImg > 0 && hImg > 0) {
-                        const x = (largura - wImg) / 2;
-                        pdf.addImage(imgCarregada, "JPEG", x, y, wImg, hImg);
-                        y += hImg + espacoAposImagem;
+                if (resposta.ok) {
+                    if (manual) {
+                        alert("E-mail enviado com sucesso para chalfouncorretor@gmail.com!");
                     } else {
+                        console.log("Notificação enviada com sucesso para chalfouncorretor@gmail.com");
+                    }
+                } else {
+                    console.warn("Falha no envio do e-mail. Código de resposta: " + resposta.status);
+                    if (manual) {
+                        alert("Houve uma falha ao enviar o e-mail. Verifique a Edge Function no Supabase.");
+                    }
+                }
+            } catch (err) {
+                console.error("Erro na requisição da Edge Function:", err);
+                if (manual) {
+                    alert("Erro ao conectar à Edge Function. Detalhes no console.");
+                }
+            } finally {
+                if (overlay) overlay.classList.remove("active");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = "✉️ Reenviar por E-mail";
+                }
+            }
+        }
+
+        function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(16);
+            doc.text("Relatório de Documentos - M&IC Corretores", 15, 20);
+            doc.setFontSize(11);
+            doc.text(`Perfil: ${perfilAtual ? perfilAtual.nome : ""}`, 15, 28);
+            doc.text(`Data: ${new Date().toLocaleString("pt-BR")}`, 15, 34);
+
+            let y = 46;
+            if (dadosFormulario) {
+                doc.setFontSize(13);
+                doc.text(dadosFormulario.titulo, 15, y);
+                y += 8;
+                doc.setFontSize(10);
+                for (let k in dadosFormulario) {
+                    if (k !== "tipo" && k !== "titulo") {
+                        if (y > 280) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`${k}: ${dadosFormulario[k]}`, 15, y);
                         y += 6;
                     }
                 }
-
-                pdf.save(`relatorio-${perfilAtual.chave}-${Date.now()}.pdf`);
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao gerar PDF.");
-            } finally {
-                ocultarLoading();
             }
+
+            doc.save(`documentos_${perfilAtual ? perfilAtual.chave : "cadastro"}.pdf`);
         }
 
         function novoProcesso() {
+            perfilAtual = null;
+            indiceDoc = 0;
             docsCapturados = [];
             documentoAtual = null;
             dadosFormulario = null;
-            indiceDoc = 0;
+            etapaProprietario = 1;
             mostrarTela("screen-main");
-        }
-
-        function mostrarLoading(texto) {
-            $("loading-text").textContent = texto || "Carregando...";
-            $("loading-overlay").classList.add("active");
-        }
-
-        function ocultarLoading() {
-            $("loading-overlay").classList.remove("active");
         }
     </script>
 </body>
