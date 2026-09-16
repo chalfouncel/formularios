@@ -220,14 +220,15 @@
             margin-bottom: 12px;
         }
 
+        /* Área de captura compacta e proporcional */
         .capture-area {
             background: #f8f9fa;
             border: 2px dashed #d4af37;
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             margin-bottom: 12px;
-            min-height: 180px;
+            min-height: 150px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -236,11 +237,12 @@
         }
 
         .capture-area img {
-            max-width: 100%;
-            max-height: 340px;
+            max-width: 180px;
+            max-height: 180px;
             border-radius: 6px;
             object-fit: contain;
             display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         }
 
         #placeholder-text {
@@ -383,38 +385,76 @@
             border: 1px solid #ffeeba;
         }
 
+        /* Lista de itens no relatório: mais racional, elegante e compacta */
         .report-item {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            text-align: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid #e8e8e8;
+            background: #fafafa;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            text-align: left;
         }
 
         .report-item img {
-            width: 260px;
-            max-width: 100%;
-            height: auto;
-            max-height: 360px;
-            object-fit: contain;
+            width: 75px;
+            height: 75px;
+            min-width: 75px;
+            object-fit: cover;
             border-radius: 6px;
-            border: 2px solid #d4af37;
+            border: 1.5px solid #d4af37;
             background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .report-item strong {
+        .report-item-icon {
+            width: 75px;
+            height: 75px;
+            min-width: 75px;
+            background: #fff;
+            border: 1.5px solid #d4af37;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .report-item-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .report-item-info strong {
             display: block;
             color: #1a1a1a;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .report-item small {
-            color: #888;
-            font-size: 12px;
+        .report-item-info small {
+            display: block;
+            color: #777;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .report-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #1a1a1a;
+            background: #d4af37;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-transform: uppercase;
         }
 
         .report-data-block {
@@ -635,6 +675,7 @@
 
                 <div class="capture-area">
                     <img id="preview-img" alt="Pré-visualização" style="display:none;">
+                    <div id="preview-pdf-icon" style="display:none; font-size:42px; margin-bottom:8px;">📄</div>
                     <p id="placeholder-text">
                         Use os botões abaixo para tirar uma foto ou anexar o documento.
                     </p>
@@ -1187,6 +1228,10 @@
 
                 <div id="report-status" style="display:none;" class="status-box"></div>
                 <div id="report-data"></div>
+
+                <div class="form-section-title" style="margin-top:15px; margin-bottom:10px;">
+                    Documentos Anexados
+                </div>
                 <div id="report-docs"></div>
 
                 <button class="btn btn-confirm" id="btn-enviar-email" onclick="enviarEmailNotificacao(true)">
@@ -1369,6 +1414,7 @@
             documentoAtual = null;
             $("preview-img").src = "";
             $("preview-img").style.display = "none";
+            $("preview-pdf-icon").style.display = "none";
             $("placeholder-text").textContent =
                 "Use os botões abaixo para tirar uma foto ou anexar o documento.";
             $("placeholder-text").style.display = "block";
@@ -1449,78 +1495,81 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(video, 0, 0, w, h);
 
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
             fecharCamera();
 
-            exibirPrevia(dataUrl, perfilAtual.docs[indiceDoc]);
+            documentoAtual = {
+                tipo: perfilAtual.docs[indiceDoc],
+                nome: "foto_camera.jpg",
+                ext: "jpg",
+                isPdf: false,
+                previewUrl: dataUrl,
+                fileBase64: dataUrl
+            };
+
+            exibirPrevia(documentoAtual);
         }
 
         function abrirGaleria() {
             $("fileInputHidden").click();
         }
 
-        // Otimizador de imagem para evitar Payload Too Large (limite da Vercel)
-        function redimensionarImagem(file, maxDim = 1280, qualidade = 0.80) {
+        function lerArquivoComoDataUrl(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let w = img.width;
-                        let h = img.height;
-                        if (w > maxDim || h > maxDim) {
-                            if (w > h) {
-                                h = Math.round((h * maxDim) / w);
-                                w = maxDim;
-                            } else {
-                                w = Math.round((w * maxDim) / h);
-                                h = maxDim;
-                            }
-                        }
-                        const canvas = document.createElement("canvas");
-                        canvas.width = w;
-                        canvas.height = h;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL("image/jpeg", qualidade));
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
+                reader.onload = e => resolve(e.target.result);
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
 
-        async function converterPdfParaImagem(file) {
+        async function gerarPreviaPdf(file) {
+            if (!window.pdfjsLib) return null;
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             const page = await pdf.getPage(1);
-            const viewport = page.getViewport({ scale: 1.2 });
+            const viewport = page.getViewport({ scale: 1.0 });
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-            return canvas.toDataURL("image/jpeg", 0.80);
+            return canvas.toDataURL("image/jpeg", 0.75);
         }
 
         async function arquivoSelecionado(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            mostrarLoading("Processando e otimizando documento...");
+            mostrarLoading("Carregando arquivo integral...");
             try {
-                let dataUrl = "";
                 const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+                // Lê o arquivo INTEGRAL para envio por email
+                const fullDataUrl = await lerArquivoComoDataUrl(file);
 
-                if (isPdf && window.pdfjsLib) {
-                    dataUrl = await converterPdfParaImagem(file);
+                let previewUrl = "";
+                let ext = file.name.split('.').pop().toLowerCase() || (isPdf ? "pdf" : "jpg");
+
+                if (isPdf) {
+                    try {
+                        previewUrl = await gerarPreviaPdf(file);
+                    } catch (e) {
+                        console.warn("Prévia PDF falhou, usando ícone padrão:", e);
+                    }
                 } else {
-                    dataUrl = await redimensionarImagem(file);
+                    previewUrl = fullDataUrl;
                 }
 
-                exibirPrevia(dataUrl, file.name);
+                documentoAtual = {
+                    tipo: perfilAtual.docs[indiceDoc],
+                    nome: file.name,
+                    ext: ext,
+                    isPdf: isPdf,
+                    previewUrl: previewUrl,
+                    fileBase64: fullDataUrl // Todo o arquivo preservado
+                };
+
+                exibirPrevia(documentoAtual);
             } catch (err) {
                 console.error("Falha ao ler arquivo:", err);
                 alert("Erro ao ler o arquivo: " + err.message);
@@ -1529,16 +1578,18 @@
             }
         }
 
-        function exibirPrevia(src, nome) {
-            documentoAtual = {
-                tipo: perfilAtual.docs[indiceDoc],
-                nome: nome,
-                dataUrl: src
-            };
+        function exibirPrevia(doc) {
+            if (doc.previewUrl) {
+                $("preview-img").src = doc.previewUrl;
+                $("preview-img").style.display = "block";
+                $("preview-pdf-icon").style.display = "none";
+            } else if (doc.isPdf) {
+                $("preview-img").style.display = "none";
+                $("preview-pdf-icon").style.display = "block";
+            }
 
-            $("preview-img").src = src;
-            $("preview-img").style.display = "block";
-            $("placeholder-text").style.display = "none";
+            $("placeholder-text").textContent = doc.nome + (doc.isPdf ? " (Documento PDF Completo)" : "");
+            $("placeholder-text").style.display = "block";
             $("capture-btns").style.display = "none";
             $("confirm-btns").style.display = "block";
         }
@@ -1833,23 +1884,32 @@
             docsCapturados.forEach((doc, idx) => {
                 const item = document.createElement("div");
                 item.className = "report-item";
+
+                const badgeText = doc.isPdf ? "PDF Integral" : "Imagem";
+                const imgHtml = doc.previewUrl 
+                    ? `<img src="${doc.previewUrl}" alt="${doc.tipo}">`
+                    : `<div class="report-item-icon">📄</div>`;
+
                 item.innerHTML = `
-                    <strong>${idx + 1}. ${doc.tipo}</strong>
-                    <img src="${doc.dataUrl}" alt="${doc.tipo}">
-                    <small>${doc.nome || ""}</small>
+                    ${imgHtml}
+                    <div class="report-item-info">
+                        <strong>${idx + 1}. ${doc.tipo}</strong>
+                        <small>${doc.nome || "documento"}</small>
+                        <span class="report-badge">${badgeText}</span>
+                    </div>
                 `;
                 containerDocs.appendChild(item);
             });
 
             mostrarTela("screen-report");
 
-            // Envio automático
+            // Envio automático para o seu e-mail
             enviarEmailNotificacao(false);
         }
 
-        // Envio para a Vercel com Anexos Reais
+        // Envio para a Vercel com Arquivos Integrais Reais
         async function enviarEmailNotificacao(manual = false) {
-            mostrarLoading("Enviando e-mail com anexos...");
+            mostrarLoading("Enviando e-mail com arquivos integrais...");
             const statusEl = $("report-status");
 
             try {
@@ -1857,19 +1917,20 @@
                     ? (dadosFormulario["Nome"] || "Cliente") 
                     : "Cliente";
 
-                // Prepara os anexos
+                // Prepara os anexos com o arquivo completo e extensão original
                 const anexosEmail = docsCapturados.map((doc, index) => {
-                    const base64Puro = doc.dataUrl.includes("base64,")
-                        ? doc.dataUrl.split("base64,")[1]
-                        : doc.dataUrl;
-                    const extensao = doc.dataUrl.includes("image/png") ? "png" : "jpg";
+                    const base64Puro = doc.fileBase64.includes("base64,")
+                        ? doc.fileBase64.split("base64,")[1]
+                        : doc.fileBase64;
+
+                    const ext = doc.ext || (doc.isPdf ? "pdf" : "jpg");
                     const nomeNormalizado = (doc.tipo || "documento")
                         .normalize("NFD")
                         .replace(/[\u0300-\u036f]/g, "")
                         .replace(/[^a-zA-Z0-9]/g, "_");
 
                     return {
-                        filename: `${index + 1}_${nomeNormalizado}.${extensao}`,
+                        filename: `${index + 1}_${nomeNormalizado}.${ext}`,
                         content: base64Puro
                     };
                 });
@@ -1888,13 +1949,13 @@
     <p style="color: #fff; margin: 5px 0 0; font-size: 13px;">Novo cadastro recebido - ${perfilAtual ? perfilAtual.nome : ""}</p>
   </div>
   <div style="padding: 20px; background: #fff;">
-    <p style="font-size: 15px;">Um novo cadastro foi finalizado pelo sistema web.</p>
+    <p style="font-size: 15px;">Um novo cadastro foi finalizado pelo sistema web com sucesso.</p>
     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
       ${linhasTabela}
     </table>
     <div style="margin-top: 25px; padding: 15px; background: #fdf8e2; border-left: 4px solid #d4af37;">
-      <strong style="color: #856404;">📎 Anexos:</strong>
-      <p style="margin: 5px 0 0; font-size: 13px; color: #555;">Foram capturados <strong>${docsCapturados.length} documentos</strong>. Os anexos estão anexados a esta mensagem.</p>
+      <strong style="color: #856404;">📎 Arquivos Anexados:</strong>
+      <p style="margin: 5px 0 0; font-size: 13px; color: #555;">Foram capturados <strong>${docsCapturados.length} arquivos integrais</strong> (em formato PDF/Imagem original). Verifique os anexos deste e-mail.</p>
     </div>
   </div>
 </div>`;
@@ -1914,9 +1975,9 @@
 
                 if (response.ok) {
                     statusEl.className = "status-box status-success";
-                    statusEl.textContent = "✅ Dados e documentos enviados com sucesso por e-mail!";
+                    statusEl.textContent = "✅ Dados e arquivos integrais enviados com sucesso por e-mail!";
                     statusEl.style.display = "block";
-                    if (manual) alert("E-mail com documentos enviado com sucesso!");
+                    if (manual) alert("E-mail com arquivos integrais enviado com sucesso!");
                 } else {
                     const err = await response.json().catch(() => ({}));
                     console.warn("Erro no envio:", err);
@@ -2013,11 +2074,17 @@
                     doc.setFont("helvetica", "bold");
                     doc.text((i + 1) + ". " + docItem.tipo, 15, 10);
 
-                    try {
-                        doc.addImage(docItem.dataUrl, "JPEG", 15, 25, 180, 240, undefined, "FAST");
-                    } catch (imgErr) {
-                        doc.setTextColor(200, 0, 0);
-                        doc.text("Não foi possível renderizar esta imagem no PDF.", 15, 40);
+                    if (docItem.previewUrl) {
+                        try {
+                            doc.addImage(docItem.previewUrl, "JPEG", 15, 25, 180, 240, undefined, "FAST");
+                        } catch (imgErr) {
+                            doc.setTextColor(200, 0, 0);
+                            doc.text("Não foi possível renderizar a imagem.", 15, 40);
+                        }
+                    } else {
+                        doc.setTextColor(100, 100, 100);
+                        doc.setFontSize(11);
+                        doc.text("Arquivo anexado integralmente ao e-mail: " + (docItem.nome || ""), 15, 35);
                     }
                 }
 
