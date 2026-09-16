@@ -20,22 +20,22 @@
 
         .header {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            padding: 16px 15px;
+            padding: 14px 15px;
             text-align: center;
             border-bottom: 3px solid #d4af37;
         }
 
         .header img {
-            max-width: 120px;
-            max-height: 60px;
+            max-width: 110px;
+            max-height: 55px;
             object-fit: contain;
-            margin: 0 auto 8px;
+            margin: 0 auto 6px;
             display: block;
         }
 
         .header h1 {
             color: #d4af37;
-            font-size: 18px;
+            font-size: 17px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -44,7 +44,7 @@
             color: #fff;
             font-size: 11px;
             letter-spacing: 2px;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
         .container {
@@ -56,7 +56,7 @@
         .card {
             background: #fff;
             border-radius: 12px;
-            padding: 20px;
+            padding: 18px;
             margin-bottom: 15px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
@@ -1936,27 +1936,31 @@
                 const pdf = new jsPDF({
                     orientation: "portrait",
                     unit: "mm",
-                    format: "a4"
+                    format: "a4" // 210 x 297 mm
                 });
 
                 const largura = 210;
                 const altura = 297;
+                const margemInf = 15;
                 let y = 14;
 
-                // TOPO CABEÇALHO DO PDF
-                pdf.setFillColor(26, 26, 26);
-                pdf.rect(0, 0, largura, 18, "F");
-                pdf.setTextColor(212, 175, 55);
-                pdf.setFontSize(13);
-                pdf.setFont("helvetica", "bold");
-                pdf.text("M&IC CORRETORES DE IMÓVEIS", largura / 2, 8.5, { align: "center" });
+                // CABEÇALHO DO TOPO (PÁGINA 1)
+                function desenharCabecalhoPagina() {
+                    pdf.setFillColor(26, 26, 26);
+                    pdf.rect(0, 0, largura, 16, "F");
+                    pdf.setTextColor(212, 175, 55);
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text("M&IC CORRETORES DE IMÓVEIS", largura / 2, 7.5, { align: "center" });
 
-                pdf.setFontSize(8);
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFont("helvetica", "normal");
-                pdf.text("RELATÓRIO DE DOCUMENTOS — " + perfilAtual.nome.toUpperCase(), largura / 2, 14, { align: "center" });
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text("RELATÓRIO DE DOCUMENTOS — " + perfilAtual.nome.toUpperCase(), largura / 2, 13, { align: "center" });
+                }
 
-                y = 24;
+                desenharCabecalhoPagina();
+                y = 22;
 
                 // DADOS DO FORMULÁRIO
                 if (dadosFormulario) {
@@ -1975,9 +1979,14 @@
                     for (const [k, v] of Object.entries(dadosFormulario)) {
                         if (k === "tipo" || k === "titulo") continue;
 
-                        if (y > altura - 20) {
+                        const textoVal = String(v);
+                        const quebras = pdf.splitTextToSize(textoVal, largura - 75);
+                        const alturaLinha = Math.max(4.5, quebras.length * 3.8);
+
+                        if (y + alturaLinha > altura - margemInf) {
                             pdf.addPage();
-                            y = 15;
+                            desenharCabecalhoPagina();
+                            y = 22;
                         }
 
                         pdf.setFont("helvetica", "bold");
@@ -1986,67 +1995,72 @@
 
                         pdf.setFont("helvetica", "normal");
                         pdf.setTextColor(20, 20, 20);
-                        const textoVal = String(v);
-                        const quebras = pdf.splitTextToSize(textoVal, largura - 75);
                         pdf.text(quebras, 68, y);
 
-                        y += Math.max(4.5, quebras.length * 3.8);
+                        y += alturaLinha;
                     }
-                    y += 4;
+                    y += 5;
                 }
 
-                // DOCUMENTOS (TARJA PRETA FINA/COMPACTA)
+                // DOCUMENTOS (CÁLCULO EXATO DE PÁGINA PARA NÃO SEPARAR CABEÇALHO/TARJA DA IMAGEM)
                 for (let i = 0; i < docsCapturados.length; i++) {
                     const doc = docsCapturados[i];
+                    let imgCarregada = null;
+                    let wImg = 0;
+                    let hImg = 0;
 
-                    if (y > altura - 45) {
-                        pdf.addPage();
-                        y = 15;
+                    if (doc.imagem) {
+                        try {
+                            imgCarregada = await carregarImagemAsync(doc.imagem);
+                            const maxW = 160;
+                            const maxH = 120; // Altura máxima equilibrada para caber junto na folha A4
+                            let iw = imgCarregada.width;
+                            let ih = imgCarregada.height;
+                            const ratio = Math.min(maxW / iw, maxH / ih);
+                            wImg = iw * ratio;
+                            hImg = ih * ratio;
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
 
-                    // --- TARJA PRETA FINA/COMPACTA ---
-                    const alturaTarja = 9; // Reduzida para otimizar espaço
+                    const alturaTarja = 8; // Tarja preta compacta
+                    const alturaMetadados = 5;
+                    const espacoAposImagem = 8;
+                    const alturaTotalBloco = alturaTarja + 2 + alturaMetadados + 3 + hImg + espacoAposImagem;
+
+                    // Se o bloco inteiro (tarja + texto + imagem) não couber no espaço que sobra da folha A4, quebra ANTES
+                    if (y + alturaTotalBloco > altura - margemInf) {
+                        pdf.addPage();
+                        desenharCabecalhoPagina();
+                        y = 22;
+                    }
+
+                    // 1. TARJA PRETA COMPACTA
                     pdf.setFillColor(26, 26, 26);
                     pdf.rect(12, y, largura - 24, alturaTarja, "F");
 
-                    // TÍTULO DOURADO CENTRALIZADO NA TARJA
+                    // TÍTULO NA TARJA
                     pdf.setTextColor(212, 175, 55);
-                    pdf.setFontSize(9.5);
+                    pdf.setFontSize(9);
                     pdf.setFont("helvetica", "bold");
-                    pdf.text(doc.nome.toUpperCase(), largura / 2, y + 6, { align: "center" });
-                    y += alturaTarja + 3;
+                    pdf.text(doc.nome.toUpperCase(), largura / 2, y + 5.5, { align: "center" });
+                    y += alturaTarja + 2.5;
 
-                    // LEGENDA / NOME DO ARQUIVO
+                    // 2. LEGENDA COM DATA / ARQUIVO
                     pdf.setFontSize(7.5);
                     pdf.setTextColor(100, 100, 100);
                     pdf.setFont("helvetica", "normal");
                     pdf.text(`${doc.nomeArquivo || ""} • ${doc.data || ""}`, largura / 2, y, { align: "center" });
-                    y += 4;
+                    y += 3.5;
 
-                    // IMAGEM DO DOCUMENTO
-                    if (doc.imagem) {
-                        try {
-                            const img = await carregarImagemAsync(doc.imagem);
-                            const maxW = 140;
-                            const maxH = 110;
-                            let w = img.width;
-                            let h = img.height;
-
-                            const ratio = Math.min(maxW / w, maxH / h);
-                            w = w * ratio;
-                            h = h * ratio;
-
-                            if (y + h > altura - 15) {
-                                pdf.addPage();
-                                y = 15;
-                            }
-
-                            const x = (largura - w) / 2;
-                            pdf.addImage(img, "JPEG", x, y, w, h);
-                            y += h + 8;
-                        } catch (e) {
-                            console.error(e);
-                        }
+                    // 3. IMAGEM DO DOCUMENTO (GARANTIDO NA MESMA PÁGINA)
+                    if (imgCarregada && wImg > 0 && hImg > 0) {
+                        const x = (largura - wImg) / 2;
+                        pdf.addImage(imgCarregada, "JPEG", x, y, wImg, hImg);
+                        y += hImg + espacoAposImagem;
+                    } else {
+                        y += 6;
                     }
                 }
 
