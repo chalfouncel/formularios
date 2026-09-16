@@ -205,6 +205,30 @@
         .modal-content video { width: 100%; border-radius: 8px; }
 
         #fileInputHidden { display: none; }
+
+        /* Loading */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 4px solid #d4af37;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        .loading-text { color: #fff; font-size: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -299,7 +323,7 @@
                     <p style="color:#888;font-size:12px;" id="report-date"></p>
                 </div>
                 <div id="report-docs"></div>
-                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">📄 Gerar PDF com Marca D'água</button>
+                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;"> Gerar PDF</button>
                 <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">🔄 Novo Processo</button>
             </div>
         </div>
@@ -315,8 +339,21 @@
         </div>
     </div>
 
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Processando...</div>
+    </div>
+
+    <!-- PDF.js para converter PDF em imagem -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
+        // Configurar worker do PDF.js
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
         // ===== CONFIGURAÇÃO DOS PERFIS =====
         const perfis = {
             proprietario: {
@@ -435,14 +472,13 @@
 
             console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
 
-            // Se for imagem
+            // Se for imagem (qualquer extensão de imagem)
             if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
                 console.log('É imagem, lendo arquivo...');
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
                     console.log('Arquivo lido com sucesso, tamanho:', e.target.result.length);
-                    console.log('Primeiros 50 chars:', e.target.result.substring(0, 50));
                     exibirPreview(e.target.result);
                 };
                 
@@ -451,18 +487,12 @@
                     alert('Não foi possível ler o arquivo. Tente outro formato.');
                 };
                 
-                reader.onabort = function() {
-                    console.log('Leitura abortada');
-                };
-                
                 reader.readAsDataURL(file);
             }
-            // Se for PDF
+            // Se for PDF - converter em imagem
             else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                console.log('É PDF');
-                alert('PDF anexado! Ele será incluído no relatório. (A pré-visualização só é exibida para imagens.)');
-                fotoAtual = { tipo: 'pdf', nome: file.name, arquivo: file };
-                exibirPreviewPdf(file.name);
+                console.log('É PDF, convertendo em imagem...');
+                converterPdfEmImagem(file);
             }
             // Outros tipos
             else {
@@ -473,7 +503,54 @@
             }
         }
 
-        // Preview para PDF / outros arquivos
+        // ===== CONVERTER PDF EM IMAGEM =====
+        async function converterPdfEmImagem(file) {
+            mostrarLoading('Convertendo PDF em imagem...');
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                // Pegar a primeira página
+                const page = await pdf.getPage(1);
+                
+                // Renderizar em canvas com alta qualidade
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+                
+                // Converter canvas em imagem
+                const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                console.log('PDF convertido, tamanho:', dataURL.length);
+                
+                exibirPreview(dataURL);
+                ocultarLoading();
+                
+            } catch (err) {
+                console.error('Erro ao converter PDF:', err);
+                ocultarLoading();
+                alert('Erro ao converter PDF em imagem. Detalhe: ' + err.message);
+            }
+        }
+
+        // ===== LOADING =====
+        function mostrarLoading(texto) {
+            $('loading-text').textContent = texto;
+            $('loading-overlay').classList.add('active');
+        }
+
+        function ocultarLoading() {
+            $('loading-overlay').classList.remove('active');
+        }
+
+        // Preview para outros arquivos (não PDF)
         function exibirPreviewPdf(nomeArquivo) {
             $('preview-img').style.display = 'none';
             $('placeholder-text').innerHTML = '📄 <strong>' + nomeArquivo + '</strong><br><small style="color:#888;">Arquivo anexado</small>';
@@ -584,17 +661,15 @@
             mostrarTela('screen-report');
         }
 
-        // ===== GERAR PDF =====
+        // ===== GERAR PDF (SEM MARCA D'ÁGUA) =====
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             
-            // URLs do GitHub
+            // URL da logo
             const logoUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png';
-            const watermarkUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Marca%20dagua%20nova.png';
 
             try {
-                const wmImg = await carregarImagem(watermarkUrl);
                 const logoImg = await carregarImagem(logoUrl);
 
                 // Cabeçalho com logo
@@ -651,20 +726,12 @@
                     }
                 }
 
-                // Marca d'água CENTRALIZADA no meio da página
-                const total = pdf.internal.getNumberOfPages();
-                for (let p = 1; p <= total; p++) {
-                    pdf.setPage(p);
-                    // Página A4: 210mm x 297mm
-                    // Marca d'água: 180mm x 15mm
-                    // Centralizada: x = (210-180)/2 = 15, y = (297-15)/2 = 141
-                    pdf.addImage(wmImg, 'PNG', 15, 141, 180, 15, undefined, 'FAST', 0.12);
-                }
+                // SEM MARCA D'ÁGUA - removido
 
                 pdf.save('M&IC_' + perfilAtual.nome + '_documentos.pdf');
 
             } catch (err) {
-                alert('Erro ao gerar PDF. Verifique a URL da marca d\'água. Detalhe: ' + err.message);
+                alert('Erro ao gerar PDF. Detalhe: ' + err.message);
             }
         }
 
