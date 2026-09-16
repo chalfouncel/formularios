@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         const { to, subject, html, attachments } = req.body;
 
         // IMPORTANTE: Coloque sua chave real do Resend aqui (re_...)
-        const RESEND_API_KEY = "SUA_CHAVE_RESEND_AQUI";
+        const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
         const respostaResend = await fetch("https://api.resend.com/emails", {
             method: "POST",
