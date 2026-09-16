@@ -220,7 +220,7 @@
             margin-bottom: 12px;
         }
 
-        /* Área de captura compacta e proporcional */
+        /* Área de captura compacta */
         .capture-area {
             background: #f8f9fa;
             border: 2px dashed #d4af37;
@@ -242,7 +242,7 @@
             border-radius: 6px;
             object-fit: contain;
             display: block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
         }
 
         #placeholder-text {
@@ -385,7 +385,7 @@
             border: 1px solid #ffeeba;
         }
 
-        /* Lista de itens no relatório: mais racional, elegante e compacta */
+        /* Miniaturas na tela de relatório: cards elegantes de 75px */
         .report-item {
             display: flex;
             align-items: center;
@@ -1544,7 +1544,6 @@
             mostrarLoading("Carregando arquivo integral...");
             try {
                 const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-                // Lê o arquivo INTEGRAL para envio por email
                 const fullDataUrl = await lerArquivoComoDataUrl(file);
 
                 let previewUrl = "";
@@ -1554,7 +1553,7 @@
                     try {
                         previewUrl = await gerarPreviaPdf(file);
                     } catch (e) {
-                        console.warn("Prévia PDF falhou, usando ícone padrão:", e);
+                        console.warn("Prévia PDF falhou:", e);
                     }
                 } else {
                     previewUrl = fullDataUrl;
@@ -1566,7 +1565,7 @@
                     ext: ext,
                     isPdf: isPdf,
                     previewUrl: previewUrl,
-                    fileBase64: fullDataUrl // Todo o arquivo preservado
+                    fileBase64: fullDataUrl // Arquivo original integral preservado
                 };
 
                 exibirPrevia(documentoAtual);
@@ -1903,11 +1902,10 @@
 
             mostrarTela("screen-report");
 
-            // Envio automático para o seu e-mail
+            // Envio automático para o seu e-mail (igual para os 4 perfis)
             enviarEmailNotificacao(false);
         }
 
-        // Envio para a Vercel com Arquivos Integrais Reais
         async function enviarEmailNotificacao(manual = false) {
             mostrarLoading("Enviando e-mail com arquivos integrais...");
             const statusEl = $("report-status");
@@ -1917,7 +1915,7 @@
                     ? (dadosFormulario["Nome"] || "Cliente") 
                     : "Cliente";
 
-                // Prepara os anexos com o arquivo completo e extensão original
+                // Anexos integrais completos enviados ao email
                 const anexosEmail = docsCapturados.map((doc, index) => {
                     const base64Puro = doc.fileBase64.includes("base64,")
                         ? doc.fileBase64.split("base64,")[1]
@@ -1997,94 +1995,157 @@
             }
         }
 
+        // Função auxiliar que obtém a resolução real da imagem para calcular o aspecto proporcional
+        function carregarDimensoesImagem(dataUrl) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
+                img.onerror = () => resolve({ w: 0, h: 0 });
+                img.src = dataUrl;
+            });
+        }
+
+        // Geração do PDF com miniatura proporcional, elegante e sem distorção
         async function gerarPDF() {
             if (!window.jspdf) {
                 alert("Biblioteca de PDF não carregada.");
                 return;
             }
 
-            mostrarLoading("Gerando arquivo PDF...");
+            mostrarLoading("Gerando arquivo PDF proporcional...");
 
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF("p", "mm", "a4");
                 let y = 20;
 
+                // Cabeçalho da página 1
                 doc.setFillColor(26, 26, 26);
-                doc.rect(0, 0, 210, 25, "F");
+                doc.rect(0, 0, 210, 24, "F");
                 doc.setTextColor(212, 175, 55);
-                doc.setFontSize(16);
+                doc.setFontSize(15);
                 doc.setFont("helvetica", "bold");
-                doc.text("M&IC Corretores de Imóveis", 105, 12, { align: "center" });
+                doc.text("M&IC CORRETORES DE IMÓVEIS", 105, 11, { align: "center" });
 
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(9);
                 doc.setFont("helvetica", "normal");
-                doc.text("Relatório de Cadastro e Documentos", 105, 19, { align: "center" });
+                doc.text("Relatório Cadastral de Documentos", 105, 18, { align: "center" });
 
                 y = 35;
                 doc.setTextColor(26, 26, 26);
                 doc.setFontSize(11);
+                doc.setFont("helvetica", "bold");
                 doc.text("Perfil: " + perfilAtual.nome, 15, y);
                 y += 6;
+
                 doc.setFontSize(9);
-                doc.setTextColor(100, 100, 100);
-                doc.text("Data: " + new Date().toLocaleString("pt-BR"), 15, y);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(110, 110, 110);
+                doc.text("Emitido em: " + new Date().toLocaleString("pt-BR"), 15, y);
                 y += 10;
 
                 if (dadosFormulario) {
                     doc.setDrawColor(212, 175, 55);
-                    doc.setLineWidth(0.5);
+                    doc.setLineWidth(0.6);
                     doc.line(15, y, 195, y);
-                    y += 6;
+                    y += 8;
 
                     doc.setFontSize(12);
                     doc.setTextColor(26, 26, 26);
                     doc.setFont("helvetica", "bold");
                     doc.text("Dados Cadastrais", 15, y);
-                    y += 6;
+                    y += 7;
 
                     doc.setFontSize(9);
                     doc.setFont("helvetica", "normal");
 
-                    for (const [campo, valor] of Object.entries(dadosFormulario)) {
+                    for (const [campo, val] of Object.entries(dadosFormulario)) {
                         if (y > 270) {
                             doc.addPage();
                             y = 20;
                         }
 
-                        doc.setTextColor(100, 100, 100);
+                        doc.setTextColor(110, 110, 110);
                         doc.text(campo + ":", 15, y);
                         doc.setTextColor(26, 26, 26);
 
-                        const linhas = doc.splitTextToSize(String(valor), 120);
-                        doc.text(linhas, 70, y);
-                        y += (linhas.length * 4) + 2;
+                        const linhas = doc.splitTextToSize(String(val), 125);
+                        doc.text(linhas, 65, y);
+                        y += (linhas.length * 4.2) + 2;
                     }
                 }
 
+                // Páginas dos Documentos com Dimensões Proporcionais
                 for (let i = 0; i < docsCapturados.length; i++) {
                     const docItem = docsCapturados[i];
                     doc.addPage();
 
+                    // Cabeçalho da página de documento
                     doc.setFillColor(26, 26, 26);
-                    doc.rect(0, 0, 210, 15, "F");
+                    doc.rect(0, 0, 210, 18, "F");
                     doc.setTextColor(212, 175, 55);
-                    doc.setFontSize(10);
+                    doc.setFontSize(11);
                     doc.setFont("helvetica", "bold");
-                    doc.text((i + 1) + ". " + docItem.tipo, 15, 10);
+                    doc.text(`${i + 1}. ${docItem.tipo}`, 15, 12);
 
                     if (docItem.previewUrl) {
                         try {
-                            doc.addImage(docItem.previewUrl, "JPEG", 15, 25, 180, 240, undefined, "FAST");
+                            const dims = await carregarDimensoesImagem(docItem.previewUrl);
+                            
+                            // Área máxima útil no A4 (sem distorcer)
+                            const maxW = 160; 
+                            const maxH = 190;
+                            
+                            let finalW = maxW;
+                            let finalH = maxH;
+
+                            if (dims.w > 0 && dims.h > 0) {
+                                const ratio = dims.w / dims.h;
+                                if (ratio > (maxW / maxH)) {
+                                    // A imagem é mais larga: fixa a largura e ajusta a altura
+                                    finalW = maxW;
+                                    finalH = maxW / ratio;
+                                } else {
+                                    // A imagem é mais alta: fixa a altura e ajusta a largura
+                                    finalH = maxH;
+                                    finalW = maxH * ratio;
+                                }
+                            }
+
+                            // Centraliza com precisão horizontal e verticalmente
+                            const posX = (210 - finalW) / 2;
+                            const posY = 32 + ((maxH - finalH) / 2);
+
+                            // Moldura suave no entorno do documento
+                            doc.setDrawColor(220, 220, 220);
+                            doc.setLineWidth(0.4);
+                            doc.rect(posX - 1, posY - 1, finalW + 2, finalH + 2);
+
+                            doc.addImage(docItem.previewUrl, "JPEG", posX, posY, finalW, finalH, undefined, "FAST");
+
+                            // Legenda informativa no rodapé do documento
+                            doc.setFontSize(8);
+                            doc.setTextColor(140, 140, 140);
+                            doc.text(
+                                `${docItem.nome || "documento"} ${docItem.isPdf ? "(Arquivo PDF Original Anexado Integralmente)" : ""}`,
+                                105, 
+                                posY + finalH + 6, 
+                                { align: "center" }
+                            );
+
                         } catch (imgErr) {
+                            console.error("Erro na imagem do PDF:", imgErr);
                             doc.setTextColor(200, 0, 0);
-                            doc.text("Não foi possível renderizar a imagem.", 15, 40);
+                            doc.text("Não foi possível renderizar a imagem do documento.", 15, 40);
                         }
                     } else {
-                        doc.setTextColor(100, 100, 100);
+                        // Caso seja um PDF sem renderização de imagem
+                        doc.setTextColor(60, 60, 60);
                         doc.setFontSize(11);
-                        doc.text("Arquivo anexado integralmente ao e-mail: " + (docItem.nome || ""), 15, 35);
+                        doc.text("Arquivo anexado integralmente ao processo:", 15, 38);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(docItem.nome || "documento.pdf", 15, 46);
                     }
                 }
 
