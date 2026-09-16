@@ -6,6 +6,7 @@
     <title>M&IC Corretores de Imóveis</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+        
         body {
             font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color:#f5f5f5;
@@ -15,59 +16,61 @@
         /* Header */
         .header {
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            padding: 30px 20px;
+            padding: 25px 20px;
             text-align: center;
             border-bottom: 4px solid #d4af37;
         }
-        .logo {
-            width: 120px;
-            height: auto;
-            margin-bottom: 15px;
+        .header img {
+            max-width: 150px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 12px;
         }
         .header h1 {
             color: #d4af37;
-            font-size: 24px;
+            font-size: 22px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
         }
         .header p {
             color: #fff;
             font-size: 13px;
             letter-spacing: 2px;
+            margin-top: 5px;
         }
 
         /* Container */
         .container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 25px 15px;
+            padding: 20px 15px;
         }
 
         /* Cards */
         .card {
             background: #fff;
             border-radius: 12px;
-            padding: 25px 20px;
+            padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        /* Seção escura numerada */
+        /* Seção escura */
         .section-header {
             background: #1a1a1a;
             color: #d4af37;
             padding: 12px 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 15px;
             font-weight: bold;
         }
 
-        /* Tela principal - grid de botões */
+        /* Telas */
         .screen { display: none; }
         .screen.active { display: block; }
 
+        /* Botões perfil (tela principal) */
         .main-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -75,106 +78,79 @@
         }
         .btn-profile {
             background: #fff;
-            border: 2px solid #fff;
+            border: 2px solid #e0e0e0;
             border-radius: 12px;
-            padding: 25px 15px;
+            padding: 20px 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .btn-profile .icon {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .btn-profile h3 {
-            font-size: 15px;
-            color: #1a1a1a;
-            margin-bottom: 3px;
-        }
-        .btn-profile small {
-            font-size: 11px;
-            color: #888;
-        }
+        .btn-profile .icon { font-size: 30px; display: block; margin-bottom: 6px; }
+        .btn-profile h3 { font-size: 14px; color: #1a1a1a; margin-bottom: 3px; }
+        .btn-profile small { font-size: 11px; color: #888; }
         .btn-profile:hover {
             border-color: #d4af37;
             transform: translateY(-3px);
             box-shadow: 0 4px 15px rgba(212,175,55,0.2);
         }
 
-        /* Texto de instrução */
+        /* Instruções */
         .instruction {
             background: rgba(212,175,55,0.08);
             border-left: 4px solid #d4af37;
             padding: 15px 20px;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 15px 0;
             font-size: 14px;
             line-height: 1.7;
             color: #444;
         }
-        .instruction strong {
-            color: #d4af37;
-        }
+        .instruction strong { color: #d4af37; }
+        .instruction ul { margin-top: 8px; padding-left: 18px; }
 
-        /* Botão iniciar captura */
-        .btn-start {
-            background: #d4af37;
-            color: #1a1a1a;
-            padding: 16px 32px;
+        /* Botões gerais */
+        .btn {
+            padding: 14px 20px;
             border: none;
             border-radius: 10px;
             font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: all 0.2s;
-        }
-        .btn-start:hover {
-            background: #c4a030;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-        }
-
-        /* Botão voltar */
-        .btn-back {
-            background: none;
-            border: none;
-            color: #d4af37;
             font-size: 15px;
             cursor: pointer;
-            padding: 10px 0;
-            margin-bottom: 15px;
+            width: 100%;
+            margin: 6px 0;
+            transition: all 0.2s;
+        }
+        .btn-gold { background: #d4af37; color: #1a1a1a; }
+        .btn-gold:hover { background: #c4a030; transform: translateY(-2px); }
+        .btn-dark { background: #1a1a1a; color: #d4af37; border: 2px solid #d4af37; }
+        .btn-dark:hover { background: #2d2d2d; }
+        .btn-confirm { background: #28a745; color: #fff; }
+        .btn-confirm:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: #fff; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-back {
+            background: none; border: none; color: #d4af37;
+            font-size: 15px; cursor: pointer; padding: 8px 0; margin-bottom: 10px;
         }
         .btn-back:hover { text-decoration: underline; }
 
-        /* Tela de captura */
+        /* Captura */
         .doc-progress {
-            text-align: center;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 10px;
+            text-align: center; color: #888; font-size: 13px; margin-bottom: 8px;
         }
         .doc-name {
-            background: #d4af37;
-            color: #1a1a1a;
-            padding: 14px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 20px;
+            background: #d4af37; color: #1a1a1a; padding: 13px;
+            border-radius: 8px; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 15px;
         }
 
         .capture-area {
             background: #f8f9fa;
             border: 2px dashed #d4af37;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            margin-bottom: 15px;
-            min-height: 250px;
+            margin-bottom: 12px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -182,136 +158,58 @@
         }
         .capture-area img {
             max-width: 100%;
-            max-height: 300px;
+            max-height: 250px;
             border-radius: 6px;
+            object-fit: contain;
         }
-        .capture-area video {
-            width: 100%;
-            max-height: 350px;
-            border-radius: 6px;
-        }
-
-        /* Botões */
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
-            width: 100%;
-            margin: 8px 0;
-            transition: all 0.2s;
-        }
-        .btn-gold {
-            background: #d4af37;
-            color: #1a1a1a;
-        }
-        .btn-gold:hover { background: #c4a030; }
-        .btn-dark {
-            background: #1a1a1a;
-            color: #d4af37;
-            border: 2px solid #d4af37;
-        }
-        .btn-dark:hover { background: #2a2a2a; }
-        .btn-confirm {
-            background: #28a745;
-            color: #fff;
-        }
-        .btn-confirm:hover { background: #218838; }
-        .btn-danger {
-            background: #dc3545;
-            color: #fff;
-        }
-        .btn-danger:hover { background: #c82333; }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-row .btn { flex: 1; }
+        #placeholder-text { color: #888; font-size: 14px; }
 
         /* Relatório */
         .report-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            text-align: center; margin-bottom: 20px; padding-bottom: 15px;
             border-bottom: 3px solid #d4af37;
         }
-        .report-section h3 {
-            background: #1a1a1a;
-            color: #d4af37;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 20px 0 10px;
-            font-size: 14px;
-        }
+        .report-header h2 { color: #1a1a1a; font-size: 20px; margin-bottom: 5px; }
         .report-item {
-            display: flex;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid #eee;
         }
-        .report-item span { flex: 1; }
-        .report-thumb {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-right: 10px;
+        .report-item img {
+            width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #d4af37;
         }
+        .report-item small { color: #888; }
 
-        /* Modal câmera */
+        /* Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.95);
+            z-index: 1000; align-items: center; justify-content: center;
         }
         .modal.active { display: flex; }
         .modal-close {
-            position: absolute;
-            top: 15px; right: 15px;
-            background: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            font-size: 22px;
-            cursor: pointer;
+            position: absolute; top: 15px; right: 15px;
+            background: #dc3545; color: #fff; border: none;
+            border-radius: 50%; width: 40px; height: 40px; font-size: 22px; cursor: pointer;
             z-index: 1001;
         }
-        .modal-content {
-            padding: 15px;
-            border-radius: 12px;
-            max-width: 95%;
-        }
-        .modal-content video {
-            width: 100%;
-            border-radius: 8px;
-        }
+        .modal-content { padding: 15px; border-radius: 12px; max-width: 95%; }
+        .modal-content video { width: 100%; border-radius: 8px; }
 
         #fileInputHidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- ========== HEADER ========== -->
+    <!-- HEADER -->
     <div class="header">
-        <img class="logo" 
-             src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" 
-             alt="M&IC" 
-             onerror="this.style.display='none'">
+        <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" alt="M&IC" onerror="this.style.display='none'">
         <h1>M&IC Corretores de Imóveis</h1>
         <p>CAPTURA DE DOCUMENTOS</p>
     </div>
 
     <div class="container">
 
-        <!-- ========== TELA 1: BOTÕES PRINCIPAIS ========== -->
+        <!-- TELA 1: BOTÕES -->
         <div id="screen-main" class="screen active">
             <div class="card">
                 <div class="main-buttons">
@@ -339,22 +237,20 @@
             </div>
         </div>
 
-        <!-- ========== TELA 2: LISTA DE DOCUMENTOS ========== -->
+        <!-- TELA 2: LISTA -->
         <div id="screen-list" class="screen">
             <button class="btn-back" onclick="voltarMain()">← Voltar</button>
             <div class="card">
-                <div class="section-header" id="list-title">Documentos Necessários</div>
+                <div class="section-header" id="list-title">Documentos</div>
                 <div class="instruction">
                     <strong id="list-text"></strong>
-                    <ul id="list-items" style="margin-top:10px;padding-left:18px;"></ul>
+                    <ul id="list-items" style="margin-top:10px;"></ul>
                 </div>
-                <button class="btn-start" onclick="iniciarCaptura()">
-                    📷 Iniciar Captura de Documentos
-                </button>
+                <button class="btn btn-gold" onclick="iniciarCaptura()">📷 Iniciar Captura</button>
             </div>
         </div>
 
-        <!-- ========== TELA 3: CAPTURA INDIVIDUAL ========== -->
+        <!-- TELA 3: CAPTURA -->
         <div id="screen-capture" class="screen">
             <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
             <div class="card">
@@ -376,11 +272,14 @@
                     <button class="btn btn-danger" onclick="refazerFoto()">🔄 Refazer</button>
                 </div>
 
-                <input type="file" id="fileInputHidden" accept="image/*" capture="environment" onchange="arquivoSelecionado(event)">
+                <!-- Input aceitando QUALQUER extensão de imagem + PDF -->
+                <input type="file" id="fileInputHidden"
+                       accept="image/*,.pdf,.heic,.heif,.tif,.tiff,.bmp,application/pdf"
+                       onchange="arquivoSelecionado(event)">
             </div>
         </div>
 
-        <!-- ========== TELA 4: RELATÓRIO ========== -->
+        <!-- TELA 4: RELATÓRIO -->
         <div id="screen-report" class="screen">
             <div class="card">
                 <div class="report-header">
@@ -389,18 +288,13 @@
                     <p style="color:#888;font-size:12px;" id="report-date"></p>
                 </div>
                 <div id="report-docs"></div>
-                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">
-                    📄 Gerar PDF com Marca D'água
-                </button>
-                <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">
-                    🔄 Novo Processo
-                </button>
+                <button class="btn btn-gold" onclick="gerarPDF()" style="margin-top:20px;">📄 Gerar PDF com Marca D'água</button>
+                <button class="btn btn-dark" onclick="novoProcesso()" style="margin-top:10px;">🔄 Novo Processo</button>
             </div>
         </div>
-
     </div>
 
-    <!-- ========== MODAL CÂMERA ========== -->
+    <!-- MODAL CÂMERA -->
     <div class="modal" id="camera-modal">
         <button class="modal-close" onclick="fecharCamera()">×</button>
         <div class="modal-content">
@@ -412,90 +306,61 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-        // ===== CONFIGURAÇÃO DOS PERFIS (exatamente como solicitado) =====
+        // ===== CONFIGURAÇÃO DOS PERFIS =====
         const perfis = {
             proprietario: {
                 nome: 'Proprietário',
                 texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Certidão de Estado Civil (Nascimento ou Casamento)'
-                ]
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)']
             },
             comprador: {
                 nome: 'Comprador',
                 texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Certidão de Estado Civil (Nascimento ou Casamento)',
-                    'CTPS Digital',
-                    'FGTS Digital',
-                    'Recibo de entrega do IR',
-                    'Imposto de Renda Completo'
-                ]
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Certidão de Estado Civil (Nascimento ou Casamento)', 'CTPS Digital', 'FGTS Digital', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
             },
             inquilino: {
                 nome: 'Inquilino',
                 texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'Comprovante de Residência',
-                    'Recibo de entrega do IR',
-                    'Imposto de Renda Completo'
-                ]
+                docs: ['RG com CPF ou CNH', 'Comprovante de Residência', 'Recibo de entrega do IR', 'Imposto de Renda Completo']
             },
             corretor: {
                 nome: 'Corretor',
                 texto: 'Pegue os seguintes documentos ou anexe de forma digital:',
-                docs: [
-                    'RG com CPF ou CNH',
-                    'CRECI'
-                ]
+                docs: ['RG com CPF ou CNH', 'CRECI']
             }
         };
 
-        // ===== ESTADO =====
-        let perfilAtual = null;
-        let indiceDoc = 0;
-        let docsCapturados = [];
-        let fotoAtual = null;
-        let cameraStream = null;
+        let perfilAtual = null, indiceDoc = 0, docsCapturados = [], fotoAtual = null, cameraStream = null;
+
+        const $ = id => document.getElementById(id);
 
         // ===== NAVEGAÇÃO =====
         function mostrarTela(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            $(id).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function voltarMain() {
-            pararCamera();
-            mostrarTela('screen-main');
-        }
+        function voltarMain() { pararCamera(); mostrarTela('screen-main'); }
 
-        // ===== PASSO 1: SELECIONAR PERFIL =====
+        // ===== PASSO 1: SELEÇÃO =====
         function selecionarPerfil(chave) {
             perfilAtual = perfis[chave];
             indiceDoc = 0;
             docsCapturados = [];
-
-            document.getElementById('list-title').textContent = 'Documentos — ' + perfilAtual.nome;
-            document.getElementById('list-text').textContent = perfilAtual.texto;
-
-            const lista = document.getElementById('list-items');
-            lista.innerHTML = '';
-            perfilAtual.docs.forEach(doc => {
+            $('list-title').textContent = 'Documentos — ' + perfilAtual.nome;
+            $('list-text').textContent = perfilAtual.texto;
+            const ul = $('list-items');
+            ul.innerHTML = '';
+            perfilAtual.docs.forEach(d => {
                 const li = document.createElement('li');
-                li.textContent = doc;
-                lista.appendChild(li);
+                li.textContent = d;
+                ul.appendChild(li);
             });
-
             mostrarTela('screen-list');
         }
 
-        // ===== PASSO 2: INICIAR CAPTURA =====
+        // ===== PASSO 2: CAPTURA =====
         function iniciarCaptura() {
             indiceDoc = 0;
             docsCapturados = [];
@@ -504,109 +369,119 @@
         }
 
         function carregarProximoDoc() {
-            if (indiceDoc >= perfilAtual.docs.length) {
-                // Todos capturados → mostrar relatório
-                mostrarRelatorio();
-                return;
-            }
+            if (indiceDoc >= perfilAtual.docs.length) { mostrarRelatorio(); return; }
 
-            const nomeDoc = perfilAtual.docs[indiceDoc];
-            document.getElementById('doc-name').textContent = nomeDoc;
-            document.getElementById('capture-progress').textContent =
-                'Documento ' + (indiceDoc + 1) + ' de ' + perfilAtual.docs.length;
+            $('doc-name').textContent = perfilAtual.docs[indiceDoc];
+            $('capture-progress').textContent = 'Documento ' + (indiceDoc + 1) + ' de ' + perfilAtual.docs.length;
 
-            // Resetar preview
             fotoAtual = null;
-            document.getElementById('preview-img').style.display = 'none';
-            document.getElementById('placeholder-text').style.display = 'block';
-            document.getElementById('capture-btns').style.display = 'block';
-            document.getElementById('confirm-btns').style.display = 'none';
-            document.getElementById('fileInputHidden').value = '';
+            $('preview-img').style.display = 'none';
+            $('placeholder-text').style.display = 'block';
+            $('capture-btns').style.display = 'block';
+            $('confirm-btns').style.display = 'none';
+            $('fileInputHidden').value = '';
         }
 
         // ===== CÂMERA =====
         async function abrirCamera() {
             try {
-                const modal = document.getElementById('camera-modal');
-                const video = document.getElementById('camera-video');
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-                video.srcObject = cameraStream;
-                modal.classList.add('active');
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                cameraStream = stream;
+                const video = $('camera-video');
+                video.srcObject = stream;
+                $('camera-modal').classList.add('active');
             } catch (err) {
-                alert('Não foi possível acessar a câmera. Use a opção "Anexar da Galeria".');
+                alert('Não foi possível acessar a câmera. Use "Anexar da Galeria".');
             }
         }
 
-        function fecharCamera() {
-            document.getElementById('camera-modal').classList.remove('active');
-            pararCamera();
-        }
-
+        function fecharCamera() { $('camera-modal').classList.remove('active'); pararCamera(); }
         function pararCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null;
-            }
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
         }
 
         function tirarFoto() {
-            const video = document.getElementById('camera-video');
-            const canvas = document.getElementById('camera-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+            const video = $('camera-video'), canvas = $('camera-canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            exibirPreview(canvas.toDataURL('image/jpeg', 0.9));
             fecharCamera();
-            exibirPreview(dataURL);
         }
 
-        // ===== GALERIA =====
-        function abrirGaleria() {
-            document.getElementById('fileInputHidden').click();
-        }
+        // ===== GALERIA (aceita qualquer imagem ou PDF) =====
+        function abrirGaleria() { $('fileInputHidden').click(); }
 
         function arquivoSelecionado(event) {
             const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                exibirPreview(e.target.result);
-            };
-            reader.readAsDataURL(file);
+            if (!file) { return; }
+
+            // Se for imagem → exibir preview
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    exibirPreview(e.target.result);
+                };
+                reader.onerror = function() {
+                    alert('Não foi possível ler o arquivo.');
+                };
+                reader.readAsDataURL(file);
+            }
+            // Se for PDF → avisar mas permitir anexar
+            else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                alert('PDF anexado! Ele será incluído no relatório. (A pré-visualização só é exibida para imagens.)');
+                // Cria um placeholder com nome do arquivo
+                fotoAtual = { tipo: 'pdf', nome: file.name, arquivo: file };
+                exibirPreviewPdf(file.name);
+            }
+            // Outros tipos
+            else {
+                alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
+                fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
+                exibirPreviewPdf(file.name);
+            }
         }
 
-        // ===== PREVIEW =====
+        // Preview para PDF / outros arquivos (mostra nome do arquivo)
+        function exibirPreviewPdf(nomeArquivo) {
+            $('preview-img').style.display = 'none';
+            $('placeholder-text').innerHTML = '📄 <strong>' + nomeArquivo + '</strong><br><small style="color:#888;">Arquivo anexado</small>';
+            $('placeholder-text').style.display = 'block';
+            $('capture-btns').style.display = 'none';
+            $('confirm-btns').style.display = 'block';
+        }
+
+        // ===== PREVIEW IMAGEM (CORRIGIDO - agora mostra a imagem) =====
         function exibirPreview(dataURL) {
-            fotoAtual = dataURL;
-            const img = document.getElementById('preview-img');
+            fotoAtual = { tipo: 'imagem', foto: dataURL };
+
+            const img = $('preview-img');
             img.src = dataURL;
-            img.style.display = 'block';
-            document.getElementById('placeholder-text').style.display = 'none';
-            document.getElementById('capture-btns').style.display = 'none';
-            document.getElementById('confirm-btns').style.display = 'block';
+            img.style.display = 'block';              // mostra a imagem
+            $('placeholder-text').style.display = 'none'; // esconde o texto placeholder
+
+            $('capture-btns').style.display = 'none';  // esconde botões captura
+            $('confirm-btns').style.display = 'block'; // mostra botões confirmar/refazer
         }
 
         function refazerFoto() {
             fotoAtual = null;
-            document.getElementById('preview-img').style.display = 'none';
-            document.getElementById('placeholder-text').style.display = 'block';
-            document.getElementById('capture-btns').style.display = 'block';
-            document.getElementById('confirm-btns').style.display = 'none';
-            document.getElementById('fileInputHidden').value = '';
+            $('preview-img').style.display = 'none';
+            $('preview-img').src = '';
+            $('placeholder-text').textContent = 'Use os botões abaixo para tirar uma foto ou anexar o documento';
+            $('placeholder-text').style.display = 'block';
+            $('capture-btns').style.display = 'block';
+            $('confirm-btns').style.display = 'none';
+            $('fileInputHidden').value = '';
         }
 
         function confirmarFoto() {
-            if (!fotoAtual) {
-                alert('Tire uma foto ou anexe um arquivo antes de confirmar.');
-                return;
-            }
+            if (!fotoAtual) { alert('Tire uma foto ou anexe um arquivo antes de confirmar.'); return; }
 
             docsCapturados.push({
                 nome: perfilAtual.docs[indiceDoc],
-                foto: fotoAtual,
+                foto: fotoAtual.foto || null,
+                tipo: fotoAtual.tipo || 'imagem',
+                nomeArquivo: fotoAtual.nome || 'foto_' + Date.now() + '.jpg',
                 data: new Date().toLocaleString('pt-BR')
             });
 
@@ -616,7 +491,7 @@
 
         function cancelarCaptura() {
             if (docsCapturados.length > 0) {
-                if (!confirm('Tem certeza? Os documentos já capturados serão perdidos.')) return;
+                if (!confirm('Tem certeza? Os documentos capturados serão perdidos.')) return;
             }
             docsCapturados = [];
             indiceDoc = 0;
@@ -624,39 +499,42 @@
             mostrarTela('screen-list');
         }
 
-        // ===== PASSO 3: RELATÓRIO =====
+        // ===== RELATÓRIO =====
         function mostrarRelatorio() {
-            document.getElementById('report-perfil').textContent = perfilAtual.nome;
-            document.getElementById('report-date').textContent =
-                'Gerado em: ' + new Date().toLocaleString('pt-BR');
+            $('report-perfil').textContent = perfilAtual.nome;
+            $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
 
-            const container = document.getElementById('report-docs');
+            const container = $('report-docs');
             container.innerHTML = '';
 
             docsCapturados.forEach((doc, i) => {
                 const div = document.createElement('div');
-                div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eee;';
+                div.className = 'report-item';
+                let visual = '';
+                if (doc.tipo === 'imagem' && doc.foto) {
+                    visual = '<img src="' + doc.foto + '" alt="">';
+                } else {
+                    visual = '<div style="width:50px;height:50px;border-radius:4px;border:2px solid #d4af37;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f8f9fa;">📄</div>';
+                }
                 div.innerHTML =
-                    '<img src="' + doc.foto + '" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:2px solid #d4af37;">' +
-                    '<div><strong>' + (i + 1) + '. ' + doc.nome + '</strong><br><small style="color:#888;">' + doc.data + '</small></div>';
+                    visual +
+                    '<div><strong>' + (i + 1) + '. ' + doc.nome + '</strong>' +
+                    '<br><small style="color:#888;">' + doc.nomeArquivo + ' • ' + doc.data + '</small></div>';
                 container.appendChild(div);
             });
 
             mostrarTela('screen-report');
         }
 
-        // ===== PASSO 4: GERAR PDF =====
+        // ===== GERAR PDF =====
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-
             const watermarkUrl = 'https://raw.githubusercontent.com/chalfouncel/formularios/main/Marca%20dagua%20nova.png';
 
             try {
-                // Carrega marca d'água
                 const wmImg = await carregarImagem(watermarkUrl);
 
-                // Cabeçalho
                 pdf.setFillColor(26, 26, 26);
                 pdf.rect(0, 0, 210, 38, 'F');
                 pdf.setTextColor(212, 175, 55);
@@ -673,7 +551,6 @@
 
                 let y = 48;
 
-                // Documentos
                 for (let i = 0; i < docsCapturados.length; i++) {
                     if (y > 240) { pdf.addPage(); y = 20; }
 
@@ -683,17 +560,23 @@
                     pdf.setFontSize(10);
                     pdf.setFont(undefined, 'bold');
                     pdf.text((i + 1) + '. ' + docsCapturados[i].nome, 16, y + 2);
-
                     y += 14;
 
                     try {
-                        const props = pdf.getImageProperties(docsCapturados[i].foto);
-                        let w = 160;
-                        let h = (props.height * w) / props.width;
-                        if (h > 100) { h = 100; w = (props.width * h) / props.height; }
-                        const x = (210 - w) / 2;
-                        pdf.addImage(docsCapturados[i].foto, 'JPEG', x, y, w, h);
-                        y += h + 10;
+                        if (docsCapturados[i].foto) {
+                            const props = pdf.getImageProperties(docsCapturados[i].foto);
+                            let w = 160, h = (props.height * w) / props.width;
+                            if (h > 100) { h = 100; w = (props.width * h) / props.height; }
+                            const x = (210 - w) / 2;
+                            pdf.addImage(docsCapturados[i].foto, 'JPEG', x, y, w, h);
+                            y += h + 10;
+                        } else {
+                            pdf.setTextColor(100, 100, 100);
+                            pdf.setFontSize(9);
+                            pdf.setFont(undefined, 'normal');
+                            pdf.text('[' + docsCapturados[i].nomeArquivo + ' — arquivo anexado]', 105, y, { align: 'center' });
+                            y += 12;
+                        }
                     } catch (e) {
                         pdf.setTextColor(200, 0, 0);
                         pdf.text('[Erro ao carregar imagem]', 105, y, { align: 'center' });
@@ -701,7 +584,6 @@
                     }
                 }
 
-                // Marca d'água em todas as páginas
                 const total = pdf.internal.getNumberOfPages();
                 for (let p = 1; p <= total; p++) {
                     pdf.setPage(p);
@@ -726,9 +608,7 @@
         }
 
         function novoProcesso() {
-            if (confirm('Iniciar um novo processo? Todos os dados serão perdidos.')) {
-                location.reload();
-            }
+            if (confirm('Iniciar um novo processo? Todos os dados serão perdidos.')) { location.reload(); }
         }
     </script>
 </body>
