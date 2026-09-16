@@ -164,20 +164,43 @@
             margin: 0;
         }
 
+        /* ===== RELATÓRIO - IMAGENS EM TAMANHO DOBRADO ===== */
         .report-header {
             text-align: center; margin-bottom: 20px; padding-bottom: 15px;
             border-bottom: 3px solid #d4af37;
         }
         .report-header h2 { color: #1a1a1a; font-size: 20px; margin-bottom: 5px; }
+
         .report-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 0; border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            text-align: center;
         }
         .report-item img {
-            width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #d4af37;
+            width: 200px;          /* Dobrado: era 100px */
+            height: auto;          /* Mantém proporção */
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 2px solid #d4af37;
+        }
+        .report-item .file-icon {
+            width: 100px; height: 100px;   /* Dobrado: era 50px */
+            border-radius: 6px;
+            border: 2px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            background: #f8f9fa;
         }
         .report-item small { color: #888; }
 
+        /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.95);
@@ -333,6 +356,7 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
+        // ===== CONFIGURAÇÃO DOS PERFIS (MESMA DINÂMICA PARA TODOS) =====
         const perfis = {
             proprietario: {
                 nome: 'Proprietário',
@@ -368,6 +392,7 @@
 
         function voltarMain() { pararCamera(); mostrarTela('screen-main'); }
 
+        // ===== PASSO 1: SELEÇÃO DO PERFIL (função única para todos os grupos) =====
         function selecionarPerfil(chave) {
             perfilAtual = perfis[chave];
             indiceDoc = 0;
@@ -384,6 +409,7 @@
             mostrarTela('screen-list');
         }
 
+        // ===== PASSO 2: CAPTURA (função única para todos os grupos) =====
         function iniciarCaptura() {
             indiceDoc = 0;
             docsCapturados = [];
@@ -425,8 +451,7 @@
             if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
         }
 
-        // ===== FUNÇÃO PRINCIPAL: COMPRIMIR IMAGEM =====
-        // Redimensiona para no máximo 1200px e qualidade 0.7
+        // ===== COMPRIMIR IMAGEM =====
         function comprimirImagem(dataURL, maxWidth, quality) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -434,7 +459,6 @@
                     let w = img.width;
                     let h = img.height;
                     
-                    // Redimensiona se for maior que maxWidth
                     if (w > maxWidth) {
                         h = (h * maxWidth) / w;
                         w = maxWidth;
@@ -449,7 +473,6 @@
                     ctx.drawImage(img, 0, 0, w, h);
                     
                     const compressed = canvas.toDataURL('image/jpeg', quality);
-                    console.log('Imagem comprimida:', dataURL.length, '->', compressed.length, 'bytes');
                     resolve(compressed);
                 };
                 img.onerror = () => reject(new Error('Falha ao carregar imagem para compressão'));
@@ -463,17 +486,11 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const dataURL = canvas.toDataURL('image/jpeg', 0.9);
-            console.log('Foto tirada, tamanho original:', dataURL.length);
             
-            // Comprime a imagem antes de exibir
             comprimirImagem(dataURL, 1200, 0.7)
-                .then(compressed => {
-                    console.log('Foto comprimida:', compressed.length);
-                    exibirPreview(compressed);
-                })
+                .then(compressed => exibirPreview(compressed))
                 .catch(err => {
                     console.error('Erro ao comprimir:', err);
-                    // Fallback: usa a original
                     exibirPreview(dataURL);
                 });
             
@@ -485,41 +502,23 @@
 
         function arquivoSelecionado(event) {
             const file = event.target.files[0];
-            if (!file) { 
-                console.log('Nenhum arquivo selecionado');
-                return; 
-            }
+            if (!file) { return; }
 
             console.log('Arquivo selecionado:', file.name, 'Tipo:', file.type, 'Tamanho:', file.size);
 
             if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|bmp|webp|heic|heif|tif|tiff)$/i.test(file.name)) {
-                console.log('É imagem, lendo arquivo...');
                 const reader = new FileReader();
-                
                 reader.onload = function(e) {
-                    console.log('Arquivo lido, tamanho:', e.target.result.length);
-                    // Comprime imagens da galeria também
                     comprimirImagem(e.target.result, 1200, 0.7)
                         .then(compressed => exibirPreview(compressed))
-                        .catch(err => {
-                            console.error('Erro ao comprimir:', err);
-                            exibirPreview(e.target.result);
-                        });
+                        .catch(err => exibirPreview(e.target.result));
                 };
-                
-                reader.onerror = function(e) {
-                    console.error('Erro ao ler arquivo:', e);
-                    alert('Não foi possível ler o arquivo. Tente outro formato.');
-                };
-                
                 reader.readAsDataURL(file);
             }
             else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-                console.log('É PDF, convertendo em imagem...');
                 converterPdfEmImagem(file);
             }
             else {
-                console.log('Outro tipo de arquivo');
                 alert('Arquivo "' + file.name + '" anexado. Ele será incluído no relatório.');
                 fotoAtual = { tipo: 'outro', nome: file.name, arquivo: file };
                 exibirPreviewOutro(file.name);
@@ -541,15 +540,9 @@
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 
-                await page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                }).promise;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
                 
                 const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                console.log('PDF convertido, tamanho:', dataURL.length);
-                
-                // Comprime também
                 const compressed = await comprimirImagem(dataURL, 1200, 0.7);
                 exibirPreview(compressed);
                 ocultarLoading();
@@ -565,7 +558,6 @@
             $('loading-text').textContent = texto;
             $('loading-overlay').classList.add('active');
         }
-
         function ocultarLoading() {
             $('loading-overlay').classList.remove('active');
         }
@@ -578,30 +570,19 @@
             $('confirm-btns').style.display = 'block';
         }
 
-        // ===== PREVIEW IMAGEM (SEM ALERT) =====
+        // ===== PREVIEW =====
         function exibirPreview(dataURL) {
-            console.log('Exibindo preview, tamanho:', dataURL.length);
             fotoAtual = { tipo: 'imagem', foto: dataURL };
 
             const img = $('preview-img');
-            
             img.onload = function() {
-                console.log('Imagem carregada no preview:', img.naturalWidth, 'x', img.naturalHeight);
+                console.log('Preview carregado:', img.naturalWidth, 'x', img.naturalHeight);
             };
-            
-            img.onerror = function(e) {
-                console.error('Erro ao exibir imagem no preview:', e);
-                // NÃO mostra alert - apenas log no console
-                // Tenta exibir mesmo assim
-            };
-            
             img.src = dataURL;
             img.style.display = 'block';
             $('placeholder-text').style.display = 'none';
             $('capture-btns').style.display = 'none';
             $('confirm-btns').style.display = 'block';
-            
-            console.log('Preview exibido');
         }
 
         function refazerFoto() {
@@ -621,8 +602,6 @@
                 return; 
             }
 
-            console.log('Confirmando foto, tipo:', fotoAtual.tipo, 'tamanho foto:', fotoAtual.foto ? fotoAtual.foto.length : 0);
-
             docsCapturados.push({
                 nome: perfilAtual.docs[indiceDoc],
                 foto: fotoAtual.foto || null,
@@ -630,8 +609,6 @@
                 nomeArquivo: fotoAtual.nome || 'foto_' + Date.now() + '.jpg',
                 data: new Date().toLocaleString('pt-BR')
             });
-
-            console.log('Documento salvo:', docsCapturados[docsCapturados.length - 1]);
 
             indiceDoc++;
             carregarProximoDoc();
@@ -647,9 +624,8 @@
             mostrarTela('screen-list');
         }
 
-        // ===== RELATÓRIO =====
+        // ===== RELATÓRIO (IMAGENS EM TAMANHO DOBRADO) =====
         function mostrarRelatorio() {
-            console.log('Mostrando relatório, documentos:', docsCapturados.length);
             $('report-perfil').textContent = perfilAtual.nome;
             $('report-date').textContent = 'Gerado em: ' + new Date().toLocaleString('pt-BR');
 
@@ -661,12 +637,12 @@
                 div.className = 'report-item';
                 let visual = '';
                 
-                console.log('Doc', i, 'tipo:', doc.tipo, 'tem foto:', !!doc.foto, 'tamanho:', doc.foto ? doc.foto.length : 0);
-                
                 if (doc.tipo === 'imagem' && doc.foto) {
+                    // Imagem em tamanho dobrado (200px)
                     visual = '<img src="' + doc.foto + '" alt="" onerror="this.style.display=\'none\'">';
                 } else {
-                    visual = '<div style="width:50px;height:50px;border-radius:4px;border:2px solid #d4af37;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f8f9fa;">📄</div>';
+                    // Ícone de arquivo em tamanho dobrado (100px)
+                    visual = '<div class="file-icon">📄</div>';
                 }
                 div.innerHTML =
                     visual +
@@ -678,7 +654,7 @@
             mostrarTela('screen-report');
         }
 
-        // ===== GERAR PDF =====
+        // ===== GERAR PDF (IMAGENS EM TAMANHO DOBRADO) =====
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -688,7 +664,6 @@
             try {
                 const logoImg = await carregarImagem(logoUrl);
 
-                // Cabeçalho
                 pdf.setFillColor(26, 26, 26);
                 pdf.rect(0, 0, 210, 45, 'F');
                 
@@ -709,8 +684,6 @@
                 let y = 55;
 
                 for (let i = 0; i < docsCapturados.length; i++) {
-                    if (y > 240) { pdf.addPage(); y = 20; }
-
                     pdf.setFillColor(212, 175, 55);
                     pdf.rect(12, y - 4, 186, 8, 'F');
                     pdf.setTextColor(26, 26, 26);
@@ -721,30 +694,26 @@
 
                     try {
                         if (docsCapturados[i].foto && docsCapturados[i].foto.length > 100) {
-                            console.log('Adicionando imagem ao PDF, doc', i, 'tamanho:', docsCapturados[i].foto.length);
-                            
                             const imgData = docsCapturados[i].foto;
                             
-                            // Detecta formato
                             let format = 'JPEG';
                             if (imgData.indexOf('data:image/png') === 0) format = 'PNG';
-                            else if (imgData.indexOf('data:image/jpeg') === 0 || imgData.indexOf('data:image/jpg') === 0) format = 'JPEG';
                             
                             const props = pdf.getImageProperties(imgData);
-                            console.log('Propriedades da imagem:', props);
                             
-                            let w = 160;
+                            // TAMANHO DOBRADO: largura máxima 180mm, altura máxima 220mm
+                            let w = 180;
                             let h = (props.height * w) / props.width;
                             
-                            // Limita altura máxima
-                            if (h > 100) { 
-                                h = 100; 
+                            if (h > 220) { 
+                                h = 220; 
                                 w = (props.width * h) / props.height; 
                             }
                             
-                            const x = (210 - w) / 2;
-                            console.log('Dimensões no PDF:', x, y, w, h, 'formato:', format);
+                            // Se a imagem não couber na página, cria nova página
+                            if (y + h > 285) { pdf.addPage(); y = 20; }
                             
+                            const x = (210 - w) / 2;
                             pdf.addImage(imgData, format, x, y, w, h);
                             y += h + 10;
                         } else {
@@ -776,14 +745,8 @@
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    console.log('Imagem carregada:', url);
-                    resolve(img);
-                };
-                img.onerror = () => {
-                    console.error('Erro ao carregar imagem:', url);
-                    reject(new Error('Falha ao carregar imagem de ' + url));
-                };
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Falha ao carregar imagem de ' + url));
                 img.src = url;
             });
         }
