@@ -1,2261 +1,1197 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M&IC Corretores de Imóveis</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            padding: 14px 15px;
-            text-align: center;
-            border-bottom: 3px solid #d4af37;
-        }
-
-        .header img {
-            max-width: 110px;
-            max-height: 55px;
-            object-fit: contain;
-            margin: 0 auto 6px;
-            display: block;
-        }
-
-        .header h1 {
-            color: #d4af37;
-            font-size: 17px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .header p {
-            color: #fff;
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-top: 3px;
-        }
-
-        .container {
-            max-width: 520px;
-            margin: 0 auto;
-            padding: 15px 12px;
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        .section-header {
-            background: #1a1a1a;
-            color: #d4af37;
-            padding: 10px 16px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .main-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-profile {
-            background: #fff;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 18px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-profile:hover {
-            border-color: #d4af37;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-        }
-
-        .btn-profile .icon {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .btn-profile h3 {
-            font-size: 14px;
-            color: #1a1a1a;
-            margin-bottom: 3px;
-        }
-
-        .btn-profile small {
-            font-size: 11px;
-            color: #888;
-        }
-
-        .instruction {
-            background: rgba(212, 175, 55, 0.08);
-            border-left: 4px solid #d4af37;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #444;
-        }
-
-        .instruction strong {
-            color: #b08d16;
-        }
-
-        .instruction ul {
-            margin-top: 6px;
-            padding-left: 18px;
-        }
-
-        .btn {
-            padding: 13px 18px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
-            margin: 6px 0;
-            transition: all 0.2s;
-        }
-
-        .btn-gold {
-            background: #d4af37;
-            color: #1a1a1a;
-        }
-
-        .btn-gold:hover {
-            background: #c4a030;
-            transform: translateY(-2px);
-        }
-
-        .btn-dark {
-            background: #1a1a1a;
-            color: #d4af37;
-            border: 2px solid #d4af37;
-        }
-
-        .btn-dark:hover {
-            background: #2d2d2d;
-        }
-
-        .btn-confirm {
-            background: #28a745;
-            color: #fff;
-        }
-
-        .btn-confirm:hover {
-            background: #218838;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn-neutral {
-            background: #f1f3f5;
-            color: #495057;
-            border: 1.5px dashed #adb5bd;
-            margin-top: 10px;
-        }
-
-        .btn-neutral:hover {
-            background: #e9ecef;
-            border-color: #6c757d;
-        }
-
-        .btn-back {
-            background: none;
-            border: none;
-            color: #b08d16;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 6px 0;
-            margin-bottom: 8px;
-        }
-
-        .btn-back:hover {
-            text-decoration: underline;
-        }
-
-        .doc-progress {
-            text-align: center;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .doc-name {
-            background: #d4af37;
-            color: #1a1a1a;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        /* Área de captura */
-        .capture-area {
-            background: #f8f9fa;
-            border: 2px dashed #d4af37;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            margin-bottom: 12px;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .capture-area img {
-            max-width: 180px;
-            max-height: 180px;
-            border-radius: 6px;
-            object-fit: contain;
-            display: block;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        #placeholder-text {
-            color: #888;
-            font-size: 13px;
-            margin: 0;
-        }
-
-        .form-section-title {
-            background: #d4af37;
-            color: #1a1a1a;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            margin: 12px 0 10px;
-            text-transform: uppercase;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 5px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            background: #fff;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #d4af37;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 65px;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .radio-option {
-            flex: 1;
-            position: relative;
-        }
-
-        .radio-option input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .radio-option label {
-            display: block;
-            padding: 10px;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.2s;
-            background: #fff;
-            color: #333;
-        }
-
-        .radio-option input:checked + label {
-            border-color: #d4af37;
-            background: #d4af37;
-            color: #1a1a1a;
-        }
-
-        .radio-option label:hover {
-            border-color: #d4af37;
-        }
-
-        .hidden-field {
-            display: none;
-        }
-
-        .form-progress {
-            text-align: center;
-            color: #888;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }
-
-        .report-header {
-            text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #d4af37;
-        }
-
-        .report-header h2 {
-            color: #1a1a1a;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .status-box {
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .status-info {
-            background: #e2f0fb;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .report-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border: 1px solid #e8e8e8;
-            background: #fafafa;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            text-align: left;
-        }
-
-        .report-item img {
-            width: 75px;
-            height: 75px;
-            min-width: 75px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1.5px solid #d4af37;
-            background: #fff;
-        }
-
-        .report-item-icon {
-            width: 75px;
-            height: 75px;
-            min-width: 75px;
-            background: #fff;
-            border: 1.5px solid #d4af37;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-        }
-
-        .report-item-info {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .report-item-info strong {
-            display: block;
-            color: #1a1a1a;
-            font-size: 13px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .report-item-info small {
-            display: block;
-            color: #777;
-            font-size: 11px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .report-badge {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            color: #1a1a1a;
-            background: #d4af37;
-            padding: 2px 7px;
-            border-radius: 4px;
-            margin-top: 5px;
-            text-transform: uppercase;
-        }
-
-        .report-data-block {
-            background: #f8f9fa;
-            border: 2px solid #d4af37;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-        }
-
-        .report-data-block h3 {
-            color: #1a1a1a;
-            font-size: 15px;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid #d4af37;
-        }
-
-        .report-data-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 5px 0;
-            border-bottom: 1px dashed #ddd;
-            font-size: 13px;
-        }
-
-        .report-data-row:last-child {
-            border-bottom: none;
-        }
-
-        .report-data-row .label {
-            color: #666;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .report-data-row .value {
-            color: #1a1a1a;
-            font-weight: 500;
-            flex: 1.5;
-            text-align: right;
-            word-break: break-word;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 22px;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .modal-content {
-            padding: 15px;
-            border-radius: 12px;
-            max-width: 95%;
-            width: 500px;
-        }
-
-        .modal-content video {
-            width: 100%;
-            border-radius: 8px;
-            background: #000;
-        }
-
-        #fileInputHidden {
-            display: none;
-        }
-
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 46px;
-            height: 46px;
-            border: 4px solid #d4af37;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 12px;
-        }
-
-        .loading-text {
-            color: #fff;
-            font-size: 15px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @media (max-width: 420px) {
-            .main-buttons {
-                grid-template-columns: 1fr;
-            }
-
-            .report-data-row {
-                flex-direction: column;
-                gap: 2px;
-            }
-
-            .report-data-row .value {
-                text-align: left;
-            }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>M&IC Corretores de Imóveis</title>
+<style>
+* { margin:0; padding:0; box-sizing: border-box; }
+body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; color:#333; }
+.header { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding:14px 15px; text-align:center; border-bottom:3px solid #d4af37; }
+.header img { max-width:110px; max-height:55px; object-fit:contain; margin:auto 0 6px; display:block; }
+.header h1 { color:#d4af37; font-size:17px; text-transform:uppercase; letter-spacing:1px; }
+.header p { color:#fff; font-size:11px; letter-spacing:2px; margin-top:3px; }
+
+.container { max-width:520px; margin:0 auto; padding:15px 12px; }
+
+.card { background:#fff; border-radius:12px; padding:18px; margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+
+.screen { display:none; }
+.screen.active { display:block; }
+
+.section-header { background:#1a1a1a; color:#d4af37; padding:10px 16px; border-radius:8px; margin-bottom:15px; font-size:15px; font-weight:bold; }
+
+.main-buttons { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.btn-profile { background:#fff; border:2px solid #e0e0e0; border-radius:12px; padding:18px 10px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.btn-profile:hover { border-color:#d4af37; transform:translateY(-3px); box-shadow:0 4px 15px rgba(212,175,55,0.2); }
+.btn-profile .icon { font-size:28px; display:block; margin-bottom:6px; }
+.btn-profile h3 { font-size:14px; color:#1a1a1a; margin-bottom:3px; }
+.btn-profile small { font-size:11px; color:#888; }
+
+.instruction { background: rgba(212,175,55,0.08); border-left:4px solid #d4af37; padding:12px 16px; border-radius:8px; margin:15px 0; font-size:13px; line-height:1.6; color:#444; }
+.instruction strong { color:#b08d16; }
+.instruction ul { margin-top:6px; padding-left:18px; }
+
+.btn { padding:13px 18px; border:none; border-radius:10px; font-weight:bold; font-size:14px; cursor:pointer; width:100%; margin:6px 0; transition:all 0.2s; }
+.btn-gold { background:#d4af37; color:#1a1a1a; }
+.btn-gold:hover { background:#c4a030; transform:translateY(-2px); }
+.btn-dark { background:#1a1a1a; color:#d4af37; border:2px solid #d4af37; }
+.btn-dark:hover { background:#2d2d2d; }
+.btn-confirm { background:#28a745; color:#fff; }
+.btn-confirm:hover { background:#218838; }
+.btn-danger { background:#dc3545; color:#fff; }
+.btn-danger:hover { background:#c82333; }
+.btn-neutral { background:#f1f3f5; color:#495057; border:1.5px dashed #adb5bd; margin-top:10px; }
+.btn-neutral:hover { background:#e9ecef; border-color:#6c757d; }
+
+.btn-back { background:none; border:none; color:#b08d16; font-size:14px; cursor:pointer; padding:6px 0; margin-bottom:8px; }
+.btn-back:hover { text-decoration:underline; }
+
+.doc-progress { text-align:center; color:#888; font-size:13px; margin-bottom:8px; }
+.doc-name { background:#d4af37; color:#1a1a1a; padding:10px; border-radius:8px; text-align:center; font-weight:bold; font-size:14px; margin-bottom:12px; }
+
+/* Grid de Páginas / Miniaturas */
+.pages-summary { font-size:12px; font-weight:bold; color:#555; margin:10px 0 6px; }
+.pages-gallery { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.page-thumb-card { position:relative; width:70px; height:80px; border-radius:6px; border:1.5px solid #d4af37; overflow:hidden; background:#fafafa; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.page-thumb-card img { width:100%; height:62px; object-fit:cover; }
+.page-thumb-card .pdf-icon { font-size:24px; }
+.page-thumb-card .page-label { font-size:9px; background:#1a1a1a; color:#d4af37; width:100%; text-align:center; padding:1px 0; font-weight:bold; }
+.page-thumb-card .btn-remove-thumb { position:absolute; top:2px; right:2px; background:rgba(220,53,69,0.9); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; line-height:18px; text-align:center; cursor:pointer; padding:0; }
+
+.capture-area { background:#f8f9fa; border:2px dashed #d4af37; border-radius:10px; padding:12px; text-align:center; margin-bottom:12px; min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
+.capture-area img { max-width:180px; max-height:180px; border-radius:6px; object-fit:contain; display:block; box-shadow:0 2px 8px rgba(0,0,0,0.12); }
+#placeholder-text { color:#888; font-size:13px; margin:0; }
+
+.form-section-title { background:#d4af37; color:#1a1a1a; padding:8px 12px; border-radius:6px; font-weight:bold; font-size:13px; margin:12px 0 10px; text-transform:uppercase; }
+.form-group { margin-bottom:12px; }
+.form-group label { display:block; font-size:13px; font-weight:600; color:#1a1a1a; margin-bottom:5px; }
+.form-group input,
+.form-group select,
+.form-group textarea { width:100%; padding:10px 12px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; font-family:inherit; transition:border-color 0.2s; background:#fff; }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { outline:none; border-color:#d4af37; }
+.form-group textarea { resize:vertical; min-height:65px; }
+.radio-group { display:flex; gap:10px; margin-top:5px; }
+.radio-option { flex:1; position:relative; }
+.radio-option input { position:absolute; opacity:0; pointer-events:none; }
+.radio-option label { display:block; padding:10px; text-align:center; border:2px solid #e0e0e0; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px; transition:all 0.2s; background:#fff; color:#333; }
+.radio-option input:checked + label { border-color:#d4af37; background:#d4af37; color:#1a1a1a; }
+.radio-option label:hover { border-color:#d4af37; }
+.hidden-field { display:none; }
+.form-progress { text-align:center; color:#888; font-size:13px; margin-bottom:10px; }
+.report-header { text-align:center; margin-bottom:15px; padding-bottom:12px; border-bottom:2px solid #d4af37; }
+.report-header h2 { color:#1a1a1a; font-size:18px; margin-bottom:4px; }
+.status-box { padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:15px; text-align:center; font-weight:bold; }
+.status-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+.status-warning { background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
+.status-info { background:#e2f0fb; color:#0c5460; border:1px solid #bee5eb; }
+
+/* Relatório de itens e páginas agrupadas */
+.report-item { padding:12px; border:1px solid #e8e8e8; background:#fafafa; margin-bottom:10px; border-radius:8px; }
+.report-item-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px; font-weight:bold; color:#1a1a1a; }
+.report-item-pages { display:flex; flex-wrap:wrap; gap:8px; }
+.report-page-thumb { width:65px; height:75px; object-fit:cover; border-radius:4px; border:1.5px solid #d4af37; background:#fff; }
+.report-page-icon { width:65px; height:75px; border-radius:4px; border:1.5px solid #d4af37; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:22px; }
+.report-badge { display:inline-block; font-size:10px; font-weight:700; color:#1a1a1a; background:#d4af37; padding:2px 7px; border-radius:4px; text-transform:uppercase; }
+
+.report-data-block { background:#f8f9fa; border:2px solid #d4af37; border-radius:10px; padding:12px; margin-bottom:15px; }
+.report-data-block h3 { color:#1a1a1a; font-size:15px; margin-bottom:8px; padding-bottom:6px; border-bottom:2px solid #d4af37; }
+.report-data-row { display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px dashed #ddd; font-size:13px; }
+.report-data-row:last-child { border-bottom:none; }
+.report-data-row .label { color:#666; font-weight:600; flex:1; }
+.report-data-row .value { color:#1a1a1a; font-weight:500; flex:1.5; text-align:right; word-break:break-word; }
+
+.modal { display:none; position:fixed; inset:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; align-items:center; justify-content:center; }
+.modal.active { display:flex; }
+.modal-close { position:absolute; top:15px; right:15px; background:#dc3545; color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:22px; cursor:pointer; z-index:1001; }
+.modal-content { padding:15px; border-radius:12px; max-width:95%; width:500px; }
+.modal-content video { width:100%; border-radius:8px; background:#000; }
+#fileInputHidden { display:none; }
+.loading-overlay { display:none; position:fixed; inset:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; flex-direction:column; }
+.loading-overlay.active { display:flex; }
+.loading-spinner { width:46px; height:46px; border:4px solid #d4af37; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin-bottom:12px; }
+.loading-text { color:#fff; font-size:15px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media(max-width:420px) { .main-buttons { grid-template-columns:1fr; } .report-data-row { flex-direction:column; gap:2px; } .report-data-row .value { text-align:left; } }
+</style>
 </head>
-
 <body>
-    <div class="header">
-        <img
-            src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png"
-            alt="M&IC"
-            onerror="this.style.display='none'"
-        >
-        <h1>M&IC Corretores de Imóveis</h1>
-        <p>CAPTURA DE DOCUMENTOS</p>
-    </div>
+<div class="header">
+<img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" alt="M&IC" onerror="this.style.display='none'"/>
+<h1>M&IC Corretores de Imóveis</h1>
+<p>CAPTURA DE DOCUMENTOS</p>
+</div>
+<div class="container">
+<!-- Tela principal -->
+<div id="screen-main" class="screen active">
+<div class="card">
+<div class="main-buttons">
+<button class="btn-profile" onclick="selecionarPerfil('proprietario')"><span class="icon">🏠</span><h3>Proprietário</h3><small>Venda / Locação</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('comprador')"><span class="icon">🛒</span><h3>Comprador</h3><small>Aquisição</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('inquilino')"><span class="icon">🔑</span><h3>Inquilino</h3><small>Locação</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('corretor')"><span class="icon">🤝</span><h3>Corretor</h3><small>Profissional</small></button>
+</div>
+</div>
+</div>
+<!-- Lista de documentos -->
+<div id="screen-list" class="screen">
+<button class="btn-back" onclick="voltarMain()">← Voltar</button>
+<div class="card">
+<div class="section-header" id="list-title">Documentos</div>
+<div class="instruction">
+<strong id="list-text"></strong>
+<ul id="list-items"></ul>
+</div>
+<button class="btn btn-gold" onclick="iniciarCaptura()">📷 Iniciar captura</button>
+</div>
+</div>
+<!-- Captura de documentos com suporte a múltiplas páginas -->
+<div id="screen-capture" class="screen">
+<button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
+<div class="card">
+<div class="doc-progress" id="capture-progress"></div>
+<div class="doc-name" id="doc-name">Documento</div>
 
-    <div class="container">
+<div class="instruction" style="margin:8px 0 12px; padding:8px 12px; font-size:12px;">
+💡 <em>Você pode adicionar mais de uma foto/página para este documento (ex.: frente e verso ou várias folhas).</em>
+</div>
 
-        <!-- TELA PRINCIPAL -->
-        <div id="screen-main" class="screen active">
-            <div class="card">
-                <div class="main-buttons">
-                    <button class="btn-profile" onclick="selecionarPerfil('proprietario')">
-                        <span class="icon">🏠</span>
-                        <h3>Proprietário</h3>
-                        <small>Venda / Locação</small>
-                    </button>
+<!-- Miniaturas das páginas adicionadas -->
+<div id="pages-gallery-wrapper" style="display:none;">
+<div class="pages-summary" id="pages-summary-text">Páginas adicionadas (0):</div>
+<div class="pages-gallery" id="pages-gallery"></div>
+</div>
 
-                    <button class="btn-profile" onclick="selecionarPerfil('comprador')">
-                        <span class="icon">🛒</span>
-                        <h3>Comprador</h3>
-                        <small>Aquisição</small>
-                    </button>
+<div class="capture-area">
+<img id="preview-img" style="display:none;" alt="Pré-visualização"/>
+<div id="preview-pdf-icon" style="display:none; font-size:42px; margin-bottom:8px;">📄</div>
+<p id="placeholder-text">Tire uma foto ou selecione o arquivo para adicionar uma página.</p>
+</div>
 
-                    <button class="btn-profile" onclick="selecionarPerfil('inquilino')">
-                        <span class="icon">🔑</span>
-                        <h3>Inquilino</h3>
-                        <small>Locação</small>
-                    </button>
+<!-- Botões de captura -->
+<div id="capture-btns">
+<button class="btn btn-gold" id="btn-foto" onclick="abrirCamera()">📷 Tirar foto</button>
+<button class="btn btn-dark" id="btn-anexo" onclick="abrirGaleria()">📎 Anexar do arquivo</button>
+<button class="btn btn-neutral" id="btn-nao-declara-ir" style="display:none;" onclick="pularImpostoDeRenda()">🚫 Não declaro Imposto de Renda (Isento)</button>
+</div>
 
-                    <button class="btn-profile" onclick="selecionarPerfil('corretor')">
-                        <span class="icon">🤝</span>
-                        <h3>Corretor</h3>
-                        <small>Profissional</small>
-                    </button>
-                </div>
-            </div>
+<!-- Botões de confirmação da página capturada -->
+<div id="confirm-page-btns" style="display:none;">
+<button class="btn btn-confirm" onclick="adicionarPaginaAoDocumento()">➕ Salvar esta página</button>
+<button class="btn btn-danger" onclick="descartarPaginaAtual()">🔄 Descartar foto</button>
+</div>
+
+<!-- Botão para avançar de documento -->
+<div id="next-doc-wrapper" style="display:none; margin-top:12px; border-top:1.5px dashed #ccc; padding-top:10px;">
+<button class="btn btn-confirm" onclick="concluirDocumentoAtual()">✅ Concluir este documento e avançar →</button>
+</div>
+
+<input type="file" id="fileInputHidden" accept="image/*,application/pdf" onchange="arquivoSelecionado(event)" />
+</div>
+</div>
+
+<!-- Formulário Proprietário -->
+<div id="screen-form-proprietario" class="screen">
+<button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
+<div class="card">
+<div class="section-header">Cadastro do Proprietário</div>
+<div class="form-progress" id="proprietario-progress">Etapa 1 de 4</div>
+<div id="proprietario-etapa-1">
+<div class="form-section-title">Finalidade do imóvel</div>
+<div class="form-group">
+<label>Seu imóvel é para locação ou venda?</label>
+<div class="radio-group">
+<div class="radio-option"><input type="radio" name="finalidade" id="finalidade-locacao" value="locacao" onchange="mudarFinalidade()"/><label for="finalidade-locacao">🔑 Locação</label></div>
+<div class="radio-option"><input type="radio" name="finalidade" id="finalidade-venda" value="venda" onchange="mudarFinalidade()"/><label for="finalidade-venda">🏷️ Venda</label></div>
+</div>
+</div>
+<button class="btn btn-gold" onclick="proximaEtapaProprietario(2)">Próximo →</button>
+</div>
+<div id="proprietario-etapa-2" style="display:none;">
+<div class="form-section-title">Dados pessoais</div>
+<div class="form-group"><label>Nome completo *</label><input type="text" id="f-nome" placeholder="Digite seu nome completo" /></div>
+<div class="form-group"><label>Nacionalidade *</label><input type="text" id="f-nacionalidade" placeholder="Ex.: Brasileiro(a)" /></div>
+<div class="form-group"><label>Estado civil *</label><select id="f-estadoCivil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União estável</option></select></div>
+<div class="form-group"><label>Profissão *</label><input type="text" id="f-profissao" placeholder="Digite sua profissão" /></div>
+<div class="form-group"><label>Número do RG (não obrigatório)</label><input type="text" id="f-rg" placeholder="00.000.000-0" /></div>
+<div class="form-group"><label>Número do CPF *</label><input type="text" id="f-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" /></div>
+<div class="form-group"><label>Endereço completo com CEP *</label><input type="text" id="f-endereco" placeholder="Rua, número, bairro, cidade - CEP" /></div>
+<div class="form-group"><label>E-mail *</label><input type="email" id="f-email" placeholder="seu@email.com" /></div>
+<div class="form-group"><label>Telefone *</label><input type="tel" id="f-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)"/></div>
+<div class="form-group">
+<label id="label-endereco-imovel">Endereço completo do imóvel *</label>
+<textarea id="f-enderecoImovel" placeholder="Endereço completo do imóvel"></textarea>
+</div>
+<button class="btn btn-dark" onclick="voltarEtapaProprietario(1)">← Voltar</button>
+<button class="btn btn-gold" onclick="proximaEtapaProprietario(3)">Próximo →</button>
+</div>
+<div id="proprietario-etapa-3" style="display:none;">
+<div class="form-section-title">Dados do imóvel para venda</div>
+<div class="form-group"><label>Número do IPTU *</label><input type="text" id="f-iptu" placeholder="Número do IPTU" /></div>
+<div class="form-group"><label>Número da matrícula do imóvel no RGI *</label><input type="text" id="f-matricula" placeholder="Número da matrícula" /></div>
+<div class="form-group"><label>Número do Cartório de Registro de Imóveis (RGI) *</label><input type="text" id="f-rgi" placeholder="Número do RGI" /></div>
+<div class="form-group"><label>O imóvel está financiado? *</label>
+<div class="radio-group">
+<div class="radio-option"><input type="radio" name="financiado" id="financiado-sim" value="sim" onchange="toggleFinanciamento()"/><label for="financiado-sim">Sim</label></div>
+<div class="radio-option"><input type="radio" name="financiado" id="financiado-nao" value="nao" onchange="toggleFinanciamento()"/><label for="financiado-nao">Não</label></div>
+</div>
+</div>
+<div class="hidden-field" id="campo-banco-financiamento">
+<div class="form-group"><label>Se estiver financiado, por qual banco?</label><input type="text" id="f-bancoFinanciamento" placeholder="Nome do banco" /></div>
+<div class="form-group"><label>Valor exato do saldo devedor</label><input type="text" id="f-saldoDevedor" placeholder="R$ 0,00" oninput="mascaraMoeda(this)"/></div>
+</div>
+<div class="form-group"><label>Foi utilizado o FGTS para compra do imóvel? *</label>
+<div class="radio-group">
+<div class="radio-option"><input type="radio" name="fgts" id="fgts-sim" value="sim"/><label for="fgts-sim">Sim</label></div>
+<div class="radio-option"><input type="radio" name="fgts" id="fgts-nao" value="nao"/><label for="fgts-nao">Não</label></div>
+</div></div>
+<button class="btn btn-dark" onclick="voltarEtapaProprietario(2)">← Voltar</button>
+<button class="btn btn-gold" onclick="proximaEtapaProprietario(4)">Próximo →</button>
+</div>
+<div id="proprietario-etapa-4" style="display:none;">
+<div class="form-section-title">Dados bancários</div>
+<div class="form-group"><label>Banco *</label><input type="text" id="f-banco" placeholder="Nome do banco" /></div>
+<div class="form-group"><label>Agência *</label><input type="text" id="f-agencia" placeholder="Número da agência" /></div>
+<div class="form-group"><label>Conta *</label><input type="text" id="f-conta" placeholder="Número da conta" /></div>
+<div class="form-group"><label>Chave PIX *</label><input type="text" id="f-chavePix" placeholder="Chave PIX"/></div>
+<button class="btn btn-dark" onclick="voltarEtapaProprietario(3)">← Voltar</button>
+<button class="btn btn-confirm" onclick="finalizarFormularioProprietario()">✅ Finalizar cadastro</button>
+</div>
+</div>
+</div>
+
+<!-- Formulário Comprador -->
+<div id="screen-form-comprador" class="screen">
+<button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
+<div class="card">
+<div class="section-header">Cadastro do Comprador</div>
+<div class="form-section-title">Dados pessoais</div>
+<div class="form-group"><label>Nome completo *</label><input type="text" id="fc-nome" placeholder="Digite seu nome completo"/></div>
+<div class="form-group"><label>Nacionalidade *</label><input type="text" id="fc-nacionalidade" placeholder="Ex.: Brasileiro(a)"/></div>
+<div class="form-group"><label>Estado civil *</label><select id="fc-estadoCivil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option><option>União estável</option></select></div>
+<div class="form-group"><label>Profissão *</label><input type="text" id="fc-profissao" placeholder="Digite sua profissão"/></div>
+<div class="form-group"><label>Número do RG (não obrigatório)</label><input type="text" id="fc-rg" placeholder="00.000.000-0"/></div>
+<div class="form-group"><label>Número do CPF *</label><input type="text" id="fc-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)"/></div>
+<div class="form-group"><label>Endereço completo com CEP *</label><input type="text" id="fc-endereco" placeholder="Rua, número, bairro, cidade - CEP"/></div>
+<div class="form-group"><label>E-mail *</label><input type="email" id="fc-email" placeholder="seu@email.com"/></div>
+<div class="form-group"><label>Telefone *</label><input type="tel" id="fc-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)"/></div>
+<div class="form-section-title">Dados bancários</div>
+<div class="form-group"><label>Banco *</label><input type="text" id="fc-banco" placeholder="Nome do banco"/></div>
+<div class="form-group"><label>Agência *</label><input type="text" id="fc-agencia" placeholder="Número da agência"/></div>
+<div class="form-group"><label>Conta *</label><input type="text" id="fc-conta" placeholder="Número da conta"/></div>
+<div class="form-group"><label>Chave PIX *</label><input type="text" id="fc-chavePix" placeholder="Chave PIX"/></div>
+<button class="btn btn-confirm" onclick="finalizarFormularioComprador()">✅ Finalizar cadastro</button>
+</div>
+</div>
+
+<!-- Formulário Inquilino -->
+<div id="screen-form-inquilino" class="screen">
+<button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
+<div class="card">
+<div class="section-header">Cadastro do Inquilino</div>
+<div class="form-section-title">Dados pessoais</div>
+<div class="form-group"><label>Nome completo *</label><input type="text" id="fi-nome" placeholder="Digite seu nome completo"/></div>
+<div class="form-group"><label>Nacionalidade *</label><input type="text" id="fi-nacionalidade" placeholder="Ex.: Brasileiro(a)"/></div>
+<div class="form-group"><label>Estado civil *</label><select id="fi-estadoCivil"><option value="">Selecione...</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Divorciado(a)</option><option>Viuvo(a)</option><option>União estável</option></select></div>
+<div class="form-group"><label>Profissão *</label><input type="text" id="fi-profissao" placeholder="Digite sua profissão"/></div>
+<div class="form-group"><label>Número do RG (não obrigatório)</label><input type="text" id="fi-rg" placeholder="00.000.000-0"/></div>
+<div class="form-group"><label>Número do CPF *</label><input type="text" id="fi-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)"/></div>
+<div class="form-group"><label>Endereço completo com CEP *</label><input type="text" id="fi-endereco" placeholder="Rua, número, bairro, cidade - CEP"/></div>
+<div class="form-group"><label>E-mail *</label><input type="email" id="fi-email" placeholder="seu@email.com"/></div>
+<div class="form-group"><label>Telefone *</label><input type="tel" id="fi-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)"/></div>
+<div class="form-group"><label>Além de você, quantas pessoas vão residir no imóvel? *</label><input type="number" id="fi-pessoas" min="0" placeholder="Ex.: 2"/></div>
+<div class="form-group"><label>Possui algum animal de estimação? *</label>
+<div class="radio-group">
+<div class="radio-option"><input type="radio" name="inquilino-pet" id="pet-sim" value="sim" onchange="togglePet()"/><label for="pet-sim">Sim</label></div>
+<div class="radio-option"><input type="radio" name="inquilino-pet" id="pet-nao" value="nao" onchange="togglePet()"/><label for="pet-nao">Não</label></div>
+</div></div>
+<div class="hidden-field" id="campo-pet-detalhe">
+<div class="form-group"><label>Se sim, informe quantos animais e o porte de cada um.</label><textarea id="fi-petDetalhe" placeholder="Ex.: 2 cachorros de porte médio"></textarea></div>
+</div>
+<div class="form-section-title">Dados bancários</div>
+<div class="form-group"><label>Banco *</label><input type="text" id="fi-banco" placeholder="Nome do banco"/></div>
+<div class="form-group"><label>Agência *</label><input type="text" id="fi-agencia" placeholder="Número da agência"/></div>
+<div class="form-group"><label>Conta *</label><input type="text" id="fi-conta" placeholder="Número da conta"/></div>
+<div class="form-group"><label>Chave PIX *</label><input type="text" id="fi-chavePix" placeholder="Chave PIX"/></div>
+<button class="btn btn-confirm" onclick="finalizarFormularioInquilino()">✅ Finalizar cadastro</button>
+</div>
+</div>
+
+<!-- Formulário Corretor -->
+<div id="screen-form-corretor" class="screen">
+<button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
+<div class="card">
+<div class="section-header">Cadastro do Corretor</div>
+<div class="form-section-title">Dados profissionais</div>
+<div class="form-group"><label>Nome completo *</label><input type="text" id="fcr-nome" placeholder="Digite seu nome completo"/></div>
+<div class="form-group"><label>Número do CPF *</label><input type="text" id="fcr-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)"/></div>
+<div class="form-group"><label>CRECI *</label><input type="text" id="fcr-creci" placeholder="Número do CRECI"/></div>
+<div class="form-group"><label>E-mail *</label><input type="email" id="fcr-email" placeholder="seu@email.com"/></div>
+<div class="form-group"><label>Telefone *</label><input type="tel" id="fcr-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)"/></div>
+<button class="btn btn-confirm" onclick="finalizarFormularioCorretor()">✅ Finalizar cadastro</button>
+</div>
+</div>
+
+<!-- Relatório -->
+<div id="screen-report" class="screen">
+<div class="card">
+<div class="report-header">
+<h2>Relatório de documentos</h2>
+<p style="color:#888;">Perfil: <strong id="report-perfil"></strong></p>
+<p style="color:#888;font-size:12px;" id="report-date"></p>
+</div>
+<div id="report-status" style="display:none;" class="status-box"></div>
+<div id="report-data"></div>
+<div class="form-section-title" style="margin-top:15px; margin-bottom:10px;">Documentos Anexados</div>
+<div id="report-docs"></div>
+<button class="btn btn-confirm" id="btn-enviar-email" onclick="enviarEmailNotificacao(true)">✉️ Reenviar por E-mail</button>
+<button class="btn btn-gold" onclick="gerarPDF()">📄 Gerar PDF</button>
+<button class="btn btn-dark" onclick="novoProcesso()">🔄 Novo processo</button>
+</div>
+</div>
+</div>
+
+<!-- Modal da câmera -->
+<div class="modal" id="camera-modal">
+<button class="modal-close" onclick="fecharCamera()">×</button>
+<div class="modal-content">
+<video id="camera-video" autoplay playsinline></video>
+<canvas id="camera-canvas" style="display:none;"></canvas>
+<button class="btn btn-gold" onclick="tirarFoto()">📸 Capturar foto</button>
+</div>
+</div>
+
+<!-- Carregamento -->
+<div class="loading-overlay" id="loading-overlay">
+<div class="loading-spinner"></div>
+<div class="loading-text" id="loading-text">Processando...</div>
+</div>
+
+<!-- Biblioteca PDF.js e jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }
+
+const perfis = {
+proprietario: { chave:"proprietario", nome:"Proprietário", texto:"Pegue os seguintes documentos ou anexe-os de forma digital:", docs:["RG com CPF ou CNH", "Comprovante de residência", "Certidão de estado civil"] },
+comprador: { chave:"comprador", nome:"Comprador", texto:"Pegue os seguintes documentos ou anexe-os de forma digital:", docs:["RG com CPF ou CNH", "Comprovante de residência", "Certidão de estado civil", "CTPS Digital", "FGTS Digital", "Recibo de entrega do Imposto de Renda", "Declaração completa do Imposto de Renda"] },
+inquilino: { chave:"inquilino", nome:"Inquilino", texto:"Pegue os seguintes documentos ou anexe-os de forma digital:", docs:["RG com CPF ou CNH", "Comprovante de residência", "Comprovante de Renda", "Recibo de entrega do Imposto de Renda", "Declaração completa do Imposto de Renda"] },
+corretor: { chave:"corretor", nome:"Corretor", texto:"Pegue os seguintes documentos ou anexe-os de forma digital:", docs:["RG com CPF ou CNH", "CRECI"] }
+};
+
+let perfilAtual = null;
+let indiceDoc = 0;
+let docsCapturados = []; 
+let paginasDocAtual = []; // Array de páginas para o doc que está sendo capturado
+let paginaTemporaria = null; // A foto ou PDF que acabou de ser tirado/anexado
+let cameraStream = null;
+let dadosFormulario = null;
+let etapaProprietario = 1;
+let isentoIR = false;
+
+const $ = id => document.getElementById(id);
+
+function mostrarLoading(t){ $("loading-text").innerText=t||"Processando..."; $("loading-overlay").classList.add("active"); }
+function esconderLoading(){ $("loading-overlay").classList.remove("active"); }
+
+function mostrarTela(id){ document.querySelectorAll(".screen").forEach(t=>t.classList.remove("active")); $(id).classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
+
+function voltarMain(){ pararCamera(); mostrarTela("screen-main"); }
+function voltarFormulario(){ 
+  if(perfilAtual && perfilAtual.chave==="proprietario"){ 
+    if(etapaProprietario>1){ voltarEtapaProprietario(etapaProprietario-1); } 
+    else { mostrarTela("screen-list"); }
+  } else { 
+    mostrarTela("screen-list"); 
+  } 
+}
+
+function selecionarPerfil(chave){ 
+  perfilAtual = perfis[chave]; 
+  indiceDoc = 0; 
+  docsCapturados = []; 
+  paginasDocAtual = [];
+  paginaTemporaria = null; 
+  dadosFormulario = null; 
+  isentoIR = false; 
+  $("list-title").textContent = "Documentos — " + perfilAtual.nome; 
+  $("list-text").textContent = perfilAtual.texto; 
+  const ul = $("list-items"); 
+  ul.innerHTML = ""; 
+  perfilAtual.docs.forEach(d => { const li = document.createElement("li"); li.textContent = d; ul.appendChild(li); }); 
+  mostrarTela("screen-list"); 
+}
+
+function iniciarCaptura(){ 
+  indiceDoc = 0; 
+  docsCapturados = []; 
+  paginasDocAtual = [];
+  paginaTemporaria = null; 
+  isentoIR = false; 
+  mostrarTela("screen-capture"); 
+  carregarProximoDocumento(); 
+}
+
+function carregarProximoDocumento(){ 
+  if(indiceDoc >= perfilAtual.docs.length){
+    concluirCaptura();
+    return;
+  } 
+  const d = perfilAtual.docs[indiceDoc]; 
+  $("doc-name").textContent = d; 
+  $("capture-progress").textContent = "Documento " + (indiceDoc + 1) + " de " + perfilAtual.docs.length; 
+  
+  paginasDocAtual = [];
+  paginaTemporaria = null;
+  resetarPreviewArea();
+  atualizarGaleriaPaginas();
+  
+  // Botão isenção de IR
+  if(d === "Recibo de entrega do Imposto de Renda"){ 
+    $("btn-nao-declara-ir").style.display = "block"; 
+  } else { 
+    $("btn-nao-declara-ir").style.display = "none"; 
+  } 
+}
+
+function resetarPreviewArea(){
+  $("preview-img").src = ""; 
+  $("preview-img").style.display = "none"; 
+  $("preview-pdf-icon").style.display = "none"; 
+  $("placeholder-text").textContent = paginasDocAtual.length === 0 
+    ? "Tire uma foto ou selecione o arquivo para adicionar uma página." 
+    : "Página salva! Você pode adicionar mais páginas ou avançar.";
+  $("placeholder-text").style.display = "block"; 
+  $("capture-btns").style.display = "block"; 
+  $("confirm-page-btns").style.display = "none"; 
+  $("fileInputHidden").value = ""; 
+
+  if(paginasDocAtual.length > 0){
+    $("btn-foto").textContent = "📷 Adicionar outra foto / página";
+    $("btn-anexo").textContent = "📎 Anexar outro arquivo";
+    $("next-doc-wrapper").style.display = "block";
+  } else {
+    $("btn-foto").textContent = "📷 Tirar foto";
+    $("btn-anexo").textContent = "📎 Anexar do arquivo";
+    $("next-doc-wrapper").style.display = "none";
+  }
+}
+
+function atualizarGaleriaPaginas(){
+  const wrapper = $("pages-gallery-wrapper");
+  const gallery = $("pages-gallery");
+  gallery.innerHTML = "";
+
+  if(paginasDocAtual.length === 0){
+    wrapper.style.display = "none";
+    return;
+  }
+
+  wrapper.style.display = "block";
+  $("pages-summary-text").textContent = `Páginas deste documento (${paginasDocAtual.length}):`;
+
+  paginasDocAtual.forEach((pag, idx) => {
+    const card = document.createElement("div");
+    card.className = "page-thumb-card";
+
+    let mediaHtml = pag.previewUrl 
+      ? `<img src="${pag.previewUrl}" alt="Pág ${idx+1}">`
+      : `<div class="pdf-icon">📄</div>`;
+
+    card.innerHTML = `
+      <button class="btn-remove-thumb" title="Remover esta página" onclick="removerPagina(${idx})">×</button>
+      ${mediaHtml}
+      <span class="page-label">Pág. ${idx+1}</span>
+    `;
+    gallery.appendChild(card);
+  });
+}
+
+function removerPagina(idx){
+  paginasDocAtual.splice(idx, 1);
+  atualizarGaleriaPaginas();
+  resetarPreviewArea();
+}
+
+function pularImpostoDeRenda(){ 
+  isentoIR = true; 
+  indiceDoc += 2; // Pula Recibo e Declaração
+  carregarProximoDocumento(); 
+}
+
+function concluirCaptura(){ 
+  if(perfilAtual.chave === "proprietario"){ 
+    abrirFormularioProprietario(); 
+  } else if(perfilAtual.chave === "comprador"){ 
+    mostrarTela("screen-form-comprador"); 
+  } else if(perfilAtual.chave === "inquilino"){ 
+    mostrarTela("screen-form-inquilino"); 
+  } else if(perfilAtual.chave === "corretor"){ 
+    mostrarTela("screen-form-corretor"); 
+  } 
+}
+
+function cancelarCaptura(){ 
+  pararCamera(); 
+  mostrarTela("screen-list"); 
+}
+
+// Câmera
+function abrirCamera(){ 
+  const m = $("camera-modal"); 
+  const v = $("camera-video"); 
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){ 
+    navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }})
+      .then(s => { cameraStream = s; v.srcObject = s; m.classList.add("active"); })
+      .catch(e => { alert("Não foi possível acessar a câmera: " + e.message); }); 
+  } else { 
+    alert("Seu navegador não suporta acesso direto à câmera."); 
+  } 
+}
+
+function pararCamera(){ 
+  if(cameraStream){ 
+    cameraStream.getTracks().forEach(t => t.stop()); 
+    cameraStream = null; 
+  } 
+}
+
+function fecharCamera(){ 
+  pararCamera(); 
+  $("camera-modal").classList.remove("active"); 
+}
+
+function tirarFoto(){ 
+  const v = $("camera-video"); 
+  const c = $("camera-canvas"); 
+  let w = v.videoWidth || 1280; 
+  let h = v.videoHeight || 720; 
+  const maxDim = 1280; 
+  if(w > maxDim || h > maxDim){ 
+    if(w > h){ h = Math.round((h * maxDim) / w); w = maxDim; } 
+    else { w = Math.round((w * maxDim) / h); h = maxDim; } 
+  } 
+  c.width = w; c.height = h; 
+  const ctx = c.getContext("2d"); 
+  ctx.drawImage(v, 0, 0, w, h); 
+  const dataUrl = c.toDataURL("image/jpeg", 0.85); 
+  fecharCamera(); 
+
+  paginaTemporaria = {
+    nome: "foto_camera.jpg", 
+    ext: "jpg", 
+    isPdf: false, 
+    previewUrl: dataUrl, 
+    fileBase64: dataUrl
+  }; 
+  exibirPreviaTemporaria(paginaTemporaria); 
+}
+
+function abrirGaleria(){ 
+  $("fileInputHidden").click(); 
+}
+
+function lerArquivoComoDataUrl(file){ 
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader(); 
+    r.onload = e => resolve(e.target.result); 
+    r.onerror = reject; 
+    r.readAsDataURL(file);
+  }); 
+}
+
+async function gerarPreviaPdf(file){ 
+  if(!window.pdfjsLib) return null; 
+  const buffer = await file.arrayBuffer(); 
+  const pdf = await pdfjsLib.getDocument({ data:buffer }).promise; 
+  const page = await pdf.getPage(1); 
+  const viewport = page.getViewport({ scale:1.0 }); 
+  const canvas = document.createElement("canvas"); 
+  const ctx = canvas.getContext("2d"); 
+  canvas.width = viewport.width; 
+  canvas.height = viewport.height; 
+  await page.render({ canvasContext: ctx, viewport: viewport }).promise; 
+  return canvas.toDataURL("image/jpeg", 0.75); 
+}
+
+async function arquivoSelecionado(e){ 
+  const file = e.target.files[0]; 
+  if(!file) return; 
+  mostrarLoading("Carregando arquivo..."); 
+  try { 
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"); 
+    const fullDataUrl = await lerArquivoComoDataUrl(file); 
+    let previewUrl = ""; 
+    let ext = file.name.split('.').pop().toLowerCase() || (isPdf ? "pdf" : "jpg"); 
+    if(isPdf){ 
+      try { previewUrl = await gerarPreviaPdf(file); } catch(err){ console.warn("Prévia PDF falhou:", err); } 
+    } else { 
+      previewUrl = fullDataUrl; 
+    } 
+    paginaTemporaria = {
+      nome: file.name, 
+      ext: ext, 
+      isPdf: isPdf, 
+      previewUrl: previewUrl, 
+      fileBase64: fullDataUrl
+    }; 
+    exibirPreviaTemporaria(paginaTemporaria); 
+  } catch(err){ 
+    console.error("Erro ao ler arquivo:", err); 
+    alert("Erro ao ler o arquivo: " + err.message); 
+  } finally { 
+    esconderLoading(); 
+  } 
+}
+
+function exibirPreviaTemporaria(item){ 
+  if(item.previewUrl){ 
+    $("preview-img").src = item.previewUrl; 
+    $("preview-img").style.display = "block"; 
+    $("preview-pdf-icon").style.display = "none"; 
+  } else if(item.isPdf){ 
+    $("preview-img").style.display = "none"; 
+    $("preview-pdf-icon").style.display = "block"; 
+  } 
+  $("placeholder-text").textContent = item.nome + (item.isPdf ? " (Documento PDF Completo)" : ""); 
+  $("placeholder-text").style.display = "block"; 
+  $("capture-btns").style.display = "none"; 
+  $("confirm-page-btns").style.display = "block"; 
+  $("next-doc-wrapper").style.display = "none";
+}
+
+function descartarPaginaAtual(){ 
+  paginaTemporaria = null; 
+  resetarPreviewArea(); 
+}
+
+function adicionarPaginaAoDocumento(){ 
+  if(paginaTemporaria){ 
+    paginasDocAtual.push(paginaTemporaria); 
+    paginaTemporaria = null; 
+  } 
+  atualizarGaleriaPaginas();
+  resetarPreviewArea();
+}
+
+function concluirDocumentoAtual(){ 
+  if(paginasDocAtual.length === 0){
+    alert("Por favor, adicione ao menos uma página/foto antes de avançar.");
+    return;
+  }
+  
+  docsCapturados.push({
+    tipo: perfilAtual.docs[indiceDoc],
+    paginas: [...paginasDocAtual]
+  });
+
+  indiceDoc++; 
+  carregarProximoDocumento(); 
+}
+
+// Formulários
+function abrirFormularioProprietario(){ 
+  etapaProprietario = 1; 
+  for(let i=1; i<=4; i++){ $("proprietario-etapa-"+i).style.display = "none"; } 
+  $("proprietario-etapa-1").style.display = "block"; 
+  atualizarProgressoProprietario(); 
+  mostrarTela("screen-form-proprietario"); 
+}
+
+function atualizarProgressoProprietario(){ 
+  $("proprietario-progress").textContent = "Etapa " + etapaProprietario + " de 4"; 
+}
+
+function mudarFinalidade(){ 
+  const f = document.querySelector('input[name="finalidade"]:checked'); 
+  if(!f) return; 
+  $("label-endereco-imovel").textContent = f.value === "locacao" 
+    ? "Endereço completo do imóvel a ser alugado *" 
+    : "Endereço completo do imóvel a ser vendido *"; 
+}
+
+function toggleFinanciamento(){ 
+  const f = document.querySelector('input[name="financiado"]:checked'); 
+  $("campo-banco-financiamento").style.display = (f && f.value === "sim") ? "block" : "none"; 
+}
+
+function togglePet(){ 
+  const f = document.querySelector('input[name="inquilino-pet"]:checked'); 
+  $("campo-pet-detalhe").style.display = (f && f.value === "sim") ? "block" : "none"; 
+}
+
+function valor(id){ return $(id).value.trim(); }
+
+function validarCampos(ids){ 
+  for(let id of ids){ 
+    const c = $(id); 
+    if(!c || !c.value.trim()){ 
+      alert("Preencha todos os campos obrigatórios."); 
+      c?.focus(); 
+      return false; 
+    } 
+  } 
+  return true; 
+}
+
+function proximaEtapaProprietario(novaEtapa){ 
+  if(etapaProprietario === 1){ 
+    const f = document.querySelector('input[name="finalidade"]:checked'); 
+    if(!f){ alert("Selecione se o imóvel é para locação ou venda."); return; } 
+  } 
+  if(etapaProprietario === 2){ 
+    const c = ["f-nome","f-nacionalidade","f-estadoCivil","f-profissao","f-cpf","f-endereco","f-email","f-telefone","f-enderecoImovel"]; 
+    if(!validarCampos(c)) return; 
+    const f = document.querySelector('input[name="finalidade"]:checked'); 
+    if(f && f.value === "locacao"){ novaEtapa = 4; } 
+  } 
+  if(etapaProprietario === 3){ 
+    const c = ["f-iptu","f-matricula","f-rgi"]; 
+    if(!validarCampos(c)) return; 
+    const fin = document.querySelector('input[name="financiado"]:checked'); 
+    if(!fin){ alert("Informe se o imóvel está financiado."); return; } 
+    const g = document.querySelector('input[name="fgts"]:checked'); 
+    if(!g){ alert("Informe se utilizou FGTS."); return; } 
+  } 
+  for(let i=1; i<=4; i++){ $("proprietario-etapa-"+i).style.display = "none"; } 
+  $("proprietario-etapa-"+novaEtapa).style.display = "block"; 
+  etapaProprietario = novaEtapa; 
+  atualizarProgressoProprietario(); 
+  window.scrollTo({top:0, behavior:"smooth"}); 
+}
+
+function voltarEtapaProprietario(etapaAnterior){ 
+  if(etapaProprietario === 4){ 
+    const f = document.querySelector('input[name="finalidade"]:checked'); 
+    if(f && f.value === "locacao"){ etapaAnterior = 2; } 
+  } 
+  for(let i=1; i<=4; i++){ $("proprietario-etapa-"+i).style.display = "none"; } 
+  $("proprietario-etapa-"+etapaAnterior).style.display = "block"; 
+  etapaProprietario = etapaAnterior; 
+  atualizarProgressoProprietario(); 
+  window.scrollTo({top:0, behavior:"smooth"}); 
+}
+
+function finalizarFormularioProprietario(){ 
+  const c = ["f-banco","f-agencia","f-conta","f-chavePix"]; 
+  if(!validarCampos(c)) return; 
+  const f = document.querySelector('input[name="finalidade"]:checked'); 
+  const financ = document.querySelector('input[name="financiado"]:checked'); 
+  const fgts = document.querySelector('input[name="fgts"]:checked'); 
+  
+  dadosFormulario = { 
+    "Finalidade": f?.value === "locacao" ? "Locação" : "Venda",
+    "Nome": valor("f-nome"),
+    "Nacionalidade": valor("f-nacionalidade"),
+    "Estado Civil": valor("f-estadoCivil"),
+    "Profissão": valor("f-profissao"),
+    "RG": valor("f-rg") || "Não informado",
+    "CPF": valor("f-cpf"),
+    "Endereço": valor("f-endereco"),
+    "E-mail": valor("f-email"),
+    "Telefone": valor("f-telefone"),
+    "Endereço do Imóvel": valor("f-enderecoImovel")
+  }; 
+  if(f?.value === "venda"){ 
+    dadosFormulario["IPTU"] = valor("f-iptu"); 
+    dadosFormulario["Matrícula RGI"] = valor("f-matricula"); 
+    dadosFormulario["Cartório RGI"] = valor("f-rgi"); 
+    dadosFormulario["Financiado"] = financ?.value || ""; 
+    if(financ?.value === "sim"){ 
+      dadosFormulario["Banco do Financiamento"] = valor("f-bancoFinanciamento"); 
+      dadosFormulario["Saldo Devedor"] = valor("f-saldoDevedor"); 
+    } 
+    dadosFormulario["Usou FGTS"] = fgts?.value || ""; 
+  } 
+  dadosFormulario["Banco"] = valor("f-banco"); 
+  dadosFormulario["Agência"] = valor("f-agencia"); 
+  dadosFormulario["Conta"] = valor("f-conta"); 
+  dadosFormulario["Chave PIX"] = valor("f-chavePix"); 
+  exibirRelatorio(); 
+}
+
+function finalizarFormularioComprador(){ 
+  const c = ["fc-nome","fc-nacionalidade","fc-estadoCivil","fc-profissao","fc-cpf","fc-endereco","fc-email","fc-telefone","fc-banco","fc-agencia","fc-conta","fc-chavePix"]; 
+  if(!validarCampos(c)) return; 
+  dadosFormulario = { 
+    "Nome": valor("fc-nome"), 
+    "Nacionalidade": valor("fc-nacionalidade"), 
+    "Estado Civil": valor("fc-estadoCivil"), 
+    "Profissão": valor("fc-profissao"), 
+    "RG": valor("fc-rg") || "Não informado", 
+    "CPF": valor("fc-cpf"), 
+    "Endereço": valor("fc-endereco"), 
+    "E-mail": valor("fc-email"), 
+    "Telefone": valor("fc-telefone"), 
+    "Declaração de IR": (isentoIR ? "Não declaro / Isento" : "Enviada"),
+    "Banco": valor("fc-banco"), 
+    "Agência": valor("fc-agencia"), 
+    "Conta": valor("fc-conta"), 
+    "Chave PIX": valor("fc-chavePix") 
+  }; 
+  exibirRelatorio(); 
+}
+
+function finalizarFormularioInquilino(){ 
+  const c = ["fi-nome","fi-nacionalidade","fi-estadoCivil","fi-profissao","fi-cpf","fi-endereco","fi-email","fi-telefone","fi-pessoas","fi-banco","fi-agencia","fi-conta","fi-chavePix"]; 
+  if(!validarCampos(c)) return; 
+  const pet = document.querySelector('input[name="inquilino-pet"]:checked'); 
+  if(!pet){ alert("Informe se possui animais de estimação."); return; } 
+  dadosFormulario = { 
+    "Nome": valor("fi-nome"), 
+    "Nacionalidade": valor("fi-nacionalidade"), 
+    "Estado Civil": valor("fi-estadoCivil"), 
+    "Profissão": valor("fi-profissao"), 
+    "RG": valor("fi-rg") || "Não informado", 
+    "CPF": valor("fi-cpf"), 
+    "Endereço": valor("fi-endereco"), 
+    "E-mail": valor("fi-email"), 
+    "Telefone": valor("fi-telefone"), 
+    "Moradores adicionais": valor("fi-pessoas"), 
+    "Possui Pet": (pet?.value === "sim") ? "Sim" : "Não", 
+    "Declaração de IR": (isentoIR ? "Não declaro / Isento" : "Enviada") 
+  }; 
+  if(pet?.value === "sim"){ 
+    dadosFormulario["Detalhes do Pet"] = valor("fi-petDetalhe"); 
+  } 
+  dadosFormulario["Banco"] = valor("fi-banco"); 
+  dadosFormulario["Agência"] = valor("fi-agencia"); 
+  dadosFormulario["Conta"] = valor("fi-conta"); 
+  dadosFormulario["Chave Pix"] = valor("fi-chavePix"); 
+  exibirRelatorio(); 
+}
+
+function finalizarFormularioCorretor(){ 
+  const c = ["fcr-nome","fcr-cpf","fcr-creci","fcr-email","fcr-telefone"]; 
+  if(!validarCampos(c)) return; 
+  dadosFormulario = { 
+    "Nome": valor("fcr-nome"), 
+    "CPF": valor("fcr-cpf"), 
+    "CRECI": valor("fcr-creci"), 
+    "E-mail": valor("fcr-email"), 
+    "Telefone": valor("fcr-telefone") 
+  }; 
+  exibirRelatorio(); 
+}
+
+// Exibição do Relatório
+function exibirRelatorio(){ 
+  $("report-perfil").textContent = perfilAtual.nome; 
+  $("report-date").textContent = "Data: " + new Date().toLocaleString("pt-BR"); 
+  const statusEl = $("report-status"); 
+  statusEl.style.display = "none"; 
+  const containerDados = $("report-data"); 
+  containerDados.innerHTML = ""; 
+  
+  if(dadosFormulario){ 
+    const div = document.createElement("div"); 
+    div.className = "report-data-block"; 
+    let html = "<h3>Dados Cadastrais</h3>"; 
+    for(const [k,v] of Object.entries(dadosFormulario)){ 
+      html += `\n<div class="report-data-row"><span class="label">${k}:</span><span class="value">${v}</span></div>\n`; 
+    } 
+    div.innerHTML = html; 
+    containerDados.appendChild(div); 
+  } 
+  
+  const containerDocs = $("report-docs"); 
+  containerDocs.innerHTML = ""; 
+
+  docsCapturados.forEach((d, i) => { 
+    const rdiv = document.createElement("div"); 
+    rdiv.className = "report-item"; 
+    
+    let pagesHtml = "";
+    d.paginas.forEach((p, pIdx) => {
+      if(p.previewUrl){
+        pagesHtml += `<img src="${p.previewUrl}" class="report-page-thumb" alt="Pág ${pIdx+1}" title="Página ${pIdx+1}">`;
+      } else {
+        pagesHtml += `<div class="report-page-icon" title="Página ${pIdx+1}">📄<span style="font-size:9px;">Pág. ${pIdx+1}</span></div>`;
+      }
+    });
+
+    rdiv.innerHTML = `
+      <div class="report-item-title">
+        <span>${i + 1}. ${d.tipo}</span>
+        <span class="report-badge">${d.paginas.length} ${d.paginas.length > 1 ? "páginas" : "página"}</span>
+      </div>
+      <div class="report-item-pages">
+        ${pagesHtml}
+      </div>
+    `; 
+    containerDocs.appendChild(rdiv); 
+  }); 
+
+  if(isentoIR){ 
+    const divIR = document.createElement("div"); 
+    divIR.className = "status-box status-info"; 
+    divIR.style.textAlign = "left"; 
+    divIR.style.fontSize = "12px"; 
+    divIR.innerHTML = "ℹ️ <strong>Imposto de Renda:</strong> Cliente informou ser isento / não declarante de IR."; 
+    containerDocs.appendChild(divIR); 
+  } 
+  
+  mostrarTela("screen-report"); 
+  enviarEmailNotificacao(false); 
+}
+
+function carregarDimensoesImagem(src){
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.width, h: img.height });
+    img.onerror = () => resolve({ w: 0, h: 0 });
+    img.src = src;
+  });
+}
+
+// Criação do Documento PDF unificado com todas as páginas
+async function criarDocumentoPDF(){ 
+  if(!window.jspdf) return null; 
+  const { jsPDF } = window.jspdf; 
+  const doc = new jsPDF("p", "mm", "a4"); 
+  let y = 20; 
+
+  // Capa / Dados Cadastrais
+  doc.setFillColor(26, 26, 26); 
+  doc.rect(0, 0, 210, 24, "F"); 
+  doc.setTextColor(212, 175, 55); 
+  doc.setFontSize(15); 
+  doc.setFont("helvetica", "bold"); 
+  doc.text("M&IC CORRETORES DE IMÓVEIS", 105, 11, { align: "center" }); 
+  doc.setTextColor(255, 255, 255); 
+  doc.setFontSize(9); 
+  doc.setFont("helvetica", "normal"); 
+  doc.text("Relatório Cadastral de Documentos", 105, 18, { align: "center" }); 
+
+  y = 35; 
+  doc.setTextColor(26, 26, 26); 
+  doc.setFontSize(11); 
+  doc.setFont("helvetica", "bold"); 
+  doc.text("Perfil: " + (perfilAtual ? perfilAtual.nome : ""), 15, y); 
+  y += 6; 
+  doc.setFontSize(9); 
+  doc.setFont("helvetica", "normal"); 
+  doc.setTextColor(110, 110, 110); 
+  doc.text("Emitido em: " + new Date().toLocaleString("pt-BR"), 15, y); 
+  y += 10; 
+
+  if(dadosFormulario){ 
+    doc.setDrawColor(212, 175, 55); 
+    doc.setLineWidth(0.6); 
+    doc.line(15, y, 195, y); 
+    y += 8; 
+    doc.setFontSize(12); 
+    doc.setTextColor(26, 26, 26); 
+    doc.setFont("helvetica", "bold"); 
+    doc.text("Dados Cadastrais", 15, y); 
+    y += 7; 
+    doc.setFontSize(9); 
+    doc.setFont("helvetica", "normal"); 
+
+    for(const [k, v] of Object.entries(dadosFormulario)){ 
+      if(y > 270){ doc.addPage(); y = 20; } 
+      doc.setTextColor(110, 110, 110); 
+      doc.text(k + ":", 15, y); 
+      doc.setTextColor(26, 26, 26); 
+      const linhas = doc.splitTextToSize(String(v), 125); 
+      doc.text(linhas, 65, y); 
+      y += (linhas.length * 4.2) + 2; 
+    } 
+  } 
+
+  // Itera por cada documento e por cada página anexada
+  for(let i = 0; i < docsCapturados.length; i++){ 
+    const d = docsCapturados[i]; 
+    for(let p = 0; p < d.paginas.length; p++){
+      const pag = d.paginas[p];
+      doc.addPage(); 
+      doc.setFillColor(26, 26, 26); 
+      doc.rect(0, 0, 210, 18, "F"); 
+      doc.setTextColor(212, 175, 55); 
+      doc.setFontSize(11); 
+      doc.setFont("helvetica", "bold"); 
+      doc.text(`${i + 1}. ${d.tipo} (Página ${p + 1} de ${d.paginas.length})`, 15, 12); 
+
+      if(pag.previewUrl){ 
+        try { 
+          const dims = await carregarDimensoesImagem(pag.previewUrl); 
+          const maxW = 160; 
+          const maxH = 220; 
+          let finalW = maxW; 
+          let finalH = maxH; 
+
+          if(dims.w > 0 && dims.h > 0){ 
+            const ratio = dims.w / dims.h; 
+            if(ratio > (maxW / maxH)){ 
+              finalW = maxW; 
+              finalH = maxW / ratio; 
+            } else { 
+              finalH = maxH; 
+              finalW = maxH * ratio; 
+            } 
+          } 
+
+          const px = (210 - finalW) / 2; 
+          const py = 28 + ((maxH - finalH) / 2); 
+          doc.setDrawColor(220, 220, 220); 
+          doc.setLineWidth(0.4); 
+          doc.rect(px - 1, py - 1, finalW + 2, finalH + 2); 
+          doc.addImage(pag.previewUrl, "JPEG", px, py, finalW, finalH, undefined, "FAST"); 
+          doc.setFontSize(8); 
+          doc.setTextColor(140, 140, 140); 
+          doc.text(`${pag.nome || "página"} ${pag.isPdf ? "(PDF original)" : ""}`, 105, py + finalH + 6, { align: "center" }); 
+        } catch(e){ 
+          console.error("Erro na imagem do PDF", e); 
+          doc.setTextColor(200, 0, 0); 
+          doc.text("Não foi possível renderizar a imagem desta página.", 15, 40); 
+        } 
+      } else { 
+        doc.setTextColor(60, 60, 60); 
+        doc.setFontSize(11); 
+        doc.text("Arquivo anexado:", 15, 38); 
+        doc.setFont("helvetica", "bold"); 
+        doc.text(pag.nome || (pag.isPdf ? "arquivo.pdf" : "Documento"), 15, 46); 
+      } 
+    }
+  } 
+  return doc; 
+}
+
+// Disparo de E-mail
+async function enviarEmailNotificacao(emReenvio){ 
+  mostrarLoading("Enviando e-mail com relatório e anexos..."); 
+  const ele = $("report-status"); 
+  try { 
+    const anexos = []; 
+    let contAnexos = 0;
+
+    // Constrói anexos desmembrados
+    docsCapturados.forEach((d, i) => { 
+      const nomeDocNormalizado = (d.tipo || "documento")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "_");
+
+      d.paginas.forEach((p, pIdx) => {
+        contAnexos++;
+        const base64 = p.fileBase64.includes("base64,") ? p.fileBase64.split("base64,")[1] : p.fileBase64; 
+        const ext = p.ext || (p.isPdf ? "pdf" : "jpg"); 
+        anexos.push({ 
+          filename: `${i + 1}_${nomeDocNormalizado}_pag${pIdx + 1}.${ext}`, 
+          content: base64 
+        }); 
+      });
+    }); 
+
+    // Relatório consolidado em PDF
+    let relatorioPDF = null; 
+    try { 
+      relatorioPDF = await criarDocumentoPDF(); 
+    } catch(e){ 
+      console.warn("Falha ao gerar relatório PDF:", e); 
+    } 
+
+    if(relatorioPDF){ 
+      const dataUri = relatorioPDF.output("datauristring"); 
+      const base64 = dataUri.split("base64,")[1]; 
+      const nomeRelatorio = `00_Relatorio_Final_${perfilAtual?.chave || "cadastro"}.pdf`; 
+      anexos.unshift({ filename: nomeRelatorio, content: base64 }); 
+    } 
+
+    let linhasTabela = ""; 
+    if(dadosFormulario){ 
+      for(const [k, v] of Object.entries(dadosFormulario)){ 
+        linhasTabela += `<tr><td style="padding:8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:35%;">${k}</td><td style="padding:8px;border:1px solid #ddd;">${v}</td></tr>`; 
+      } 
+    } 
+
+    const htmlEmail = `
+      <div style="font-family:Arial,sans-serif; max-width:650px; margin:0 auto; color:#333;">
+        <div style="background:#1a1a1a; padding:20px; text-align:center; border-bottom:4px solid #d4af37;">
+          <h2 style="color:#d4af37; margin:0; text-transform:uppercase;">M&IC Corretores de Imóveis</h2>
+          <p style="color:#fff; margin:5px 0 0; font-size:13px;">Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}</p>
         </div>
-
-        <!-- LISTA DE DOCUMENTOS -->
-        <div id="screen-list" class="screen">
-            <button class="btn-back" onclick="voltarMain()">← Voltar</button>
-
-            <div class="card">
-                <div class="section-header" id="list-title">Documentos</div>
-
-                <div class="instruction">
-                    <strong id="list-text"></strong>
-                    <ul id="list-items"></ul>
-                </div>
-
-                <button class="btn btn-gold" onclick="iniciarCaptura()">
-                    📷 Iniciar captura
-                </button>
-            </div>
+        <div style="padding:20px; background:#fff;">
+          <p style="font-size:15px;">O cadastro foi finalizado no sistema web.</p>
+          <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">${linhasTabela}</table>
+          <div style="margin-top:25px; padding:15px; background:#fdf8e2; border-left:4px solid #d4af37;">
+            <strong style="color:#856404;">📎 Arquivos anexados:</strong>
+            <p style="margin:5px 0 0; font-size:13px; color:#555;">Foram capturadas <strong>${contAnexos} páginas/arquivos originais</strong> organizados neste e-mail junto ao PDF resumo.</p>
+          </div>
         </div>
-
-        <!-- CAPTURA DE DOCUMENTOS -->
-        <div id="screen-capture" class="screen">
-            <button class="btn-back" onclick="cancelarCaptura()">← Cancelar</button>
-
-            <div class="card">
-                <div class="doc-progress" id="capture-progress"></div>
-                <div class="doc-name" id="doc-name">Documento</div>
-
-                <div class="capture-area">
-                    <img id="preview-img" alt="Pré-visualização" style="display:none;">
-                    <div id="preview-pdf-icon" style="display:none; font-size:42px; margin-bottom:8px;">📄</div>
-                    <p id="placeholder-text">
-                        Use os botões abaixo para tirar uma foto ou anexar o documento.
-                    </p>
-                </div>
-
-                <div id="capture-btns">
-                    <button class="btn btn-gold" onclick="abrirCamera()">
-                        📷 Tirar foto
-                    </button>
-
-                    <button class="btn btn-dark" onclick="abrirGaleria()">
-                        📎 Anexar da galeria / Arquivo
-                    </button>
-
-                    <!-- Botão condicional de não declaração do IR -->
-                    <button class="btn btn-neutral" id="btn-nao-declara-ir" style="display:none;" onclick="pularImpostoDeRenda()">
-                        🚫 Não declaro Imposto de Renda (Isento)
-                    </button>
-                </div>
-
-                <div id="confirm-btns" style="display:none;">
-                    <button class="btn btn-confirm" onclick="confirmarDocumento()">
-                        ✅ Confirmar
-                    </button>
-
-                    <button class="btn btn-danger" onclick="refazerDocumento()">
-                        🔄 Refazer
-                    </button>
-                </div>
-
-                <input
-                    type="file"
-                    id="fileInputHidden"
-                    accept="image/*,application/pdf"
-                    onchange="arquivoSelecionado(event)"
-                >
-            </div>
-        </div>
-
-        <!-- FORMULÁRIO DO PROPRIETÁRIO -->
-        <div id="screen-form-proprietario" class="screen">
-            <button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
-
-            <div class="card">
-                <div class="section-header">Cadastro do Proprietário</div>
-
-                <div class="form-progress" id="proprietario-progress">
-                    Etapa 1 de 4
-                </div>
-
-                <!-- ETAPA 1 -->
-                <div id="proprietario-etapa-1">
-                    <div class="form-section-title">Finalidade do imóvel</div>
-
-                    <div class="form-group">
-                        <label>Seu imóvel é para locação ou venda?</label>
-
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input
-                                    type="radio"
-                                    name="finalidade"
-                                    id="finalidade-locacao"
-                                    value="locacao"
-                                    onchange="mudarFinalidade()"
-                                >
-                                <label for="finalidade-locacao">🔑 Locação</label>
-                            </div>
-
-                            <div class="radio-option">
-                                <input
-                                    type="radio"
-                                    name="finalidade"
-                                    id="finalidade-venda"
-                                    value="venda"
-                                    onchange="mudarFinalidade()"
-                                >
-                                <label for="finalidade-venda">🏷️ Venda</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-gold" onclick="proximaEtapaProprietario(2)">
-                        Próximo →
-                    </button>
-                </div>
-
-                <!-- ETAPA 2 -->
-                <div id="proprietario-etapa-2" style="display:none;">
-                    <div class="form-section-title">Dados pessoais</div>
-
-                    <div class="form-group">
-                        <label>Nome completo *</label>
-                        <input type="text" id="f-nome" placeholder="Digite seu nome completo">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Nacionalidade *</label>
-                        <input type="text" id="f-nacionalidade" placeholder="Ex.: Brasileiro(a)">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Estado civil *</label>
-                        <select id="f-estadoCivil">
-                            <option value="">Selecione...</option>
-                            <option>Solteiro(a)</option>
-                            <option>Casado(a)</option>
-                            <option>Divorciado(a)</option>
-                            <option>Viúvo(a)</option>
-                            <option>União estável</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Profissão *</label>
-                        <input type="text" id="f-profissao" placeholder="Digite sua profissão">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número do RG (não obrigatório)</label>
-                        <input type="text" id="f-rg" placeholder="00.000.000-0">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número do CPF *</label>
-                        <input type="text" id="f-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Endereço completo com CEP *</label>
-                        <input type="text" id="f-endereco" placeholder="Rua, número, bairro, cidade - CEP">
-                    </div>
-
-                    <div class="form-group">
-                        <label>E-mail *</label>
-                        <input type="email" id="f-email" placeholder="seu@email.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Telefone *</label>
-                        <input type="tel" id="f-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-                    </div>
-
-                    <div class="form-group">
-                        <label id="label-endereco-imovel">
-                            Endereço completo do imóvel *
-                        </label>
-                        <textarea id="f-enderecoImovel" placeholder="Endereço completo do imóvel"></textarea>
-                    </div>
-
-                    <button class="btn btn-dark" onclick="voltarEtapaProprietario(1)">
-                        ← Voltar
-                    </button>
-
-                    <button class="btn btn-gold" onclick="proximaEtapaProprietario(3)">
-                        Próximo →
-                    </button>
-                </div>
-
-                <!-- ETAPA 3 -->
-                <div id="proprietario-etapa-3" style="display:none;">
-                    <div class="form-section-title">Dados do imóvel para venda</div>
-
-                    <div class="form-group">
-                        <label>Número do IPTU *</label>
-                        <input type="text" id="f-iptu" placeholder="Número do IPTU">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número da matrícula do imóvel no RGI *</label>
-                        <input type="text" id="f-matricula" placeholder="Número da matrícula">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número do Cartório de Registro de Imóveis (RGI) *</label>
-                        <input type="text" id="f-rgi" placeholder="Número do RGI">
-                    </div>
-
-                    <div class="form-group">
-                        <label>O imóvel está financiado? *</label>
-
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input
-                                    type="radio"
-                                    name="financiado"
-                                    id="financiado-sim"
-                                    value="sim"
-                                    onchange="toggleFinanciamento()"
-                                >
-                                <label for="financiado-sim">Sim</label>
-                            </div>
-
-                            <div class="radio-option">
-                                <input
-                                    type="radio"
-                                    name="financiado"
-                                    id="financiado-nao"
-                                    value="nao"
-                                    onchange="toggleFinanciamento()"
-                                >
-                                <label for="financiado-nao">Não</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="hidden-field" id="campo-banco-financiamento">
-                        <div class="form-group">
-                            <label>Se estiver financiado, por qual banco?</label>
-                            <input type="text" id="f-bancoFinanciamento" placeholder="Nome do banco">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Qual é o valor exato do saldo devedor?</label>
-                            <input
-                                type="text"
-                                id="f-saldoDevedor"
-                                placeholder="R$ 0,00"
-                                oninput="mascaraMoeda(this)"
-                            >
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Foi utilizado o FGTS para a compra do imóvel? *</label>
-
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="fgts" id="fgts-sim" value="sim">
-                                <label for="fgts-sim">Sim</label>
-                            </div>
-
-                            <div class="radio-option">
-                                <input type="radio" name="fgts" id="fgts-nao" value="nao">
-                                <label for="fgts-nao">Não</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-dark" onclick="voltarEtapaProprietario(2)">
-                        ← Voltar
-                    </button>
-
-                    <button class="btn btn-gold" onclick="proximaEtapaProprietario(4)">
-                        Próximo →
-                    </button>
-                </div>
-
-                <!-- ETAPA 4 -->
-                <div id="proprietario-etapa-4" style="display:none;">
-                    <div class="form-section-title">Dados bancários</div>
-
-                    <div class="form-group">
-                        <label>Banco *</label>
-                        <input type="text" id="f-banco" placeholder="Nome do banco">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Agência *</label>
-                        <input type="text" id="f-agencia" placeholder="Número da agência">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Conta *</label>
-                        <input type="text" id="f-conta" placeholder="Número da conta">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Chave PIX *</label>
-                        <input type="text" id="f-chavePix" placeholder="Chave PIX">
-                    </div>
-
-                    <button class="btn btn-dark" onclick="voltarEtapaProprietario(3)">
-                        ← Voltar
-                    </button>
-
-                    <button class="btn btn-confirm" onclick="finalizarFormularioProprietario()">
-                        ✅ Finalizar cadastro
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- FORMULÁRIO DO COMPRADOR -->
-        <div id="screen-form-comprador" class="screen">
-            <button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
-
-            <div class="card">
-                <div class="section-header">Cadastro do Comprador</div>
-
-                <div class="form-section-title">Dados pessoais</div>
-
-                <div class="form-group">
-                    <label>Nome completo *</label>
-                    <input type="text" id="fc-nome" placeholder="Digite seu nome completo">
-                </div>
-
-                <div class="form-group">
-                    <label>Nacionalidade *</label>
-                    <input type="text" id="fc-nacionalidade" placeholder="Ex.: Brasileiro(a)">
-                </div>
-
-                <div class="form-group">
-                    <label>Estado civil *</label>
-                    <select id="fc-estadoCivil">
-                        <option value="">Selecione...</option>
-                        <option>Solteiro(a)</option>
-                        <option>Casado(a)</option>
-                        <option>Divorciado(a)</option>
-                        <option>Viúvo(a)</option>
-                        <option>União estável</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Profissão *</label>
-                    <input type="text" id="fc-profissao" placeholder="Digite sua profissão">
-                </div>
-
-                <div class="form-group">
-                    <label>Número do RG (não obrigatório)</label>
-                    <input type="text" id="fc-rg" placeholder="00.000.000-0">
-                </div>
-
-                <div class="form-group">
-                    <label>Número do CPF *</label>
-                    <input type="text" id="fc-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)">
-                </div>
-
-                <div class="form-group">
-                    <label>Endereço completo com CEP *</label>
-                    <input type="text" id="fc-endereco" placeholder="Rua, número, bairro, cidade - CEP">
-                </div>
-
-                <div class="form-group">
-                    <label>E-mail *</label>
-                    <input type="email" id="fc-email" placeholder="seu@email.com">
-                </div>
-
-                <div class="form-group">
-                    <label>Telefone *</label>
-                    <input type="tel" id="fc-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-                </div>
-
-                <div class="form-section-title">Dados bancários</div>
-
-                <div class="form-group">
-                    <label>Banco *</label>
-                    <input type="text" id="fc-banco" placeholder="Nome do banco">
-                </div>
-
-                <div class="form-group">
-                    <label>Agência *</label>
-                    <input type="text" id="fc-agencia" placeholder="Número da agência">
-                </div>
-
-                <div class="form-group">
-                    <label>Conta *</label>
-                    <input type="text" id="fc-conta" placeholder="Número da conta">
-                </div>
-
-                <div class="form-group">
-                    <label>Chave PIX *</label>
-                    <input type="text" id="fc-chavePix" placeholder="Chave PIX">
-                </div>
-
-                <button class="btn btn-confirm" onclick="finalizarFormularioComprador()">
-                    ✅ Finalizar cadastro
-                </button>
-            </div>
-        </div>
-
-        <!-- FORMULÁRIO DO INQUILINO -->
-        <div id="screen-form-inquilino" class="screen">
-            <button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
-
-            <div class="card">
-                <div class="section-header">Cadastro do Inquilino</div>
-
-                <div class="form-section-title">Dados pessoais</div>
-
-                <div class="form-group">
-                    <label>Nome completo *</label>
-                    <input type="text" id="fi-nome" placeholder="Digite seu nome completo">
-                </div>
-
-                <div class="form-group">
-                    <label>Nacionalidade *</label>
-                    <input type="text" id="fi-nacionalidade" placeholder="Ex.: Brasileiro(a)">
-                </div>
-
-                <div class="form-group">
-                    <label>Estado civil *</label>
-                    <select id="fi-estadoCivil">
-                        <option value="">Selecione...</option>
-                        <option>Solteiro(a)</option>
-                        <option>Casado(a)</option>
-                        <option>Divorciado(a)</option>
-                        <option>Viúvo(a)</option>
-                        <option>União estável</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Profissão *</label>
-                    <input type="text" id="fi-profissao" placeholder="Digite sua profissão">
-                </div>
-
-                <div class="form-group">
-                    <label>Número do RG (não obrigatório)</label>
-                    <input type="text" id="fi-rg" placeholder="00.000.000-0">
-                </div>
-
-                <div class="form-group">
-                    <label>Número do CPF *</label>
-                    <input type="text" id="fi-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)">
-                </div>
-
-                <div class="form-group">
-                    <label>Endereço completo com CEP *</label>
-                    <input type="text" id="fi-endereco" placeholder="Rua, número, bairro, cidade - CEP">
-                </div>
-
-                <div class="form-group">
-                    <label>E-mail *</label>
-                    <input type="email" id="fi-email" placeholder="seu@email.com">
-                </div>
-
-                <div class="form-group">
-                    <label>Telefone *</label>
-                    <input type="tel" id="fi-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-                </div>
-
-                <div class="form-group">
-                    <label>Além de você, quantas pessoas vão residir no imóvel? *</label>
-                    <input type="number" id="fi-pessoas" min="0" placeholder="Ex.: 2">
-                </div>
-
-                <div class="form-group">
-                    <label>Possui algum animal de estimação? *</label>
-
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="inquilino-pet"
-                                id="pet-sim"
-                                value="sim"
-                                onchange="togglePet()"
-                            >
-                            <label for="pet-sim">Sim</label>
-                        </div>
-
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="inquilino-pet"
-                                id="pet-nao"
-                                value="nao"
-                                onchange="togglePet()"
-                            >
-                            <label for="pet-nao">Não</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hidden-field" id="campo-pet-detalhe">
-                    <div class="form-group">
-                        <label>Se sim, informe quantos animais e o porte de cada um.</label>
-                        <textarea
-                            id="fi-petDetalhe"
-                            placeholder="Ex.: 2 cachorros de porte médio"
-                        ></textarea>
-                    </div>
-                </div>
-
-                <div class="form-section-title">Dados bancários</div>
-
-                <div class="form-group">
-                    <label>Banco *</label>
-                    <input type="text" id="fi-banco" placeholder="Nome do banco">
-                </div>
-
-                <div class="form-group">
-                    <label>Agência *</label>
-                    <input type="text" id="fi-agencia" placeholder="Número da agência">
-                </div>
-
-                <div class="form-group">
-                    <label>Conta *</label>
-                    <input type="text" id="fi-conta" placeholder="Número da conta">
-                </div>
-
-                <div class="form-group">
-                    <label>Chave PIX *</label>
-                    <input type="text" id="fi-chavePix" placeholder="Chave PIX">
-                </div>
-
-                <button class="btn btn-confirm" onclick="finalizarFormularioInquilino()">
-                    ✅ Finalizar cadastro
-                </button>
-            </div>
-        </div>
-
-        <!-- FORMULÁRIO DO CORRETOR -->
-        <div id="screen-form-corretor" class="screen">
-            <button class="btn-back" onclick="voltarFormulario()">← Voltar</button>
-
-            <div class="card">
-                <div class="section-header">Cadastro do Corretor</div>
-
-                <div class="form-section-title">Dados profissionais</div>
-
-                <div class="form-group">
-                    <label>Nome completo *</label>
-                    <input type="text" id="fcr-nome" placeholder="Digite seu nome completo">
-                </div>
-
-                <div class="form-group">
-                    <label>Número do CPF *</label>
-                    <input type="text" id="fcr-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)">
-                </div>
-
-                <div class="form-group">
-                    <label>CRECI *</label>
-                    <input type="text" id="fcr-creci" placeholder="Número do CRECI">
-                </div>
-
-                <div class="form-group">
-                    <label>E-mail *</label>
-                    <input type="email" id="fcr-email" placeholder="seu@email.com">
-                </div>
-
-                <div class="form-group">
-                    <label>Telefone *</label>
-                    <input type="tel" id="fcr-telefone" placeholder="(00) 00000-0000" oninput="mascaraTelefone(this)">
-                </div>
-
-                <button class="btn btn-confirm" onclick="finalizarFormularioCorretor()">
-                    ✅ Finalizar cadastro
-                </button>
-            </div>
-        </div>
-
-        <!-- RELATÓRIO -->
-        <div id="screen-report" class="screen">
-            <div class="card">
-                <div class="report-header">
-                    <h2>Relatório de documentos</h2>
-                    <p style="color:#888;">
-                        Perfil: <strong id="report-perfil"></strong>
-                    </p>
-                    <p style="color:#888;font-size:12px;" id="report-date"></p>
-                </div>
-
-                <div id="report-status" style="display:none;" class="status-box"></div>
-                <div id="report-data"></div>
-
-                <div class="form-section-title" style="margin-top:15px; margin-bottom:10px;">
-                    Documentos Anexados
-                </div>
-                <div id="report-docs"></div>
-
-                <button class="btn btn-confirm" id="btn-enviar-email" onclick="enviarEmailNotificacao(true)">
-                    ✉️ Reenviar por E-mail
-                </button>
-
-                <button class="btn btn-gold" onclick="gerarPDF()">
-                    📄 Gerar PDF
-                </button>
-
-                <button class="btn btn-dark" onclick="novoProcesso()">
-                    🔄 Novo processo
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DA CÂMERA -->
-    <div class="modal" id="camera-modal">
-        <button class="modal-close" onclick="fecharCamera()">×</button>
-
-        <div class="modal-content">
-            <video id="camera-video" autoplay playsinline></video>
-            <canvas id="camera-canvas" style="display:none;"></canvas>
-
-            <button class="btn btn-gold" onclick="tirarFoto()">
-                📸 Capturar foto
-            </button>
-        </div>
-    </div>
-
-    <!-- CARREGAMENTO -->
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text" id="loading-text">Processando...</div>
-    </div>
-
-    <!-- Bibliotecas PDF.js e jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-    <script>
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-        }
-
-        const perfis = {
-            proprietario: {
-                chave: "proprietario",
-                nome: "Proprietário",
-                texto: "Pegue os seguintes documentos ou anexe-os de forma digital:",
-                docs: [
-                    "RG com CPF ou CNH",
-                    "Comprovante de residência",
-                    "Certidão de estado civil"
-                ]
-            },
-            comprador: {
-                chave: "comprador",
-                nome: "Comprador",
-                texto: "Pegue os seguintes documentos ou anexe-os de forma digital:",
-                docs: [
-                    "RG com CPF ou CNH",
-                    "Comprovante de residência",
-                    "Certidão de estado civil",
-                    "CTPS Digital",
-                    "FGTS Digital",
-                    "Recibo de entrega do Imposto de Renda",
-                    "Declaração completa do Imposto de Renda"
-                ]
-            },
-            inquilino: {
-                chave: "inquilino",
-                nome: "Inquilino",
-                texto: "Pegue os seguintes documentos ou anexe-os de forma digital:",
-                docs: [
-                    "RG com CPF ou CNH",
-                    "Comprovante de residência",
-                    "Comprovante de Renda",
-                    "Recibo de entrega do Imposto de Renda",
-                    "Declaração completa do Imposto de Renda"
-                ]
-            },
-            corretor: {
-                chave: "corretor",
-                nome: "Corretor",
-                texto: "Pegue os seguintes documentos ou anexe-os de forma digital:",
-                docs: [
-                    "RG com CPF ou CNH",
-                    "CRECI"
-                ]
-            }
-        };
-
-        let perfilAtual = null;
-        let indiceDoc = 0;
-        let docsCapturados = [];
-        let documentoAtual = null;
-        let cameraStream = null;
-        let dadosFormulario = null;
-        let etapaProprietario = 1;
-        let isentoIR = false; // Flag para rastrear se marcou 'Não declaro IR'
-
-        const $ = id => document.getElementById(id);
-
-        function mostrarLoading(texto) {
-            $("loading-text").innerText = texto || "Processando...";
-            $("loading-overlay").classList.add("active");
-        }
-
-        function esconderLoading() {
-            $("loading-overlay").classList.remove("active");
-        }
-
-        function mostrarTela(id) {
-            document.querySelectorAll(".screen").forEach(tela => {
-                tela.classList.remove("active");
-            });
-
-            $(id).classList.add("active");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        function voltarMain() {
-            pararCamera();
-            mostrarTela("screen-main");
-        }
-
-        function voltarFormulario() {
-            if (perfilAtual && perfilAtual.chave === "proprietario") {
-                if (etapaProprietario > 1) {
-                    voltarEtapaProprietario(etapaProprietario - 1);
-                } else {
-                    mostrarTela("screen-list");
-                }
-            } else {
-                mostrarTela("screen-list");
-            }
-        }
-
-        function selecionarPerfil(chave) {
-            perfilAtual = perfis[chave];
-            indiceDoc = 0;
-            docsCapturados = [];
-            documentoAtual = null;
-            dadosFormulario = null;
-            isentoIR = false;
-
-            $("list-title").textContent = "Documentos — " + perfilAtual.nome;
-            $("list-text").textContent = perfilAtual.texto;
-
-            const lista = $("list-items");
-            lista.innerHTML = "";
-
-            perfilAtual.docs.forEach(documento => {
-                const item = document.createElement("li");
-                item.textContent = documento;
-                lista.appendChild(item);
-            });
-
-            mostrarTela("screen-list");
-        }
-
-        function iniciarCaptura() {
-            indiceDoc = 0;
-            docsCapturados = [];
-            documentoAtual = null;
-            isentoIR = false;
-            mostrarTela("screen-capture");
-            carregarProximoDocumento();
-        }
-
-        function carregarProximoDocumento() {
-            if (indiceDoc >= perfilAtual.docs.length) {
-                concluirCaptura();
-                return;
-            }
-
-            const nomeDocAtual = perfilAtual.docs[indiceDoc];
-            $("doc-name").textContent = nomeDocAtual;
-            $("capture-progress").textContent =
-                "Documento " + (indiceDoc + 1) + " de " + perfilAtual.docs.length;
-
-            documentoAtual = null;
-            $("preview-img").src = "";
-            $("preview-img").style.display = "none";
-            $("preview-pdf-icon").style.display = "none";
-            $("placeholder-text").textContent =
-                "Use os botões abaixo para tirar uma foto ou anexar o documento.";
-            $("placeholder-text").style.display = "block";
-            $("capture-btns").style.display = "block";
-            $("confirm-btns").style.display = "none";
-            $("fileInputHidden").value = "";
-
-            // Exibir opção "Não declaro IR" somente no Recibo do IR
-            const btnNaoDeclara = $("btn-nao-declara-ir");
-            if (nomeDocAtual === "Recibo de entrega do Imposto de Renda") {
-                btnNaoDeclara.style.display = "block";
-            } else {
-                btnNaoDeclara.style.display = "none";
-            }
-        }
-
-        // Pula 'Recibo de entrega' e 'Declaração completa'
-        function pularImpostoDeRenda() {
-            isentoIR = true;
-            // Pula os dois documentos de IR (Recibo e Declaração)
-            indiceDoc += 2;
-            carregarProximoDocumento();
-        }
-
-        function concluirCaptura() {
-            if (perfilAtual.chave === "proprietario") {
-                abrirFormularioProprietario();
-            } else if (perfilAtual.chave === "comprador") {
-                mostrarTela("screen-form-comprador");
-            } else if (perfilAtual.chave === "inquilino") {
-                mostrarTela("screen-form-inquilino");
-            } else if (perfilAtual.chave === "corretor") {
-                mostrarTela("screen-form-corretor");
-            }
-        }
-
-        function cancelarCaptura() {
-            pararCamera();
-            mostrarTela("screen-list");
-        }
-
-        function abrirCamera() {
-            const modal = $("camera-modal");
-            const video = $("camera-video");
-
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" }
-                })
-                .then(stream => {
-                    cameraStream = stream;
-                    video.srcObject = stream;
-                    modal.classList.add("active");
-                })
-                .catch(err => {
-                    alert("Não foi possível acessar a câmera: " + err.message);
-                });
-            } else {
-                alert("Seu navegador não suporta acesso direto à câmera.");
-            }
-        }
-
-        function pararCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-        }
-
-        function fecharCamera() {
-            pararCamera();
-            $("camera-modal").classList.remove("active");
-        }
-
-        function tirarFoto() {
-            const video = $("camera-video");
-            const canvas = $("camera-canvas");
-
-            let w = video.videoWidth || 1280;
-            let h = video.videoHeight || 720;
-            const maxDim = 1280;
-            if (w > maxDim || h > maxDim) {
-                if (w > h) {
-                    h = Math.round((h * maxDim) / w);
-                    w = maxDim;
-                } else {
-                    w = Math.round((w * maxDim) / h);
-                    h = maxDim;
-                }
-            }
-
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, w, h);
-
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-            fecharCamera();
-
-            documentoAtual = {
-                tipo: perfilAtual.docs[indiceDoc],
-                nome: "foto_camera.jpg",
-                ext: "jpg",
-                isPdf: false,
-                previewUrl: dataUrl,
-                fileBase64: dataUrl
-            };
-
-            exibirPrevia(documentoAtual);
-        }
-
-        function abrirGaleria() {
-            $("fileInputHidden").click();
-        }
-
-        function lerArquivoComoDataUrl(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function gerarPreviaPdf(file) {
-            if (!window.pdfjsLib) return null;
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            const page = await pdf.getPage(1);
-            const viewport = page.getViewport({ scale: 1.0 });
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-            return canvas.toDataURL("image/jpeg", 0.75);
-        }
-
-        async function arquivoSelecionado(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            mostrarLoading("Carregando arquivo integral...");
-            try {
-                const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-                const fullDataUrl = await lerArquivoComoDataUrl(file);
-
-                let previewUrl = "";
-                let ext = file.name.split('.').pop().toLowerCase() || (isPdf ? "pdf" : "jpg");
-
-                if (isPdf) {
-                    try {
-                        previewUrl = await gerarPreviaPdf(file);
-                    } catch (e) {
-                        console.warn("Prévia PDF falhou:", e);
-                    }
-                } else {
-                    previewUrl = fullDataUrl;
-                }
-
-                documentoAtual = {
-                    tipo: perfilAtual.docs[indiceDoc],
-                    nome: file.name,
-                    ext: ext,
-                    isPdf: isPdf,
-                    previewUrl: previewUrl,
-                    fileBase64: fullDataUrl
-                };
-
-                exibirPrevia(documentoAtual);
-            } catch (err) {
-                console.error("Falha ao ler arquivo:", err);
-                alert("Erro ao ler o arquivo: " + err.message);
-            } finally {
-                esconderLoading();
-            }
-        }
-
-        function exibirPrevia(doc) {
-            if (doc.previewUrl) {
-                $("preview-img").src = doc.previewUrl;
-                $("preview-img").style.display = "block";
-                $("preview-pdf-icon").style.display = "none";
-            } else if (doc.isPdf) {
-                $("preview-img").style.display = "none";
-                $("preview-pdf-icon").style.display = "block";
-            }
-
-            $("placeholder-text").textContent = doc.nome + (doc.isPdf ? " (Documento PDF Completo)" : "");
-            $("placeholder-text").style.display = "block";
-            $("capture-btns").style.display = "none";
-            $("confirm-btns").style.display = "block";
-        }
-
-        function refazerDocumento() {
-            documentoAtual = null;
-            carregarProximoDocumento();
-        }
-
-        function confirmarDocumento() {
-            if (documentoAtual) {
-                docsCapturados.push(documentoAtual);
-            }
-            indiceDoc++;
-            carregarProximoDocumento();
-        }
-
-        function abrirFormularioProprietario() {
-            etapaProprietario = 1;
-
-            for (let i = 1; i <= 4; i++) {
-                $("proprietario-etapa-" + i).style.display = "none";
-            }
-
-            $("proprietario-etapa-1").style.display = "block";
-            atualizarProgressoProprietario();
-            mostrarTela("screen-form-proprietario");
-        }
-
-        function atualizarProgressoProprietario() {
-            $("proprietario-progress").textContent =
-                "Etapa " + etapaProprietario + " de 4";
-        }
-
-        function mudarFinalidade() {
-            const finalidade = document.querySelector('input[name="finalidade"]:checked');
-            if (!finalidade) return;
-
-            $("label-endereco-imovel").textContent =
-                finalidade.value === "locacao"
-                    ? "Endereço completo do imóvel a ser alugado *"
-                    : "Endereço completo do imóvel a ser vendido *";
-        }
-
-        function toggleFinanciamento() {
-            const financiado = document.querySelector('input[name="financiado"]:checked');
-            $("campo-banco-financiamento").style.display =
-                financiado && financiado.value === "sim" ? "block" : "none";
-        }
-
-        function togglePet() {
-            const pet = document.querySelector('input[name="inquilino-pet"]:checked');
-            $("campo-pet-detalhe").style.display =
-                pet && pet.value === "sim" ? "block" : "none";
-        }
-
-        function valor(id) {
-            const el = $(id);
-            return el ? el.value.trim() : "";
-        }
-
-        function validarCampos(ids) {
-            for (const id of ids) {
-                const campo = $(id);
-                if (!campo || !campo.value.trim()) {
-                    alert("Preencha todos os campos obrigatórios.");
-                    if (campo) campo.focus();
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        function proximaEtapaProprietario(novaEtapa) {
-            if (etapaProprietario === 1) {
-                const finalidade = document.querySelector('input[name="finalidade"]:checked');
-                if (!finalidade) {
-                    alert("Selecione se o imóvel é para locação ou venda.");
-                    return;
-                }
-            }
-
-            if (etapaProprietario === 2) {
-                const campos = [
-                    "f-nome", "f-nacionalidade", "f-estadoCivil", "f-profissao",
-                    "f-cpf", "f-endereco", "f-email", "f-telefone", "f-enderecoImovel"
-                ];
-                if (!validarCampos(campos)) return;
-
-                const finalidade = document.querySelector('input[name="finalidade"]:checked');
-                if (finalidade && finalidade.value === "locacao") {
-                    novaEtapa = 4;
-                }
-            }
-
-            if (etapaProprietario === 3) {
-                const campos = ["f-iptu", "f-matricula", "f-rgi"];
-                if (!validarCampos(campos)) return;
-
-                const financiado = document.querySelector('input[name="financiado"]:checked');
-                if (!financiado) {
-                    alert("Informe se o imóvel está financiado.");
-                    return;
-                }
-                const fgts = document.querySelector('input[name="fgts"]:checked');
-                if (!fgts) {
-                    alert("Informe se utilizou FGTS.");
-                    return;
-                }
-            }
-
-            for (let i = 1; i <= 4; i++) {
-                $("proprietario-etapa-" + i).style.display = "none";
-            }
-
-            $("proprietario-etapa-" + novaEtapa).style.display = "block";
-            etapaProprietario = novaEtapa;
-            atualizarProgressoProprietario();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        function voltarEtapaProprietario(etapaAnterior) {
-            const finalidade = document.querySelector('input[name="finalidade"]:checked');
-            if (etapaProprietario === 4 && finalidade && finalidade.value === "locacao") {
-                etapaAnterior = 2;
-            }
-
-            for (let i = 1; i <= 4; i++) {
-                $("proprietario-etapa-" + i).style.display = "none";
-            }
-
-            $("proprietario-etapa-" + etapaAnterior).style.display = "block";
-            etapaProprietario = etapaAnterior;
-            atualizarProgressoProprietario();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        function finalizarFormularioProprietario() {
-            const campos = ["f-banco", "f-agencia", "f-conta", "f-chavePix"];
-            if (!validarCampos(campos)) return;
-
-            const finalidade = document.querySelector('input[name="finalidade"]:checked');
-            const financiado = document.querySelector('input[name="financiado"]:checked');
-            const fgts = document.querySelector('input[name="fgts"]:checked');
-
-            dadosFormulario = {
-                "Finalidade": finalidade ? (finalidade.value === "locacao" ? "Locação" : "Venda") : "",
-                "Nome": valor("f-nome"),
-                "Nacionalidade": valor("f-nacionalidade"),
-                "Estado Civil": valor("f-estadoCivil"),
-                "Profissão": valor("f-profissao"),
-                "RG": valor("f-rg") || "Não informado",
-                "CPF": valor("f-cpf"),
-                "Endereço": valor("f-endereco"),
-                "E-mail": valor("f-email"),
-                "Telefone": valor("f-telefone"),
-                "Endereço do Imóvel": valor("f-enderecoImovel")
-            };
-
-            if (finalidade && finalidade.value === "venda") {
-                dadosFormulario["IPTU"] = valor("f-iptu");
-                dadosFormulario["Matrícula RGI"] = valor("f-matricula");
-                dadosFormulario["Cartório RGI"] = valor("f-rgi");
-                dadosFormulario["Financiado"] = financiado ? financiado.value : "";
-                if (financiado && financiado.value === "sim") {
-                    dadosFormulario["Banco do Financiamento"] = valor("f-bancoFinanciamento");
-                    dadosFormulario["Saldo Devedor"] = valor("f-saldoDevedor");
-                }
-                dadosFormulario["Usou FGTS"] = fgts ? fgts.value : "";
-            }
-
-            dadosFormulario["Banco"] = valor("f-banco");
-            dadosFormulario["Agência"] = valor("f-agencia");
-            dadosFormulario["Conta"] = valor("f-conta");
-            dadosFormulario["Chave PIX"] = valor("f-chavePix");
-
-            exibirRelatorio();
-        }
-
-        function finalizarFormularioComprador() {
-            const campos = [
-                "fc-nome", "fc-nacionalidade", "fc-estadoCivil", "fc-profissao",
-                "fc-cpf", "fc-endereco", "fc-email", "fc-telefone",
-                "fc-banco", "fc-agencia", "fc-conta", "fc-chavePix"
-            ];
-            if (!validarCampos(campos)) return;
-
-            dadosFormulario = {
-                "Nome": valor("fc-nome"),
-                "Nacionalidade": valor("fc-nacionalidade"),
-                "Estado Civil": valor("fc-estadoCivil"),
-                "Profissão": valor("fc-profissao"),
-                "RG": valor("fc-rg") || "Não informado",
-                "CPF": valor("fc-cpf"),
-                "Endereço": valor("fc-endereco"),
-                "E-mail": valor("fc-email"),
-                "Telefone": valor("fc-telefone"),
-                "Declaração de IR": isentoIR ? "Não declarante / Isento" : "Enviada",
-                "Banco": valor("fc-banco"),
-                "Agência": valor("fc-agencia"),
-                "Conta": valor("fc-conta"),
-                "Chave PIX": valor("fc-chavePix")
-            };
-
-            exibirRelatorio();
-        }
-
-        function finalizarFormularioInquilino() {
-            const campos = [
-                "fi-nome", "fi-nacionalidade", "fi-estadoCivil", "fi-profissao",
-                "fi-cpf", "fi-endereco", "fi-email", "fi-telefone", "fi-pessoas",
-                "fi-banco", "fi-agencia", "fi-conta", "fi-chavePix"
-            ];
-            if (!validarCampos(campos)) return;
-
-            const pet = document.querySelector('input[name="inquilino-pet"]:checked');
-            if (!pet) {
-                alert("Informe se possui animais de estimação.");
-                return;
-            }
-
-            dadosFormulario = {
-                "Nome": valor("fi-nome"),
-                "Nacionalidade": valor("fi-nacionalidade"),
-                "Estado Civil": valor("fi-estadoCivil"),
-                "Profissão": valor("fi-profissao"),
-                "RG": valor("fi-rg") || "Não informado",
-                "CPF": valor("fi-cpf"),
-                "Endereço": valor("fi-endereco"),
-                "E-mail": valor("fi-email"),
-                "Telefone": valor("fi-telefone"),
-                "Número de moradores adicionais": valor("fi-pessoas"),
-                "Possui Pet": pet.value === "sim" ? "Sim" : "Não",
-                "Declaração de IR": isentoIR ? "Não declarante / Isento" : "Enviada"
-            };
-
-            if (pet.value === "sim") {
-                dadosFormulario["Detalhes do Pet"] = valor("fi-petDetalhe");
-            }
-
-            dadosFormulario["Banco"] = valor("fi-banco");
-            dadosFormulario["Agência"] = valor("fi-agencia");
-            dadosFormulario["Conta"] = valor("fi-conta");
-            dadosFormulario["Chave PIX"] = valor("fi-chavePix");
-
-            exibirRelatorio();
-        }
-
-        function finalizarFormularioCorretor() {
-            const campos = ["fcr-nome", "fcr-cpf", "fcr-creci", "fcr-email", "fcr-telefone"];
-            if (!validarCampos(campos)) return;
-
-            dadosFormulario = {
-                "Nome": valor("fcr-nome"),
-                "CPF": valor("fcr-cpf"),
-                "CRECI": valor("fcr-creci"),
-                "E-mail": valor("fcr-email"),
-                "Telefone": valor("fcr-telefone")
-            };
-
-            exibirRelatorio();
-        }
-
-        function exibirRelatorio() {
-            $("report-perfil").textContent = perfilAtual.nome;
-            $("report-date").textContent = "Data: " + new Date().toLocaleString("pt-BR");
-
-            const statusEl = $("report-status");
-            statusEl.style.display = "none";
-
-            const containerDados = $("report-data");
-            containerDados.innerHTML = "";
-
-            if (dadosFormulario) {
-                const bloco = document.createElement("div");
-                bloco.className = "report-data-block";
-
-                let html = "<h3>Dados Cadastrais</h3>";
-                for (const [chave, val] of Object.entries(dadosFormulario)) {
-                    html += `
-                        <div class="report-data-row">
-                            <span class="label">${chave}:</span>
-                            <span class="value">${val}</span>
-                        </div>
-                    `;
-                }
-                bloco.innerHTML = html;
-                containerDados.appendChild(bloco);
-            }
-
-            const containerDocs = $("report-docs");
-            containerDocs.innerHTML = "";
-
-            docsCapturados.forEach((doc, idx) => {
-                const item = document.createElement("div");
-                item.className = "report-item";
-
-                const badgeText = doc.isPdf ? "PDF Integral" : "Imagem";
-                const imgHtml = doc.previewUrl 
-                    ? `<img src="${doc.previewUrl}" alt="${doc.tipo}">`
-                    : `<div class="report-item-icon">📄</div>`;
-
-                item.innerHTML = `
-                    ${imgHtml}
-                    <div class="report-item-info">
-                        <strong>${idx + 1}. ${doc.tipo}</strong>
-                        <small>${doc.nome || "documento"}</small>
-                        <span class="report-badge">${badgeText}</span>
-                    </div>
-                `;
-                containerDocs.appendChild(item);
-            });
-
-            if (isentoIR) {
-                const itemIsento = document.createElement("div");
-                itemIsento.className = "status-box status-info";
-                itemIsento.style.textAlign = "left";
-                itemIsento.style.fontSize = "12px";
-                itemIsento.innerHTML = "ℹ️ <strong>Imposto de Renda:</strong> O cliente declarou ser isento / não declarante de IR.";
-                containerDocs.appendChild(itemIsento);
-            }
-
-            mostrarTela("screen-report");
-
-            // Dispara o envio por e-mail com anexos integrais + relatório em PDF
-            enviarEmailNotificacao(false);
-        }
-
-        // Função utilitária para medir dimensões da imagem e desenhar proporcionalmente no PDF
-        function carregarDimensoesImagem(dataUrl) {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => resolve({ w: img.naturalWidth || img.width, h: img.naturalHeight || img.height });
-                img.onerror = () => resolve({ w: 0, h: 0 });
-                img.src = dataUrl;
-            });
-        }
-
-        // Constrói a instância do PDF com cabeçalho, dados e documentos proporcionais
-        async function criarDocumentoPDF() {
-            if (!window.jspdf) return null;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF("p", "mm", "a4");
-            let y = 20;
-
-            // Cabeçalho Página 1
-            doc.setFillColor(26, 26, 26);
-            doc.rect(0, 0, 210, 24, "F");
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(15);
-            doc.setFont("helvetica", "bold");
-            doc.text("M&IC CORRETORES DE IMÓVEIS", 105, 11, { align: "center" });
-
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text("Relatório Cadastral de Documentos", 105, 18, { align: "center" });
-
-            y = 35;
-            doc.setTextColor(26, 26, 26);
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "bold");
-            doc.text("Perfil: " + (perfilAtual ? perfilAtual.nome : ""), 15, y);
-            y += 6;
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(110, 110, 110);
-            doc.text("Emitido em: " + new Date().toLocaleString("pt-BR"), 15, y);
-            y += 10;
-
-            if (dadosFormulario) {
-                doc.setDrawColor(212, 175, 55);
-                doc.setLineWidth(0.6);
-                doc.line(15, y, 195, y);
-                y += 8;
-
-                doc.setFontSize(12);
-                doc.setTextColor(26, 26, 26);
-                doc.setFont("helvetica", "bold");
-                doc.text("Dados Cadastrais", 15, y);
-                y += 7;
-
-                doc.setFontSize(9);
-                doc.setFont("helvetica", "normal");
-
-                for (const [campo, val] of Object.entries(dadosFormulario)) {
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 20;
-                    }
-
-                    doc.setTextColor(110, 110, 110);
-                    doc.text(campo + ":", 15, y);
-                    doc.setTextColor(26, 26, 26);
-
-                    const linhas = doc.splitTextToSize(String(val), 125);
-                    doc.text(linhas, 65, y);
-                    y += (linhas.length * 4.2) + 2;
-                }
-            }
-
-            // Páginas dos Documentos
-            for (let i = 0; i < docsCapturados.length; i++) {
-                const docItem = docsCapturados[i];
-                doc.addPage();
-
-                doc.setFillColor(26, 26, 26);
-                doc.rect(0, 0, 210, 18, "F");
-                doc.setTextColor(212, 175, 55);
-                doc.setFontSize(11);
-                doc.setFont("helvetica", "bold");
-                doc.text(`${i + 1}. ${docItem.tipo}`, 15, 12);
-
-                if (docItem.previewUrl) {
-                    try {
-                        const dims = await carregarDimensoesImagem(docItem.previewUrl);
-                        const maxW = 160; 
-                        const maxH = 190;
-                        let finalW = maxW;
-                        let finalH = maxH;
-
-                        if (dims.w > 0 && dims.h > 0) {
-                            const ratio = dims.w / dims.h;
-                            if (ratio > (maxW / maxH)) {
-                                finalW = maxW;
-                                finalH = maxW / ratio;
-                            } else {
-                                finalH = maxH;
-                                finalW = maxH * ratio;
-                            }
-                        }
-
-                        const posX = (210 - finalW) / 2;
-                        const posY = 32 + ((maxH - finalH) / 2);
-
-                        doc.setDrawColor(220, 220, 220);
-                        doc.setLineWidth(0.4);
-                        doc.rect(posX - 1, posY - 1, finalW + 2, finalH + 2);
-
-                        doc.addImage(docItem.previewUrl, "JPEG", posX, posY, finalW, finalH, undefined, "FAST");
-
-                        doc.setFontSize(8);
-                        doc.setTextColor(140, 140, 140);
-                        doc.text(
-                            `${docItem.nome || "documento"} ${docItem.isPdf ? "(Arquivo PDF Original Anexado Integralmente)" : ""}`,
-                            105, 
-                            posY + finalH + 6, 
-                            { align: "center" }
-                        );
-                    } catch (imgErr) {
-                        console.error("Erro na imagem do PDF:", imgErr);
-                        doc.setTextColor(200, 0, 0);
-                        doc.text("Não foi possível renderizar a imagem do documento.", 15, 40);
-                    }
-                } else {
-                    doc.setTextColor(60, 60, 60);
-                    doc.setFontSize(11);
-                    doc.text("Arquivo anexado integralmente ao processo:", 15, 38);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(docItem.nome || "documento.pdf", 15, 46);
-                }
-            }
-
-            return doc;
-        }
-
-        async function enviarEmailNotificacao(manual = false) {
-            mostrarLoading("Preparando relatório e enviando e-mail...");
-            const statusEl = $("report-status");
-
-            try {
-                const nomeCliente = (typeof dadosFormulario !== 'undefined' && dadosFormulario) 
-                    ? (dadosFormulario["Nome"] || "Cliente") 
-                    : "Cliente";
-
-                // Anexos dos arquivos originais
-                const anexosEmail = docsCapturados.map((doc, index) => {
-                    const base64Puro = doc.fileBase64.includes("base64,")
-                        ? doc.fileBase64.split("base64,")[1]
-                        : doc.fileBase64;
-
-                    const ext = doc.ext || (doc.isPdf ? "pdf" : "jpg");
-                    const nomeNormalizado = (doc.tipo || "documento")
-                        .normalize("NFD")
-                        .replace(/[\u0300-\u036f]/g, "")
-                        .replace(/[^a-zA-Z0-9]/g, "_");
-
-                    return {
-                        filename: `${index + 1}_${nomeNormalizado}.${ext}`,
-                        content: base64Puro
-                    };
-                });
-
-                // Gerar o Relatório Final em PDF e incluí-lo como primeiro anexo
-                try {
-                    const pdfDoc = await criarDocumentoPDF();
-                    if (pdfDoc) {
-                        const pdfDataUri = pdfDoc.output("datauristring");
-                        const pdfBase64 = pdfDataUri.split("base64,")[1];
-                        
-                        const nomeRelatorio = `00_Relatorio_Final_${perfilAtual ? perfilAtual.chave : "cadastro"}.pdf`;
-                        anexosEmail.unshift({
-                            filename: nomeRelatorio,
-                            content: pdfBase64
-                        });
-                    }
-                } catch (pdfErr) {
-                    console.warn("Aviso: Falha ao gerar anexo do relatório PDF:", pdfErr);
-                }
-
-                let linhasTabela = "";
-                if (dadosFormulario) {
-                    for (let [k, v] of Object.entries(dadosFormulario)) {
-                        linhasTabela += `<tr><td style="padding: 8px 12px; border: 1px solid #ddd; background:#f9f9f9; font-weight:bold; width:35%;">${k}</td><td style="padding: 8px 12px; border: 1px solid #ddd;">${v}</td></tr>`;
-                    }
-                }
-
-                const avisoIsencaoEmail = isentoIR 
-                    ? `<p style="margin: 8px 0 0; color: #0c5460; font-size: 13px;"><strong>Nota IR:</strong> Cliente informou ser isento / não declarante de Imposto de Renda.</p>`
-                    : '';
-
-                const htmlEmail = `
-<div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333;">
-  <div style="background: #1a1a1a; padding: 20px; text-align: center; border-bottom: 4px solid #d4af37;">
-    <h2 style="color: #d4af37; margin: 0; text-transform: uppercase;">M&IC Corretores de Imóveis</h2>
-    <p style="color: #fff; margin: 5px 0 0; font-size: 13px;">Novo cadastro recebido - ${perfilAtual ? perfilAtual.nome : ""}</p>
-  </div>
-  <div style="padding: 20px; background: #fff;">
-    <p style="font-size: 15px;">Um novo cadastro foi finalizado pelo sistema web com sucesso.</p>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
-      ${linhasTabela}
-    </table>
-    <div style="margin-top: 25px; padding: 15px; background: #fdf8e2; border-left: 4px solid #d4af37;">
-      <strong style="color: #856404;">📎 Arquivos Anexados:</strong>
-      <p style="margin: 5px 0 0; font-size: 13px; color: #555;">
-        Em anexo constam o <strong>Relatório Final em PDF compilado</strong> e todos os <strong>${docsCapturados.length} arquivos integrais</strong> originais.
-      </p>
-      ${avisoIsencaoEmail}
-    </div>
-  </div>
-</div>`;
-
-                const response = await fetch("/api/send", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        to: ["chalfouncel@gmail.com"],
-                        subject: `Novo Cadastro: ${perfilAtual ? perfilAtual.nome : "Perfil"} - ${nomeCliente}`,
-                        html: htmlEmail,
-                        attachments: anexosEmail
-                    })
-                });
-
-                if (response.ok) {
-                    statusEl.className = "status-box status-success";
-                    statusEl.textContent = "✅ Dados, relatório em PDF e documentos originais enviados com sucesso por e-mail!";
-                    statusEl.style.display = "block";
-                    if (manual) alert("E-mail com relatório e anexos enviado com sucesso!");
-                } else {
-                    const err = await response.json().catch(() => ({}));
-                    console.warn("Erro no envio:", err);
-                    statusEl.className = "status-box status-warning";
-                    statusEl.textContent = "⚠️ Ocorreu uma instabilidade no envio automático. Use o botão 'Reenviar por E-mail'.";
-                    statusEl.style.display = "block";
-                    if (manual) alert("Falha ao enviar e-mail: " + (err.error || response.status));
-                }
-            } catch (e) {
-                console.error("Erro na requisição:", e);
-                statusEl.className = "status-box status-warning";
-                statusEl.textContent = "⚠️ Não foi possível conectar ao servidor de e-mail.";
-                statusEl.style.display = "block";
-                if (manual) alert("Erro ao conectar com a API de envio.");
-            } finally {
-                esconderLoading();
-            }
-        }
-
-        // Download manual do PDF quando solicitado pelo usuário
-        async function gerarPDF() {
-            mostrarLoading("Gerando arquivo PDF proporcional...");
-            try {
-                const doc = await criarDocumentoPDF();
-                if (doc) {
-                    doc.save("Cadastro_" + perfilAtual.chave + "_" + Date.now() + ".pdf");
-                }
-            } catch (err) {
-                console.error("Erro ao gerar PDF:", err);
-                alert("Erro ao gerar o PDF: " + err.message);
-            } finally {
-                esconderLoading();
-            }
-        }
-
-        function novoProcesso() {
-            mostrarTela("screen-main");
-        }
-
-        // Funções de máscara
-        function mascaraCPF(el) {
-            let v = el.value.replace(/\D/g, "");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            el.value = v.substring(0, 14);
-        }
-
-        function mascaraTelefone(el) {
-            let v = el.value.replace(/\D/g, "");
-            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
-            el.value = v.substring(0, 15);
-        }
-
-        function mascaraMoeda(el) {
-            let v = el.value.replace(/\D/g, "");
-            v = (v / 100).toFixed(2) + "";
-            v = v.replace(".", ",");
-            v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-            el.value = "R$ " + v;
-        }
-    </script>
+      </div>`; 
+
+    const response = await fetch("/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: ["chalfouncel@gmail.com"], 
+        subject: `Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}`, 
+        html: htmlEmail, 
+        attachments: anexos 
+      })
+    });
+
+    ele.style.display = "block";
+    if(response.ok){ 
+      ele.className = "status-box status-success"; 
+      ele.textContent = "✅ Enviado com sucesso!"; 
+    } else { 
+      ele.className = "status-box status-warning"; 
+      ele.textContent = "⚠️ Falha ao enviar por e-mail."; 
+    } 
+  } catch(e){ 
+    console.error(e); 
+    ele.style.display = "block";
+    ele.className = "status-box status-warning"; 
+    ele.textContent = "⚠️ Erro de conexão ao enviar."; 
+  } finally { 
+    esconderLoading(); 
+  } 
+}
+
+async function gerarPDF(){ 
+  mostrarLoading("Gerando relatório PDF proporcional..."); 
+  try { 
+    const doc = await criarDocumentoPDF(); 
+    if(doc){ 
+      doc.save("Cadastro_" + perfilAtual.chave + "_" + Date.now() + ".pdf"); 
+    } 
+  } catch(e){ 
+    alert("Erro ao gerar PDF: " + e.message); 
+  } finally { 
+    esconderLoading(); 
+  } 
+}
+
+function novoProcesso(){ 
+  mostrarTela("screen-main"); 
+}
+
+function mascaraCPF(el){ 
+  let v = el.value.replace(/\D/g,""); 
+  v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+  v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+  v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); 
+  el.value = v.substring(0,14);
+}
+
+function mascaraTelefone(el){ 
+  let v = el.value.replace(/\D/g,""); 
+  v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); 
+  v = v.replace(/(\d)(\d{4})$/, "$1-$2"); 
+  el.value = v.substring(0,15);
+}
+
+function mascaraMoeda(el){ 
+  let v = el.value.replace(/\D/g,""); 
+  v = (Number(v)/100).toFixed(2); 
+  let parts = v.split("."); 
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); 
+  el.value = "R$ " + parts.join(","); 
+}
+</script>
 </body>
 </html>
