@@ -15,10 +15,9 @@ export default async function handler(req, res) {
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-    // Se EMAIL_DESTINO não estiver configurada,
-    // utiliza este endereço como padrão.
+    // E-mail que receberá os documentos
     const EMAIL_DESTINO =
-      process.env.EMAIL_DESTINO || "chalfouncel@gmail.com";
+      process.env.EMAIL_DESTINO || "chalfouncorretor@gmail.com";
 
     if (!RESEND_API_KEY) {
       return res.status(500).json({
