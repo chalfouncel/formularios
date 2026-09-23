@@ -52,7 +52,6 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 .doc-progress { text-align:center; color:#888; font-size:13px; margin-bottom:8px; }
 .doc-name { background:#d4af37; color:#1a1a1a; padding:10px; border-radius:8px; text-align:center; font-weight:bold; font-size:14px; margin-bottom:12px; }
 
-/* Grid de Páginas / Miniaturas */
 .pages-summary { font-size:12px; font-weight:bold; color:#555; margin:10px 0 6px; }
 .pages-gallery { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
 .page-thumb-card { position:relative; width:70px; height:80px; border-radius:6px; border:1.5px solid #d4af37; overflow:hidden; background:#fafafa; display:flex; flex-direction:column; align-items:center; justify-content:center; }
@@ -90,7 +89,6 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 .status-warning { background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
 .status-info { background:#e2f0fb; color:#0c5460; border:1px solid #bee5eb; }
 
-/* Relatório de itens e páginas agrupadas */
 .report-item { padding:12px; border:1px solid #e8e8e8; background:#fafafa; margin-bottom:10px; border-radius:8px; }
 .report-item-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px; font-weight:bold; color:#1a1a1a; }
 .report-item-pages { display:flex; flex-wrap:wrap; gap:8px; }
@@ -133,9 +131,9 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 <div class="card">
 <div class="main-buttons">
 <button class="btn-profile" onclick="selecionarPerfil('proprietario')"><span class="icon">🏠</span><h3>Proprietário</h3><small>Venda / Locação</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('comprador')"><span class="icon"></span><h3>Comprador</h3><small>Aquisição</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('inquilino')"><span class="icon"></span><h3>Inquilino</h3><small>Locação</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('corretor')"><span class="icon"></span><h3>Corretor</h3><small>Profissional</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('comprador')"><span class="icon">🛒</span><h3>Comprador</h3><small>Aquisição</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('inquilino')"><span class="icon">🔑</span><h3>Inquilino</h3><small>Locação</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('corretor')"><span class="icon">🤝</span><h3>Corretor</h3><small>Profissional</small></button>
 </div>
 </div>
 </div>
@@ -170,7 +168,7 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 
 <div class="capture-area">
 <img id="preview-img" style="display:none;" alt="Pré-visualização"/>
-<div id="preview-pdf-icon" style="display:none; font-size:42px; margin-bottom:8px;">📄</div>
+<div id="preview-pdf-icon" style="display:none; font-size:42px; margin-bottom:8px;"></div>
 <p id="placeholder-text">Tire uma foto ou selecione o arquivo para adicionar uma página.</p>
 </div>
 
@@ -178,7 +176,7 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 <div id="capture-btns">
 <button class="btn btn-gold" id="btn-foto" onclick="abrirCamera()">📷 Tirar foto</button>
 <button class="btn btn-dark" id="btn-anexo" onclick="abrirGaleria()">📎 Anexar do arquivo</button>
-<button class="btn btn-neutral" id="btn-nao-declara-ir" style="display:none;" onclick="pularImpostoDeRenda()">🚫 Não declaro Imposto de Renda (Isento)</button>
+<button class="btn btn-neutral" id="btn-nao-declara-ir" style="display:none;" onclick="pularImpostoDeRenda()"> Não declaro Imposto de Renda (Isento)</button>
 </div>
 
 <!-- Botões de confirmação da página capturada -->
@@ -1139,7 +1137,7 @@ async function enviarEmailNotificacao(emReenvio){
     console.error(e); 
     ele.style.display = "block";
     ele.className = "status-box status-warning"; 
-    ele.textContent = "️ Erro de conexão ao enviar."; 
+    ele.textContent = "⚠️ Erro de conexão ao enviar."; 
   } finally { 
     esconderLoading(); 
   } 
