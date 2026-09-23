@@ -7,10 +7,11 @@
 <style>
 * { margin:0; padding:0; box-sizing: border-box; }
 body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; color:#333; }
-.header { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding:14px 15px; text-align:center; border-bottom:3px solid #d4af37; }
-.header img { max-width:110px; max-height:55px; object-fit:contain; margin:auto 0 6px; display:block; }
-.header h1 { color:#d4af37; font-size:17px; text-transform:uppercase; letter-spacing:1px; }
-.header p { color:#fff; font-size:11px; letter-spacing:2px; margin-top:3px; }
+.header { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding:14px 15px; display:flex; align-items:center; gap:14px; border-bottom:3px solid #d4af37; }
+.header img { max-width:60px; max-height:60px; object-fit:contain; flex-shrink:0; }
+.header-text { display:flex; flex-direction:column; justify-content:center; }
+.header h1 { color:#d4af37; font-size:17px; text-transform:uppercase; letter-spacing:1px; line-height:1.2; }
+.header p { color:#fff; font-size:11px; letter-spacing:2px; margin-top:2px; }
 
 .container { max-width:520px; margin:0 auto; padding:15px 12px; }
 
@@ -115,14 +116,16 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 .loading-spinner { width:46px; height:46px; border:4px solid #d4af37; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin-bottom:12px; }
 .loading-text { color:#fff; font-size:15px; }
 @keyframes spin { to { transform:rotate(360deg); } }
-@media(max-width:420px) { .main-buttons { grid-template-columns:1fr; } .report-data-row { flex-direction:column; gap:2px; } .report-data-row .value { text-align:left; } }
+@media(max-width:420px) { .main-buttons { grid-template-columns:1fr; } .report-data-row { flex-direction:column; gap:2px; } .report-data-row .value { text-align:left; } .header h1 { font-size:15px; } .header p { font-size:10px; } }
 </style>
 </head>
 <body>
 <div class="header">
 <img src="https://raw.githubusercontent.com/chalfouncel/formularios/main/Loga%20marca%20nova.png" alt="M&IC" onerror="this.style.display='none'"/>
+<div class="header-text">
 <h1>M&IC Corretores de Imóveis</h1>
 <p>CAPTURA DE DOCUMENTOS</p>
+</div>
 </div>
 <div class="container">
 <!-- Tela principal -->
@@ -130,9 +133,9 @@ body { font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:#
 <div class="card">
 <div class="main-buttons">
 <button class="btn-profile" onclick="selecionarPerfil('proprietario')"><span class="icon">🏠</span><h3>Proprietário</h3><small>Venda / Locação</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('comprador')"><span class="icon">🛒</span><h3>Comprador</h3><small>Aquisição</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('inquilino')"><span class="icon">🔑</span><h3>Inquilino</h3><small>Locação</small></button>
-<button class="btn-profile" onclick="selecionarPerfil('corretor')"><span class="icon">🤝</span><h3>Corretor</h3><small>Profissional</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('comprador')"><span class="icon"></span><h3>Comprador</h3><small>Aquisição</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('inquilino')"><span class="icon"></span><h3>Inquilino</h3><small>Locação</small></button>
+<button class="btn-profile" onclick="selecionarPerfil('corretor')"><span class="icon"></span><h3>Corretor</h3><small>Profissional</small></button>
 </div>
 </div>
 </div>
@@ -386,8 +389,8 @@ corretor: { chave:"corretor", nome:"Corretor", texto:"Pegue os seguintes documen
 let perfilAtual = null;
 let indiceDoc = 0;
 let docsCapturados = []; 
-let paginasDocAtual = []; // Array de páginas para o doc que está sendo capturado
-let paginaTemporaria = null; // A foto ou PDF que acabou de ser tirado/anexado
+let paginasDocAtual = [];
+let paginaTemporaria = null;
 let cameraStream = null;
 let dadosFormulario = null;
 let etapaProprietario = 1;
@@ -450,7 +453,6 @@ function carregarProximoDocumento(){
   resetarPreviewArea();
   atualizarGaleriaPaginas();
   
-  // Botão isenção de IR
   if(d === "Recibo de entrega do Imposto de Renda"){ 
     $("btn-nao-declara-ir").style.display = "block"; 
   } else { 
@@ -519,7 +521,7 @@ function removerPagina(idx){
 
 function pularImpostoDeRenda(){ 
   isentoIR = true; 
-  indiceDoc += 2; // Pula Recibo e Declaração
+  indiceDoc += 2;
   carregarProximoDocumento(); 
 }
 
@@ -540,7 +542,6 @@ function cancelarCaptura(){
   mostrarTela("screen-list"); 
 }
 
-// Câmera
 function abrirCamera(){ 
   const m = $("camera-modal"); 
   const v = $("camera-video"); 
@@ -693,7 +694,6 @@ function concluirDocumentoAtual(){
   carregarProximoDocumento(); 
 }
 
-// Formulários
 function abrirFormularioProprietario(){ 
   etapaProprietario = 1; 
   for(let i=1; i<=4; i++){ $("proprietario-etapa-"+i).style.display = "none"; } 
@@ -878,7 +878,6 @@ function finalizarFormularioCorretor(){
   exibirRelatorio(); 
 }
 
-// Exibição do Relatório
 function exibirRelatorio(){ 
   $("report-perfil").textContent = perfilAtual.nome; 
   $("report-date").textContent = "Data: " + new Date().toLocaleString("pt-BR"); 
@@ -948,14 +947,12 @@ function carregarDimensoesImagem(src){
   });
 }
 
-// Criação do Documento PDF unificado com todas as páginas
 async function criarDocumentoPDF(){ 
   if(!window.jspdf) return null; 
   const { jsPDF } = window.jspdf; 
   const doc = new jsPDF("p", "mm", "a4"); 
   let y = 20; 
 
-  // Capa / Dados Cadastrais
   doc.setFillColor(26, 26, 26); 
   doc.rect(0, 0, 210, 24, "F"); 
   doc.setTextColor(212, 175, 55); 
@@ -1003,7 +1000,6 @@ async function criarDocumentoPDF(){
     } 
   } 
 
-  // Itera por cada documento e por cada página anexada
   for(let i = 0; i < docsCapturados.length; i++){ 
     const d = docsCapturados[i]; 
     for(let p = 0; p < d.paginas.length; p++){
@@ -1061,7 +1057,6 @@ async function criarDocumentoPDF(){
   return doc; 
 }
 
-// Disparo de E-mail
 async function enviarEmailNotificacao(emReenvio){ 
   mostrarLoading("Enviando e-mail com relatório e anexos..."); 
   const ele = $("report-status"); 
@@ -1069,7 +1064,6 @@ async function enviarEmailNotificacao(emReenvio){
     const anexos = []; 
     let contAnexos = 0;
 
-    // Constrói anexos desmembrados
     docsCapturados.forEach((d, i) => { 
       const nomeDocNormalizado = (d.tipo || "documento")
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "_");
@@ -1085,7 +1079,6 @@ async function enviarEmailNotificacao(emReenvio){
       });
     }); 
 
-    // Relatório consolidado em PDF
     let relatorioPDF = null; 
     try { 
       relatorioPDF = await criarDocumentoPDF(); 
@@ -1146,7 +1139,7 @@ async function enviarEmailNotificacao(emReenvio){
     console.error(e); 
     ele.style.display = "block";
     ele.className = "status-box status-warning"; 
-    ele.textContent = "⚠️ Erro de conexão ao enviar."; 
+    ele.textContent = "️ Erro de conexão ao enviar."; 
   } finally { 
     esconderLoading(); 
   } 
