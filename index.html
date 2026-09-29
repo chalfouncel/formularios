@@ -947,7 +947,7 @@ function exibirRelatorio(){
     divIR.className = "status-box status-info"; 
     divIR.style.textAlign = "left"; 
     divIR.style.fontSize = "12px"; 
-    divIR.innerHTML = "ℹ️ <strong>Imposto de Renda:</strong> Cliente informou ser isento / não declarante de IR."; 
+    divIR.innerHTML = "ℹ️️ <strong>Imposto de Renda:</strong> Cliente informou ser isento / não declarante de IR."; 
     containerDocs.appendChild(divIR); 
   } 
   
@@ -1083,7 +1083,7 @@ async function enviarEmailNotificacao(emReenvio){
     const linksSupabase = [];
     const pastaProcesso = `${perfilAtual?.chave || "cliente"}_${Date.now()}`;
 
-    // 1. Upload dos documentos para o bucket documentos-clientes do sitemic
+    // 1. Upload dos documentos originais para o bucket do Supabase (sitemic)
     for(let i = 0; i < docsCapturados.length; i++){
       const d = docsCapturados[i];
       const nomeDocNormalizado = (d.tipo || "documento")
@@ -1121,7 +1121,7 @@ async function enviarEmailNotificacao(emReenvio){
       }
     }
 
-    // 2. Gerar relatório PDF para envio direto em anexo
+    // 2. Gerar APENAS o PDF consolidado em anexo (mantendo payload abaixo de 1 MB)
     let relatorioPDF = null; 
     try { 
       relatorioPDF = await criarDocumentoPDF(); 
@@ -1132,8 +1132,8 @@ async function enviarEmailNotificacao(emReenvio){
     if(relatorioPDF){ 
       const dataUri = relatorioPDF.output("datauristring"); 
       const base64 = dataUri.split("base64,")[1]; 
-      const nomeRelatorio = `00_Relatorio_Final_${perfilAtual?.chave || "cadastro"}.pdf`; 
-      anexos.unshift({ filename: nomeRelatorio, content: base64 }); 
+      const nomeRelatorio = `00_Relatorio_${perfilAtual?.chave || "cadastro"}_${Date.now()}.pdf`; 
+      anexos.push({ filename: nomeRelatorio, content: base64 }); 
     } 
 
     let linhasTabela = ""; 
@@ -1146,9 +1146,9 @@ async function enviarEmailNotificacao(emReenvio){
     let linksHtml = "";
     if(linksSupabase.length > 0){
       linksHtml = `<div style="margin-top:20px; padding:15px; background:#f4f9f4; border-left:4px solid #28a745; border-radius:6px;">
-        <strong style="color:#155724; font-size:14px;">📁 Documentos salvos no Storage:</strong>
-        <ul style="margin-top:8px; padding-left:20px; font-size:13px; line-height:1.7;">
-          ${linksSupabase.map(item => `<li><a href="${item.url}" target="_blank" style="color:#b08d16; font-weight:bold; text-decoration:none;">🔗 Abrir / Baixar: ${item.nome}</a></li>`).join("")}
+        <strong style="color:#155724; font-size:14px;">📁 Documentos originais salvos na nuvem:</strong>
+        <ul style="margin-top:8px; padding-left:20px; font-size:13px; line-height:1.8;">
+          ${linksSupabase.map(item => `<li><a href="${item.url}" target="_blank" style="color:#b08d16; font-weight:bold; text-decoration:underline;">🔗 Abrir / Descarregar: ${item.nome}</a></li>`).join("")}
         </ul>
       </div>`;
     }
@@ -1160,12 +1160,12 @@ async function enviarEmailNotificacao(emReenvio){
           <p style="color:#fff; margin:5px 0 0; font-size:13px;">Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}</p>
         </div>
         <div style="padding:20px; background:#fff;">
-          <p style="font-size:15px;">O cadastro foi finalizado no sistema web.</p>
+          <p style="font-size:15px;">O cadastro foi finalizado com sucesso.</p>
           <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">${linhasTabela}</table>
           ${linksHtml}
           <div style="margin-top:25px; padding:15px; background:#fdf8e2; border-left:4px solid #d4af37; border-radius:6px;">
             <strong style="color:#856404;">📎 Resumo dos arquivos:</strong>
-            <p style="margin:5px 0 0; font-size:13px; color:#555;">Foram capturadas <strong>${contAnexos} páginas/arquivos originais</strong> gravadas com segurança no Supabase Storage e consolidadas no PDF em anexo.</p>
+            <p style="margin:5px 0 0; font-size:13px; color:#555;">Foram salvas <strong>${contAnexos} páginas/documentos</strong> na nuvem. O relatório em PDF consolidado segue anexo a este e-mail.</p>
           </div>
         </div>
       </div>`; 
@@ -1174,7 +1174,6 @@ async function enviarEmailNotificacao(emReenvio){
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        to: ["chalfouncel@gmail.com"], 
         subject: `Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}`, 
         html: htmlEmail, 
         attachments: anexos 
@@ -1186,8 +1185,10 @@ async function enviarEmailNotificacao(emReenvio){
       ele.className = "status-box status-success"; 
       ele.textContent = "✅ Salvo no Supabase e e-mail enviado com sucesso!"; 
     } else { 
+      const errRes = await response.json().catch(() => ({}));
+      console.warn("Erro retornado pela API:", errRes);
       ele.className = "status-box status-warning"; 
-      ele.textContent = "⚠️ Salvo no Storage, mas houve falha ao enviar por e-mail."; 
+      ele.textContent = "⚠️ Salvo no Storage, mas houve falha no envio do e-mail."; 
     } 
   } catch(e){ 
     console.error(e); 
