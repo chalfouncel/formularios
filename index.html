@@ -947,7 +947,7 @@ function exibirRelatorio(){
     divIR.className = "status-box status-info"; 
     divIR.style.textAlign = "left"; 
     divIR.style.fontSize = "12px"; 
-    divIR.innerHTML = "ℹ️️ <strong>Imposto de Renda:</strong> Cliente informou ser isento / não declarante de IR."; 
+    divIR.innerHTML = "ℹ️ <strong>Imposto de Renda:</strong> Cliente informou ser isento / não declarante de IR."; 
     containerDocs.appendChild(divIR); 
   } 
   
@@ -1078,12 +1078,11 @@ async function enviarEmailNotificacao(emReenvio){
   mostrarLoading("Salvando no Supabase e enviando e-mail..."); 
   const ele = $("report-status"); 
   try { 
-    const anexos = []; 
     let contAnexos = 0;
     const linksSupabase = [];
     const pastaProcesso = `${perfilAtual?.chave || "cliente"}_${Date.now()}`;
 
-    // 1. Upload dos documentos originais para o bucket do Supabase (sitemic)
+    // 1. Upload dos documentos para o Supabase Storage (sitemic)
     for(let i = 0; i < docsCapturados.length; i++){
       const d = docsCapturados[i];
       const nomeDocNormalizado = (d.tipo || "documento")
@@ -1121,21 +1120,6 @@ async function enviarEmailNotificacao(emReenvio){
       }
     }
 
-    // 2. Gerar APENAS o PDF consolidado em anexo (mantendo payload abaixo de 1 MB)
-    let relatorioPDF = null; 
-    try { 
-      relatorioPDF = await criarDocumentoPDF(); 
-    } catch(e){ 
-      console.warn("Falha ao gerar relatório PDF:", e); 
-    } 
-
-    if(relatorioPDF){ 
-      const dataUri = relatorioPDF.output("datauristring"); 
-      const base64 = dataUri.split("base64,")[1]; 
-      const nomeRelatorio = `00_Relatorio_${perfilAtual?.chave || "cadastro"}_${Date.now()}.pdf`; 
-      anexos.push({ filename: nomeRelatorio, content: base64 }); 
-    } 
-
     let linhasTabela = ""; 
     if(dadosFormulario){ 
       for(const [k, v] of Object.entries(dadosFormulario)){ 
@@ -1160,23 +1144,24 @@ async function enviarEmailNotificacao(emReenvio){
           <p style="color:#fff; margin:5px 0 0; font-size:13px;">Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}</p>
         </div>
         <div style="padding:20px; background:#fff;">
-          <p style="font-size:15px;">O cadastro foi finalizado com sucesso.</p>
+          <p style="font-size:15px;">O cadastro foi finalizado com sucesso no sistema web.</p>
           <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:14px;">${linhasTabela}</table>
           ${linksHtml}
           <div style="margin-top:25px; padding:15px; background:#fdf8e2; border-left:4px solid #d4af37; border-radius:6px;">
             <strong style="color:#856404;">📎 Resumo dos arquivos:</strong>
-            <p style="margin:5px 0 0; font-size:13px; color:#555;">Foram salvas <strong>${contAnexos} páginas/documentos</strong> na nuvem. O relatório em PDF consolidado segue anexo a este e-mail.</p>
+            <p style="margin:5px 0 0; font-size:13px; color:#555;">Foram capturadas e guardadas com segurança <strong>${contAnexos} páginas/documentos</strong> no Supabase Storage.</p>
           </div>
         </div>
       </div>`; 
 
+    // Payload ultra-leve (sem ficheiros em Base64 anexados), elimina 100% o erro 413
     const response = await fetch("/api/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         subject: `Novo cadastro — ${perfilAtual ? perfilAtual.nome : ""}`, 
         html: htmlEmail, 
-        attachments: anexos 
+        attachments: [] 
       })
     });
 
