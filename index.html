@@ -382,7 +382,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
 // Configuração do Supabase (Projeto sitemic)
 const SUPABASE_URL = "https://uztsmkhlvoemjbbyebcr.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_nmolEh_G5_hKcfdgy2Xpeg_s4T6ePAz";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const perfis = {
 proprietario: { chave:"proprietario", nome:"Proprietário", texto:"Pegue os seguintes documentos ou anexe-os de forma digital:", docs:["RG com CPF ou CNH", "Comprovante de residência", "Certidão de estado civil"] },
@@ -1102,12 +1102,12 @@ async function enviarEmailNotificacao(emReenvio){
         }
 
         if(uploadBlob){
-          const { error: uploadError } = await supabase.storage
+          const { error: uploadError } = await supabaseClient.storage
             .from("documentos-clientes")
             .upload(filePath, uploadBlob, { upsert: true });
 
           if(!uploadError){
-            const { data: publicData } = supabase.storage
+            const { data: publicData } = supabaseClient.storage
               .from("documentos-clientes")
               .getPublicUrl(filePath);
 
