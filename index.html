@@ -346,6 +346,7 @@ async function criarDocumentoPDF(){
  if(p.previewUrl){try{const dims=await carregarDimensoesImagem(p.previewUrl),maxW=160,maxH=220;let fw=maxW,fh=maxH;if(dims.w&&dims.h){const r=dims.w/dims.h;if(r>maxW/maxH)fh=maxW/r;else fw=maxH*r}const x=(210-fw)/2,y0=28+(maxH-fh)/2;doc.addImage(p.previewUrl,"JPEG",x,y0,fw,fh,undefined,"FAST")}catch(e){doc.text("Não foi possível renderizar esta página.",15,40)}}else{doc.setTextColor(60,60,60);doc.text("Arquivo original anexado: "+(p.nome||"documento"),15,40)}}
  return doc
 }
+
 async function enviarEmailNotificacao(emReenvio){
  mostrarLoading("Salvando no Supabase e enviando e-mail...");const ele=$("report-status");
  try{
@@ -358,7 +359,7 @@ async function enviarEmailNotificacao(emReenvio){
     const {error}=await supabaseClient.storage.from("documentos-clientes").upload(path,blob,{upsert:true,contentType:blob.type||"application/octet-stream"});
     if(error){console.warn("Falha no upload:",error);falhasUpload++;continue}
     const {data}=supabaseClient.storage.from("documentos-clientes").getPublicUrl(path);
-    if(data?.publicUrl)linksSupabase.push({nome:`${d.tipo} - Página ${j+1}`,url:data.publicUrl});
+    if(data?.publicUrl)linksSupabase.push({nome:`${d.tipo} - Pág. ${j+1}`,url:data.publicUrl});
     contAnexos++
    }
   }
@@ -371,10 +372,13 @@ async function enviarEmailNotificacao(emReenvio){
     else{const {data}=supabaseClient.storage.from("documentos-clientes").getPublicUrl(zipPath);zipUrl=data?.publicUrl||""}
    }catch(e){console.warn("Falha ao criar/enviar ZIP:",e);falhasUpload++}
   }
-  const linhasTabela=dadosFormulario?Object.entries(dadosFormulario).map(([k,v])=>`<tr><td style="padding:8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:35%">${escaparHtml(k)}</td><td style="padding:8px;border:1px solid #ddd">${escaparHtml(v)}</td></tr>`).join(""):"";
-  const linksHtml=linksSupabase.length?`<div style="margin-top:20px;padding:15px;background:#f4f9f4;border-left:4px solid #28a745;border-radius:6px"><strong style="color:#155724">📁 Documentos originais salvos na nuvem:</strong><ul style="margin-top:8px;padding-left:20px;line-height:1.8">${linksSupabase.map(x=>`<li><a href="${x.url}" target="_blank">🔗 Abrir / baixar: ${escaparHtml(x.nome)}</a></li>`).join("")}</ul></div>`:"";
-  const botaoZip=zipUrl?`<div style="margin:20px 0;text-align:center"><a href="${zipUrl}" target="_blank" style="display:inline-block;background:#28a745;color:#fff;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold">⬇️ Baixar todos os documentos (.ZIP)</a></div>`:"";
-  const htmlEmail=`<div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;color:#333"><div style="background:#1a1a1a;padding:20px;text-align:center;border-bottom:4px solid #d4af37"><h2 style="color:#d4af37;margin:0">M&IC Corretores de Imóveis</h2><p style="color:#fff">Novo cadastro — ${escaparHtml(perfilAtual.nome)}</p></div><div style="padding:20px"><p>O cadastro foi finalizado com sucesso no sistema web.</p><table style="width:100%;border-collapse:collapse;margin-top:15px">${linhasTabela}</table>${botaoZip}${linksHtml}<div style="margin-top:25px;padding:15px;background:#fdf8e2;border-left:4px solid #d4af37"><strong>📎 Resumo dos arquivos:</strong><p>Foram salvos ${contAnexos} arquivos/páginas no Supabase Storage.</p></div></div></div>`;
+  
+  // HTML DO E-MAIL OTIMIZADO PARA CABER EM UMA PÁGINA:
+  const linhasTabela = dadosFormulario ? Object.entries(dadosFormulario).map(([k, v]) => `<tr><td style="padding:5px 8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:35%;font-size:13px;">${escaparHtml(k)}</td><td style="padding:5px 8px;border:1px solid #ddd;font-size:13px;">${escaparHtml(v)}</td></tr>`).join("") : "";
+  const linksHtml = linksSupabase.length ? `<div style="margin-top:15px;padding:10px;background:#f4f9f4;border-left:4px solid #28a745;border-radius:4px;"><strong style="color:#155724;font-size:13px;display:block;margin-bottom:8px;">📁 Documentos originais salvos (${contAnexos} arquivos):</strong><div style="font-size:12px;">${linksSupabase.map(x => `<a href="${x.url}" target="_blank" style="display:inline-block;background:#fff;border:1px solid #c3e6cb;padding:4px 8px;border-radius:4px;margin:0 6px 6px 0;color:#0056b3;text-decoration:none;">📎 ${escaparHtml(x.nome)}</a>`).join("")}</div></div>` : "";
+  const botaoZip = zipUrl ? `<div style="margin:15px 0;text-align:center"><a href="${zipUrl}" target="_blank" style="display:inline-block;background:#28a745;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:13px;">⬇️ Baixar todos os documentos (.ZIP)</a></div>` : "";
+  const htmlEmail = `<div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;color:#333"><div style="background:#1a1a1a;padding:12px;text-align:center;border-bottom:4px solid #d4af37"><h2 style="color:#d4af37;margin:0;font-size:18px;">M&IC Corretores de Imóveis</h2><p style="color:#fff;font-size:12px;margin:4px 0 0 0;">Novo cadastro — ${escaparHtml(perfilAtual.nome)}</p></div><div style="padding:12px"><p style="font-size:13px;margin:0 0 10px 0;">O cadastro foi finalizado com sucesso no sistema web.</p><table style="width:100%;border-collapse:collapse;">${linhasTabela}</table>${botaoZip}${linksHtml}</div></div>`;
+  
   const response=await fetch("/api/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subject:`Novo cadastro — ${perfilAtual.nome}`,html:htmlEmail,attachments:[]})});
   ele.style.display="block";
   if(response.ok){ele.className="status-box status-success";ele.textContent=falhasUpload?"✅ E-mail enviado. Atenção: alguns arquivos não puderam ser enviados ao Storage.":"✅ Arquivos salvos e e-mail enviado com sucesso!"}
@@ -382,7 +386,7 @@ async function enviarEmailNotificacao(emReenvio){
  }catch(e){console.error(e);ele.style.display="block";ele.className="status-box status-warning";ele.textContent="⚠️ Erro de conexão durante o processo."}
  finally{esconderLoading()}
 }
-async function gerarPDF(){mostrarLoading("Gerando relatório PDF...");try{const doc=await criarDocumentoPDF();if(doc)doc.save(`Cadastro_${perfilAtual.chave}_${Date.now()}.pdf`)}catch(e){alert("Erro ao gerar PDF: "+e.message)}finally{esconderLoading()}}
+
 function novoProcesso(){mostrarTela("screen-main")}
 function mascaraCPF(el){let v=el.value.replace(/\D/g,"");v=v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");el.value=v.substring(0,14)}
 function mascaraTelefone(el){let v=el.value.replace(/\D/g,"");v=v.replace(/^(\d{2})(\d)/,"($1) $2").replace(/(\d)(\d{4})$/,"$1-$2");el.value=v.substring(0,15)}
