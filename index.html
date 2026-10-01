@@ -394,6 +394,8 @@ async function enviarEmailNotificacao(emReenvio){
   const linksHtml = linksSupabase.length ? `<div style="background:#f4f9f4;border:1px solid #c3e6cb;border-radius:6px;padding:12px;"><strong style="color:#155724;font-size:13px;display:block;margin-bottom:10px;">📁 Arquivos Salvos (${contAnexos}):</strong><div style="font-size:12px;line-height:1.6;">${linksSupabase.map(x => `<a href="${x.url}" target="_blank" style="color:#0056b3;text-decoration:none;display:block;margin-bottom:6px;border-bottom:1px dashed #ddd;padding-bottom:4px;">🔗 ${escaparHtml(x.nome)}</a>`).join("")}</div></div>` : "";
   const botaoZip = zipUrl ? `<div style="margin-bottom:15px;"><a href="${zipUrl}" target="_blank" style="display:block;background:#28a745;color:#fff;padding:25px 15px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;text-align:center;">⬇️ Baixar Tudo (.ZIP)<br><span style="font-size:12px;font-weight:normal;opacity:0.9;display:block;margin-top:4px;">(Contém todos os ${contAnexos} anexos)</span></a></div>` : "";
   
+  const nomeCliente = dadosFormulario && dadosFormulario["Nome"] ? dadosFormulario["Nome"] : "Cliente";
+  
   const htmlEmail = `
   <div style="font-family:Arial,sans-serif;max-width:850px;margin:0 auto;color:#333;border:1px solid #eee;">
     <div style="background:#1a1a1a;padding:15px;text-align:center;border-bottom:4px solid #d4af37">
@@ -416,12 +418,12 @@ async function enviarEmailNotificacao(emReenvio){
     </div>
   </div>`;
   
-  // 5. ENVIA A REQUISIÇÃO (COM OS ANEXOS)
+  // 5. ENVIA A REQUISIÇÃO (COM OS ANEXOS E ASSUNTO DINÂMICO)
   const response=await fetch("/api/send",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      subject:`Novo cadastro — ${perfilAtual.nome}`,
+      subject:`Novo cadastro — ${perfilAtual.nome} — ${nomeCliente}`,
       html:htmlEmail,
       attachments: anexosEmail
     })
