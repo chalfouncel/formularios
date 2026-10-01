@@ -319,13 +319,31 @@ function exibirRelatorio(){
 }
 function obterBlob(p){if(p.fileBlob)return p.fileBlob;if(p.fileBase64)return dataUrlToBlob(p.fileBase64);return null}
 function nomeSeguro(s){return String(s||"arquivo").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9._-]/g,"_")}
+
 async function criarZipArquivos(){
  if(!window.JSZip)throw new Error("Não foi possível carregar o recurso para criar o ZIP.");
  const zip=new JSZip();let total=0;
+ 
+ // 1. Adiciona as fotos/páginas dos documentos
  docsCapturados.forEach((d,i)=>d.paginas.forEach((p,j)=>{const blob=obterBlob(p);if(blob){const ext=nomeSeguro(p.ext||((p.isPdf)?"pdf":"jpg"));const arquivo=`${String(i+1).padStart(2,"0")}_${nomeSeguro(d.tipo)}_pag${j+1}.${ext}`;zip.file(arquivo,blob);total++}}));
+ 
+ // 2. Adiciona a Ficha PDF Cadastral dentro do ZIP
+ try {
+   const fichaPdf = await criarDocumentoPDF();
+   if (fichaPdf) {
+     const nomeCliente = dadosFormulario && dadosFormulario["Nome"] ? dadosFormulario["Nome"] : perfilAtual.nome;
+     const nomeFicha = `Ficha_Cadastro_${nomeSeguro(nomeCliente)}.pdf`;
+     zip.file(nomeFicha, fichaPdf.output("blob"));
+     total++;
+   }
+ } catch (e) {
+   console.warn("Erro ao gerar PDF para o ZIP", e);
+ }
+
  if(!total)throw new Error("Não há arquivos para baixar.");
  return zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:5}})
 }
+
 async function baixarTudo(){
  mostrarLoading("Preparando o ZIP com todos os documentos...");
  try{const blob=await criarZipArquivos(),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`Documentos_${nomeSeguro(perfilAtual.chave)}_${Date.now()}.zip`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000)}
@@ -363,7 +381,7 @@ async function enviarEmailNotificacao(emReenvio){
    }
   }
   
-  // 2. GERA O ARQUIVO ZIP
+  // 2. GERA O ARQUIVO ZIP (Que agora inclui a ficha PDF)
   let zipUrl="";
   if(contAnexos){
    try{
@@ -374,25 +392,10 @@ async function enviarEmailNotificacao(emReenvio){
    }catch(e){console.warn("Falha ao criar/enviar ZIP:",e);falhasUpload++}
   }
   
-  // 3. GERA O PDF E CONVERTE PARA BASE64 PARA ANEXAR DIRETAMENTE NO EMAIL
-  let anexosEmail = [];
-  try {
-    const pdfDoc = await criarDocumentoPDF();
-    if (pdfDoc) {
-      const base64Str = pdfDoc.output('datauristring').split('base64,')[1];
-      anexosEmail.push({
-        filename: `Ficha_Cadastro_${nomeSeguro(perfilAtual.nome)}.pdf`,
-        content: base64Str
-      });
-    }
-  } catch(err) {
-    console.warn("Aviso: Não foi possível anexar o PDF automaticamente.", err);
-  }
-
-  // 4. HTML DO E-MAIL EM DUAS COLUNAS
+  // 3. HTML DO E-MAIL EM DUAS COLUNAS
   const linhasTabela = dadosFormulario ? Object.entries(dadosFormulario).map(([k, v]) => `<tr><td style="padding:6px 8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:40%;font-size:12px;">${escaparHtml(k)}</td><td style="padding:6px 8px;border:1px solid #ddd;font-size:12px;">${escaparHtml(v)}</td></tr>`).join("") : "";
   const linksHtml = linksSupabase.length ? `<div style="background:#f4f9f4;border:1px solid #c3e6cb;border-radius:6px;padding:12px;"><strong style="color:#155724;font-size:13px;display:block;margin-bottom:10px;">📁 Arquivos Salvos (${contAnexos}):</strong><div style="font-size:12px;line-height:1.6;">${linksSupabase.map(x => `<a href="${x.url}" target="_blank" style="color:#0056b3;text-decoration:none;display:block;margin-bottom:6px;border-bottom:1px dashed #ddd;padding-bottom:4px;">🔗 ${escaparHtml(x.nome)}</a>`).join("")}</div></div>` : "";
-  const botaoZip = zipUrl ? `<div style="margin-bottom:15px;"><a href="${zipUrl}" target="_blank" style="display:block;background:#28a745;color:#fff;padding:25px 15px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;text-align:center;">⬇️ Baixar Tudo (.ZIP)<br><span style="font-size:12px;font-weight:normal;opacity:0.9;display:block;margin-top:4px;">(Contém todos os ${contAnexos} anexos)</span></a></div>` : "";
+  const botaoZip = zipUrl ? `<div style="margin-bottom:15px;"><a href="${zipUrl}" target="_blank" style="display:block;background:#28a745;color:#fff;padding:25px 15px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;text-align:center;">⬇️ Baixar Tudo (.ZIP)<br><span style="font-size:12px;font-weight:normal;opacity:0.9;display:block;margin-top:4px;">(Contém a ficha PDF e os ${contAnexos} anexos originais)</span></a></div>` : "";
   
   const nomeCliente = dadosFormulario && dadosFormulario["Nome"] ? dadosFormulario["Nome"] : "Cliente";
   
@@ -403,7 +406,7 @@ async function enviarEmailNotificacao(emReenvio){
       <p style="color:#fff;font-size:12px;margin:4px 0 0 0;">Novo cadastro — ${escaparHtml(perfilAtual.nome)}</p>
     </div>
     <div style="padding:20px">
-      <p style="font-size:13px;margin:0 0 15px 0;">O cadastro foi finalizado com sucesso no sistema web. A ficha em PDF contendo as imagens foi <strong>anexada a este e-mail</strong>.</p>
+      <p style="font-size:13px;margin:0 0 15px 0;">O cadastro foi finalizado com sucesso no sistema web. A ficha cadastral em PDF e os documentos originais <strong>estão disponíveis para download no arquivo ZIP ao lado.</strong></p>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td width="60%" valign="top" style="padding-right:20px;">
@@ -418,14 +421,14 @@ async function enviarEmailNotificacao(emReenvio){
     </div>
   </div>`;
   
-  // 5. ENVIA A REQUISIÇÃO (COM OS ANEXOS E ASSUNTO DINÂMICO)
+  // 4. ENVIA A REQUISIÇÃO (Sem anexos e com o assunto dinâmico)
   const response=await fetch("/api/send",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       subject:`Novo cadastro — ${perfilAtual.nome} — ${nomeCliente}`,
       html:htmlEmail,
-      attachments: anexosEmail
+      attachments: [] // Deixado vazio de propósito para não enviar a ficha como anexo do e-mail
     })
   });
   
