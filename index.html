@@ -183,11 +183,8 @@ body{font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:#f5f5f5;
 <script>
 if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 const SUPABASE_URL="https://uztsmkhlvoemjbbyebcr.supabase.co";
-
-// CHAVE ATUALIZADA: Nova chave public/publishable
 const SUPABASE_ANON_KEY="sb_publishable_nmolEh_G5_hKcfdgy2Xpeg_s4T6ePAz";
 
-// GAMBIARRA NECESSÁRIA PARA O SDK V2 ACEITAR A NOVA CHAVE:
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   global: {
     headers: {
@@ -351,6 +348,8 @@ async function enviarEmailNotificacao(emReenvio){
  mostrarLoading("Salvando no Supabase e enviando e-mail...");const ele=$("report-status");
  try{
   let contAnexos=0,linksSupabase=[],falhasUpload=0;
+  
+  // 1. OBTÉM OS ARQUIVOS E SALVA NO SUPABASE
   for(let i=0;i<docsCapturados.length;i++){
    const d=docsCapturados[i],docSeguro=nomeSeguro(d.tipo);
    for(let j=0;j<d.paginas.length;j++){
@@ -363,6 +362,8 @@ async function enviarEmailNotificacao(emReenvio){
     contAnexos++
    }
   }
+  
+  // 2. GERA O ARQUIVO ZIP
   let zipUrl="";
   if(contAnexos){
    try{
@@ -373,13 +374,59 @@ async function enviarEmailNotificacao(emReenvio){
    }catch(e){console.warn("Falha ao criar/enviar ZIP:",e);falhasUpload++}
   }
   
-  // HTML DO E-MAIL OTIMIZADO PARA CABER EM UMA PÁGINA:
-  const linhasTabela = dadosFormulario ? Object.entries(dadosFormulario).map(([k, v]) => `<tr><td style="padding:5px 8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:35%;font-size:13px;">${escaparHtml(k)}</td><td style="padding:5px 8px;border:1px solid #ddd;font-size:13px;">${escaparHtml(v)}</td></tr>`).join("") : "";
-  const linksHtml = linksSupabase.length ? `<div style="margin-top:15px;padding:10px;background:#f4f9f4;border-left:4px solid #28a745;border-radius:4px;"><strong style="color:#155724;font-size:13px;display:block;margin-bottom:8px;">📁 Documentos originais salvos (${contAnexos} arquivos):</strong><div style="font-size:12px;">${linksSupabase.map(x => `<a href="${x.url}" target="_blank" style="display:inline-block;background:#fff;border:1px solid #c3e6cb;padding:4px 8px;border-radius:4px;margin:0 6px 6px 0;color:#0056b3;text-decoration:none;">📎 ${escaparHtml(x.nome)}</a>`).join("")}</div></div>` : "";
-  const botaoZip = zipUrl ? `<div style="margin:15px 0;text-align:center"><a href="${zipUrl}" target="_blank" style="display:inline-block;background:#28a745;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:13px;">⬇️ Baixar todos os documentos (.ZIP)</a></div>` : "";
-  const htmlEmail = `<div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;color:#333"><div style="background:#1a1a1a;padding:12px;text-align:center;border-bottom:4px solid #d4af37"><h2 style="color:#d4af37;margin:0;font-size:18px;">M&IC Corretores de Imóveis</h2><p style="color:#fff;font-size:12px;margin:4px 0 0 0;">Novo cadastro — ${escaparHtml(perfilAtual.nome)}</p></div><div style="padding:12px"><p style="font-size:13px;margin:0 0 10px 0;">O cadastro foi finalizado com sucesso no sistema web.</p><table style="width:100%;border-collapse:collapse;">${linhasTabela}</table>${botaoZip}${linksHtml}</div></div>`;
+  // 3. GERA O PDF E CONVERTE PARA BASE64 PARA ANEXAR DIRETAMENTE NO EMAIL
+  let anexosEmail = [];
+  try {
+    const pdfDoc = await criarDocumentoPDF();
+    if (pdfDoc) {
+      const base64Str = pdfDoc.output('datauristring').split('base64,')[1];
+      anexosEmail.push({
+        filename: `Ficha_Cadastro_${nomeSeguro(perfilAtual.nome)}.pdf`,
+        content: base64Str
+      });
+    }
+  } catch(err) {
+    console.warn("Aviso: Não foi possível anexar o PDF automaticamente.", err);
+  }
+
+  // 4. HTML DO E-MAIL EM DUAS COLUNAS
+  const linhasTabela = dadosFormulario ? Object.entries(dadosFormulario).map(([k, v]) => `<tr><td style="padding:6px 8px;border:1px solid #ddd;background:#f9f9f9;font-weight:bold;width:40%;font-size:12px;">${escaparHtml(k)}</td><td style="padding:6px 8px;border:1px solid #ddd;font-size:12px;">${escaparHtml(v)}</td></tr>`).join("") : "";
+  const linksHtml = linksSupabase.length ? `<div style="background:#f4f9f4;border:1px solid #c3e6cb;border-radius:6px;padding:12px;"><strong style="color:#155724;font-size:13px;display:block;margin-bottom:10px;">📁 Arquivos Salvos (${contAnexos}):</strong><div style="font-size:12px;line-height:1.6;">${linksSupabase.map(x => `<a href="${x.url}" target="_blank" style="color:#0056b3;text-decoration:none;display:block;margin-bottom:6px;border-bottom:1px dashed #ddd;padding-bottom:4px;">🔗 ${escaparHtml(x.nome)}</a>`).join("")}</div></div>` : "";
+  const botaoZip = zipUrl ? `<div style="margin-bottom:15px;"><a href="${zipUrl}" target="_blank" style="display:block;background:#28a745;color:#fff;padding:25px 15px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;text-align:center;">⬇️ Baixar Tudo (.ZIP)<br><span style="font-size:12px;font-weight:normal;opacity:0.9;display:block;margin-top:4px;">(Contém todos os ${contAnexos} anexos)</span></a></div>` : "";
   
-  const response=await fetch("/api/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({subject:`Novo cadastro — ${perfilAtual.nome}`,html:htmlEmail,attachments:[]})});
+  const htmlEmail = `
+  <div style="font-family:Arial,sans-serif;max-width:850px;margin:0 auto;color:#333;border:1px solid #eee;">
+    <div style="background:#1a1a1a;padding:15px;text-align:center;border-bottom:4px solid #d4af37">
+      <h2 style="color:#d4af37;margin:0;font-size:18px;">M&IC Corretores de Imóveis</h2>
+      <p style="color:#fff;font-size:12px;margin:4px 0 0 0;">Novo cadastro — ${escaparHtml(perfilAtual.nome)}</p>
+    </div>
+    <div style="padding:20px">
+      <p style="font-size:13px;margin:0 0 15px 0;">O cadastro foi finalizado com sucesso no sistema web. A ficha em PDF contendo as imagens foi <strong>anexada a este e-mail</strong>.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="60%" valign="top" style="padding-right:20px;">
+            <table style="width:100%;border-collapse:collapse;">${linhasTabela}</table>
+          </td>
+          <td width="40%" valign="top">
+            ${botaoZip}
+            ${linksHtml}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>`;
+  
+  // 5. ENVIA A REQUISIÇÃO (COM OS ANEXOS)
+  const response=await fetch("/api/send",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      subject:`Novo cadastro — ${perfilAtual.nome}`,
+      html:htmlEmail,
+      attachments: anexosEmail
+    })
+  });
+  
   ele.style.display="block";
   if(response.ok){ele.className="status-box status-success";ele.textContent=falhasUpload?"✅ E-mail enviado. Atenção: alguns arquivos não puderam ser enviados ao Storage.":"✅ Arquivos salvos e e-mail enviado com sucesso!"}
   else{const err=await response.json().catch(()=>({}));console.warn("Erro da API:",err);ele.className="status-box status-warning";ele.textContent="⚠️ Os arquivos foram processados, mas houve falha no envio do e-mail."}
